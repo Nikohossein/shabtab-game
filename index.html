@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>شب‌تاب</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0A0E1F;
+    --bg-1:#131A33;
+    --bg-2:#1B2447;
+    --mint:#7CFFCB;
+    --mint-dim:#3FA98A;
+    --gold:#FFC55C;
+    --gold-dim:#B98A34;
+    --pink:#FF8FB1;
+    --ink:#EAF0FF;
+    --muted:#8892B0;
+    --line:rgba(124,255,203,0.14);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(124,255,203,0.08), transparent 60%),
+      radial-gradient(ellipse 80% 60% at 20% 100%, rgba(255,143,177,0.05), transparent 60%),
+      var(--bg-0);
+    color:var(--ink);
+    font-family:'Vazirmatn', sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+    user-select:none;
+  }
+  .wrap{ max-width:560px; margin:0 auto; padding:22px 16px 90px; position:relative; z-index:1; }
+
+  header{ text-align:center; margin-bottom:4px; }
+  .eyebrow{ font-size:12px; letter-spacing:.12em; color:var(--mint); opacity:.85; margin-bottom:6px; }
+  h1{
+    font-size:clamp(28px,7vw,36px); font-weight:800; margin:0 0 4px;
+    background:linear-gradient(90deg, var(--mint), #B9FFE4 60%, var(--mint));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .sub{ color:var(--muted); font-size:13.5px; margin:0; line-height:1.85; }
+
+  /* Top stat bar */
+  .stat-bar{
+    display:flex; justify-content:space-between; align-items:center;
+    margin:16px 0 10px; padding:10px 14px; border-radius:14px;
+    background:var(--bg-1); border:1px solid var(--line); font-size:13px;
+  }
+  .stat-bar .item{ text-align:center; }
+  .stat-bar .num{ font-weight:800; font-size:17px; font-variant-numeric:tabular-nums; }
+  .stat-bar .lbl{ color:var(--muted); font-size:11px; }
+
+  /* Game field */
+  #field{
+    position:relative; width:100%; height:min(58vh,420px);
+    border-radius:20px; overflow:hidden; margin-top:6px;
+    background:linear-gradient(180deg, var(--bg-1), var(--bg-2));
+    border:1px solid var(--line);
+    touch-action:none;
+  }
+  .firefly{
+    position:absolute; width:44px; height:44px; border-radius:50%;
+    transform:translate(-50%,-50%);
+    background:radial-gradient(circle, #E9FFF4 0%, var(--mint) 45%, transparent 72%);
+    filter: drop-shadow(0 0 10px rgba(124,255,203,0.85));
+    cursor:pointer;
+  }
+  .firefly.gold{
+    background:radial-gradient(circle, #FFF3D6 0%, var(--gold) 45%, transparent 72%);
+    filter: drop-shadow(0 0 12px rgba(255,197,92,0.9));
+  }
+  .firefly.trap{
+    background:radial-gradient(circle, #FFE3EC 0%, var(--pink) 45%, transparent 72%);
+    filter: drop-shadow(0 0 10px rgba(255,143,177,0.85));
+  }
+  .firefly::after{
+    content:''; position:absolute; inset:0; border-radius:50%;
+    animation:pulseRing 900ms ease-out infinite;
+    border:2px solid rgba(255,255,255,0.5);
+  }
+  @keyframes pulseRing{ from{transform:scale(0.6);opacity:.9;} to{transform:scale(1.4);opacity:0;} }
+
+  .overlay-msg{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+    background:rgba(10,14,31,0.72); backdrop-filter:blur(2px); gap:12px; padding:20px;
+  }
+  .overlay-msg h3{ font-size:20px; margin:0; }
+  .overlay-msg p{ font-size:13px; color:var(--muted); margin:0; max-width:280px; line-height:1.8;}
+  .big-num{ font-size:44px; font-weight:800; color:var(--mint); }
+
+  .start-btn, .again-btn{
+    border:none; cursor:pointer; font-family:inherit; font-weight:700;
+    padding:14px 26px; border-radius:14px; font-size:16px;
+    background:linear-gradient(180deg, var(--mint), var(--mint-dim)); color:#08130F;
+    box-shadow:0 6px 0 rgba(0,0,0,0.25);
+  }
+  .again-btn:active, .start-btn:active{ transform:translateY(3px); box-shadow:0 3px 0 rgba(0,0,0,0.25); }
+
+  .combo-flag{
+    position:absolute; top:10px; inset-inline-start:12px;
+    background:rgba(255,197,92,0.15); border:1px solid rgba(255,197,92,0.4);
+    color:var(--gold); font-size:12px; font-weight:700; padding:5px 10px; border-radius:10px;
+    opacity:0; transition:opacity .2s;
+  }
+  .combo-flag.show{ opacity:1; }
+
+  .timer-bar{
+    position:absolute; top:0; inset-inline:0; height:4px; background:rgba(124,255,203,0.12);
+  }
+  .timer-bar > div{ height:100%; background:linear-gradient(90deg, var(--mint-dim), var(--mint)); width:100%; }
+
+  .float-pt{
+    position:absolute; pointer-events:none; font-weight:800; font-size:15px;
+    animation:rise 700ms ease-out forwards; color:var(--mint);
+  }
+  .float-pt.bad{ color:var(--pink); }
+  @keyframes rise{ from{opacity:1; transform:translateY(0);} to{opacity:0; transform:translateY(-40px);} }
+
+  /* Progress toward permanent stage */
+  .stage-label{ text-align:center; font-size:12.5px; color:var(--mint); margin-top:14px; }
+  .progress{ height:8px; border-radius:5px; background:var(--bg-2); border:1px solid var(--line); overflow:hidden; margin-top:6px; }
+  .progress > div{ height:100%; background:linear-gradient(90deg, var(--mint-dim), var(--mint)); width:0%; transition:width .4s ease; }
+
+  /* Upgrades */
+  section.panel{ margin-top:22px; border-radius:18px; background:var(--bg-1); border:1px solid var(--line); padding:16px; }
+  .panel h2{ font-size:14px; letter-spacing:.04em; color:var(--muted); margin:0 0 12px; display:flex; align-items:center; gap:8px; font-weight:600; }
+  .panel h2 .dot{ width:6px; height:6px; border-radius:50%; background:var(--mint); }
+  .upg{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px; border-radius:12px; background:var(--bg-2); margin-bottom:8px; }
+  .upg:last-child{ margin-bottom:0; }
+  .upg-name{ font-size:14px; font-weight:600; }
+  .upg-desc{ font-size:12px; color:var(--muted); margin-top:2px; }
+  .upg-btn{ flex-shrink:0; border:1px solid var(--line); background:transparent; color:var(--mint); font-family:inherit; font-size:13px; font-weight:700; padding:9px 14px; border-radius:10px; cursor:pointer; }
+  .upg-btn:disabled{ color:var(--muted); border-color:rgba(255,255,255,0.06); cursor:default; }
+
+  /* Support panel */
+  .support{ margin-top:22px; border-radius:18px; background:linear-gradient(160deg, rgba(255,197,92,0.10), var(--bg-1) 60%); border:1px solid rgba(255,197,92,0.25); padding:20px; text-align:center; }
+  .support .icon{ font-size:26px; margin-bottom:6px; display:block; }
+  .support h2{ font-size:17px; font-weight:800; margin:0 0 6px; color:var(--gold); }
+  .support p{ font-size:13px; color:var(--muted); line-height:1.9; margin:0 0 14px; }
+  .donate-btn{ display:inline-block; text-decoration:none; background:linear-gradient(180deg, var(--gold), var(--gold-dim)); color:#241705; font-weight:800; font-size:15px; padding:14px 26px; border-radius:12px; box-shadow:0 6px 0 rgba(0,0,0,0.25); width:100%; }
+  .how-msg{ margin-top:12px; font-size:12px; color:var(--muted); background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:10px; padding:10px; text-align:right; line-height:1.9;}
+
+  /* Supporter wall */
+  .wall-item{ padding:10px 12px; border-radius:10px; background:var(--bg-2); margin-bottom:8px; font-size:13px; }
+  .wall-item b{ color:var(--gold); }
+  .wall-empty{ color:var(--muted); font-size:12.5px; text-align:center; padding:8px; }
+
+  footer{ text-align:center; margin-top:20px; font-size:11.5px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">یک بازیِ شب</div>
+    <h1>شب‌تاب</h1>
+    <p class="sub">کرم‌شب‌تاب‌ها رو قبل از خاموش‌شدن لمس کن. سرعتت رو زیاد کن، کمبو بگیر، امتیاز جمع کن و باغِ خودت رو ارتقا بده.</p>
+  </header>
+
+  <div class="stat-bar">
+    <div class="item"><div class="num" id="totalNum">0</div><div class="lbl">امتیاز کل</div></div>
+    <div class="item"><div class="num" id="bestNum">0</div><div class="lbl">بهترین دور</div></div>
+    <div class="item"><div class="num" id="levelNum">۱</div><div class="lbl">سطح باغ</div></div>
+  </div>
+
+  <div id="field">
+    <div class="timer-bar"><div id="timerFill"></div></div>
+    <div class="combo-flag" id="comboFlag">کمبو ×2</div>
+    <div class="overlay-msg" id="startOverlay">
+      <h3>آماده‌ای؟</h3>
+      <p>یه دور ۶۰ ثانیه‌ای. روی نورهای سبز بزن (+امتیاز)، طلایی‌ها امتیاز بیشتری دارن، از صورتی‌ها دور بمون (امتیاز کم می‌کنن).</p>
+      <button class="start-btn" id="startBtn">شروع دور 🌙</button>
+    </div>
+  </div>
+
+  <div class="stage-label" id="stageLabel">جوانه — سطح ۱</div>
+  <div class="progress"><div id="stageBar"></div></div>
+
+  <section class="panel">
+    <h2><span class="dot"></span>ارتقاهای دائمی</h2>
+    <div id="upgradesList"></div>
+  </section>
+
+  <div class="support">
+    <span class="icon">🌕</span>
+    <h2>حامیِ شب‌تاب شو</h2>
+    <p>این بازی رو خودم می‌سازم و توسعه می‌دم. اگه دوستش داری، یه حمایت کوچیک بذار — دوست دارم بدونم چی دوست داری بهش اضافه بشه.</p>
+    <a class="donate-btn" href="https://daramet.com/GameIzeh" target="_blank" rel="noopener">🎁 حمایت از شب‌تاب</a>
+    <div class="how-msg">
+      هرچی دلت خواست (پیشنهاد، درخواست یه ویژگیِ جدید، یا حتی یه سلام) رو توی قسمت پیامِ دونیت — عمومی یا خصوصی — بنویس. پیام مستقیم برای من میاد و اگه عمومی باشه، دستی میارمش همین‌جا روی تابلوی حامی‌ها.
+    </div>
+  </div>
+
+  <section class="panel">
+    <h2><span class="dot"></span>تابلوی حامی‌ها</h2>
+    <div id="wallList"><div class="wall-empty">هنوز کسی اینجا نیست — اولین نفر تو باش ✨</div></div>
+  </section>
+
+  <footer>پیشرفتت روی همین مرورگر ذخیره می‌شه.</footer>
+</div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'shabtab-save';
+
+  // ---- Editable supporter wall: add entries here after checking daramet donations ----
+  const supporterWall = [
+    // { name: 'مثلاً علی', note: 'ممنون بابت حمایت 🙏' },
+  ];
+
+  let state = {
+    total: 0,       // lifetime points, used for permanent upgrades/level
+    best: 0,        // best single round score
+    upgrades: { spawnRate:0, lifespan:0, hitbox:0 }
+  };
+
+  const upgradeDefs = [
+    { id:'spawnRate', name:'نورِ بیشتر', desc:'کرم‌شب‌تاب‌های بیشتری هم‌زمان روی صحنه میاد', baseCost:40, costMult:1.7, max:5 },
+    { id:'lifespan', name:'نفسِ طولانی‌تر', desc:'هر کرم‌شب‌تاب کمی بیشتر روشن می‌مونه', baseCost:60, costMult:1.8, max:5 },
+    { id:'hitbox', name:'دستِ چابک', desc:'ناحیه‌ی لمس هر نور کمی بزرگ‌تر می‌شه', baseCost:90, costMult:1.9, max:4 },
+  ];
+
+  const stages = [
+    { min:0, label:'جوانه — سطح ۱' },
+    { min:300, label:'نهال — سطح ۲' },
+    { min:900, label:'شکوفه — سطح ۳' },
+    { min:2200, label:'باغِ نورانی — سطح ۴' },
+    { min:5000, label:'دشتِ شب‌تاب — سطح ۵' },
+  ];
+
+  const totalNumEl = document.getElementById('totalNum');
+  const bestNumEl = document.getElementById('bestNum');
+  const levelNumEl = document.getElementById('levelNum');
+  const stageLabelEl = document.getElementById('stageLabel');
+  const stageBarEl = document.getElementById('stageBar');
+  const upgradesListEl = document.getElementById('upgradesList');
+  const field = document.getElementById('field');
+  const startOverlay = document.getElementById('startOverlay');
+  const startBtn = document.getElementById('startBtn');
+  const timerFill = document.getElementById('timerFill');
+  const comboFlag = document.getElementById('comboFlag');
+  const wallListEl = document.getElementById('wallList');
+
+  async function load(){
+    try{
+      const res = await window.storage.get(STORAGE_KEY);
+      if(res && res.value){ state = Object.assign(state, JSON.parse(res.value)); }
+    }catch(e){}
+    renderMeta();
+    renderWall();
+  }
+  let saveTimer=null;
+  function save(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async ()=>{
+      try{ await window.storage.set(STORAGE_KEY, JSON.stringify(state)); }catch(e){ console.error(e); }
+    }, 400);
+  }
+
+  function costFor(def){
+    const owned = state.upgrades[def.id]||0;
+    return Math.round(def.baseCost * Math.pow(def.costMult, owned));
+  }
+  function currentStage(){
+    let cur = stages[0];
+    for(const s of stages){ if(state.total >= s.min) cur = s; }
+    return cur;
+  }
+  function nextStage(){
+    const idx = stages.indexOf(currentStage());
+    return stages[idx+1] || null;
+  }
+
+  function renderMeta(){
+    totalNumEl.textContent = Math.floor(state.total).toLocaleString('fa-IR');
+    bestNumEl.textContent = Math.floor(state.best).toLocaleString('fa-IR');
+    const cur = currentStage();
+    levelNumEl.textContent = (stages.indexOf(cur)+1).toLocaleString('fa-IR');
+    stageLabelEl.textContent = cur.label;
+    const nxt = nextStage();
+    if(nxt){
+      const pct = Math.min(100, ((state.total-cur.min)/(nxt.min-cur.min))*100);
+      stageBarEl.style.width = pct+'%';
+    } else { stageBarEl.style.width='100%'; }
+
+    upgradesListEl.innerHTML='';
+    upgradeDefs.forEach(def=>{
+      const owned = state.upgrades[def.id]||0;
+      const maxed = owned >= def.max;
+      const cost = costFor(def);
+      const row = document.createElement('div');
+      row.className='upg';
+      row.innerHTML = `
+        <div>
+          <div class="upg-name">${def.name} ${owned>0?`<span style="color:var(--gold);font-size:12px">×${owned}</span>`:''}</div>
+          <div class="upg-desc">${def.desc}</div>
+        </div>
+        <button class="upg-btn" data-id="${def.id}" ${(maxed || state.total<cost)?'disabled':''}>${maxed?'بیشینه':cost.toLocaleString('fa-IR')+' امتیاز'}</button>
+      `;
+      upgradesListEl.appendChild(row);
+    });
+    save();
+  }
+
+  upgradesListEl.addEventListener('click',(e)=>{
+    const btn = e.target.closest('.upg-btn');
+    if(!btn || btn.disabled) return;
+    const id = btn.dataset.id;
+    const def = upgradeDefs.find(d=>d.id===id);
+    const cost = costFor(def);
+    if(state.total < cost) return;
+    state.total -= cost;
+    state.upgrades[id]=(state.upgrades[id]||0)+1;
+    renderMeta();
+  });
+
+  function renderWall(){
+    if(!supporterWall.length){ return; }
+    wallListEl.innerHTML='';
+    supporterWall.forEach(s=>{
+      const d = document.createElement('div');
+      d.className='wall-item';
+      d.innerHTML = `<b>${s.name}</b> — ${s.note}`;
+      wallListEl.appendChild(d);
+    });
+  }
+
+  // ---------------- Game round logic ----------------
+  const ROUND_MS = 60000;
+  let roundActive = false;
+  let roundScore = 0;
+  let combo = 0;
+  let comboTimer = null;
+  let spawnTimer = null;
+  let roundEndAt = 0;
+  let rafId = null;
+  const activeFireflies = new Set();
+
+  function upgradeVal(id){ return state.upgrades[id]||0; }
+
+  function maxConcurrent(){ return 1 + upgradeVal('spawnRate'); } // 1..6
+  function lifespanMs(){ return 1100 - upgradeVal('lifespan')*90; } // shorter as level up is harder baseline; upgrade extends it
+  function fireflySize(){ return 44 + upgradeVal('hitbox')*8; }
+
+  function spawnLoop(){
+    if(!roundActive) return;
+    if(activeFireflies.size < maxConcurrent()){
+      spawnFirefly();
+    }
+    const delay = 260 + Math.random()*260;
+    spawnTimer = setTimeout(spawnLoop, delay);
+  }
+
+  function spawnFirefly(){
+    const rect = field.getBoundingClientRect();
+    const size = fireflySize();
+    const margin = size/2 + 6;
+    const x = margin + Math.random()*(rect.width - margin*2);
+    const y = margin + Math.random()*(rect.height - margin*2);
+
+    const roll = Math.random();
+    let type = 'normal';
+    if(roll > 0.92) type = 'gold';
+    else if(roll > 0.78) type = 'trap';
+
+    const el = document.createElement('div');
+    el.className = 'firefly' + (type==='gold'?' gold':'') + (type==='trap'?' trap':'');
+    el.style.width = size+'px';
+    el.style.height = size+'px';
+    el.style.left = x+'px';
+    el.style.top = y+'px';
+    field.appendChild(el);
+    activeFireflies.add(el);
+
+    // real base lifespan, slightly randomized, floor so it's never instant/never absurdly long
+    const life = Math.max(650, lifespanMs() + Math.random()*250);
+    let consumed = false;
+
+    const remove = ()=>{
+      if(activeFireflies.has(el)){
+        activeFireflies.delete(el);
+        el.remove();
+      }
+    };
+
+    const onHit = (ev)=>{
+      if(consumed || !roundActive) return;
+      consumed = true;
+      ev.stopPropagation();
+      const px = parseFloat(el.style.left), py = parseFloat(el.style.top);
+      if(type === 'trap'){
+        roundScore = Math.max(0, roundScore - 6);
+        combo = 0;
+        spawnFloat(px, py, '-6', true);
+      } else {
+        combo += 1;
+        const base = type==='gold' ? 8 : 2;
+        const comboMult = 1 + Math.min(4, Math.floor(combo/5)) * 0.5;
+        const gained = Math.round(base * comboMult);
+        roundScore += gained;
+        spawnFloat(px, py, '+'+gained, false);
+        if(combo>=5 && combo%5===0){
+          comboFlag.textContent = 'کمبو ×' + (1+Math.min(4,Math.floor(combo/5))*0.5).toFixed(1);
+          comboFlag.classList.add('show');
+          clearTimeout(comboTimer);
+          comboTimer = setTimeout(()=>comboFlag.classList.remove('show'), 900);
+        }
+      }
+      remove();
+    };
+    el.addEventListener('pointerdown', onHit, { once:true });
+
+    setTimeout(()=>{
+      if(!consumed){
+        // missed a normal/gold: tiny combo reset only if it was worth catching
+        if(type !== 'trap') combo = 0;
+        remove();
+      }
+    }, life);
+  }
+
+  function spawnFloat(x,y,text,bad){
+    const f = document.createElement('div');
+    f.className = 'float-pt' + (bad?' bad':'');
+    f.textContent = text;
+    f.style.left = x+'px';
+    f.style.top = y+'px';
+    field.appendChild(f);
+    setTimeout(()=>f.remove(), 700);
+  }
+
+  function startRound(){
+    roundActive = true;
+    roundScore = 0;
+    combo = 0;
+    startOverlay.style.display = 'none';
+    roundEndAt = performance.now() + ROUND_MS;
+    spawnLoop();
+    tick();
+  }
+
+  function tick(){
+    const remaining = roundEndAt - performance.now();
+    const pct = Math.max(0, remaining / ROUND_MS) * 100;
+    timerFill.style.width = pct + '%';
+    if(remaining <= 0){
+      endRound();
+      return;
+    }
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function endRound(){
+    roundActive = false;
+    clearTimeout(spawnTimer);
+    cancelAnimationFrame(rafId);
+    activeFireflies.forEach(el=>el.remove());
+    activeFireflies.clear();
+
+    state.total += roundScore;
+    if(roundScore > state.best) state.best = roundScore;
+    renderMeta();
+
+    startOverlay.innerHTML = `
+      <h3>دور تموم شد!</h3>
+      <div class="big-num">${roundScore.toLocaleString('fa-IR')}</div>
+      <p>امتیازِ این دور. به مجموعت اضافه شد — می‌تونی باهاش باغت رو ارتقا بدی.</p>
+      <button class="again-btn" id="againBtn">یه دور دیگه 🌙</button>
+    `;
+    startOverlay.style.display = 'flex';
+    document.getElementById('againBtn').addEventListener('click', startRound);
+  }
+
+  startBtn.addEventListener('click', startRound);
+
+  load();
+})();
+</script>
+</body>
+</html>
