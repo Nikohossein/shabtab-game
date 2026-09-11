@@ -2,2143 +2,1477 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>DuoDash — نبرد آرنا آنلاین</title>
-<meta name="description" content="DuoDash: نبرد سریع ۴ نفره برای جمع‌آوری سکه. بدون نصب، داخل مرورگر.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23181432'/%3E%3Ccircle cx='24' cy='30' r='11' fill='%2344E8C4'/%3E%3Ccircle cx='40' cy='30' r='11' fill='%23FF5DA2'/%3E%3Ccircle cx='32' cy='42' r='11' fill='%23FFD166'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://cdn.jsdelivr.net">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AMX Mod X Academy | آکادمی پلاگین‌نویسی</title>
 <style>
-:root{
-  --bg-0:#0d0b21;
-  --bg-1:#181432;
-  --bg-2:#221c47;
-  --panel: rgba(255,255,255,0.06);
-  --panel-border: rgba(255,255,255,0.12);
-  --ink:#f2f0fb;
-  --ink-dim:#a9a3cc;
-  --teal:#44e8c4;
-  --pink:#ff5da2;
-  --gold:#ffd166;
-  --danger:#ff5a5a;
-  --radius:18px;
-  --radius-sm:10px;
-  --font-display: 'Vazirmatn', 'Baloo 2', 'Segoe UI Rounded', system-ui, sans-serif;
-  --font-body: 'Vazirmatn', 'Inter', system-ui, -apple-system, sans-serif;
-}
-*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
-html,body{
-  margin:0;padding:0;height:100%;width:100%;
-  position:fixed;top:0;left:0;
-  background:
-    radial-gradient(1200px 800px at 15% -10%, #2a2160 0%, transparent 60%),
-    radial-gradient(1000px 700px at 110% 10%, #1c3a3f 0%, transparent 55%),
-    var(--bg-0);
-  color:var(--ink);
-  font-family:var(--font-body);
-  overflow:hidden;
-  overscroll-behavior:none;
-  touch-action:none;
-  direction:rtl;
-}
-#app{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
-.screen{
-  position:absolute;inset:0;
-  display:none;
-  flex-direction:column;
-  align-items:center;
-  justify-content:flex-start;
-  padding:20px 20px 40px;
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
-}
-.screen.active{display:flex;}
-.stars{
-  position:absolute;inset:0;pointer-events:none;z-index:0;
-  background-image:
-    radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,.5), transparent),
-    radial-gradient(2px 2px at 70% 60%, rgba(255,255,255,.35), transparent),
-    radial-gradient(1.5px 1.5px at 40% 80%, rgba(255,255,255,.4), transparent),
-    radial-gradient(1.5px 1.5px at 85% 20%, rgba(255,255,255,.4), transparent),
-    radial-gradient(1.5px 1.5px at 55% 15%, rgba(255,255,255,.3), transparent);
-  background-size:100% 100%;
-}
-.wrap{position:relative;z-index:1;width:100%;max-width:560px;display:flex;flex-direction:column;align-items:center;gap:16px;margin-top:20px;}
-.logo-title{
-  font-family:var(--font-display);
-  font-weight:800;
-  font-size:clamp(36px,9vw,60px);
-  letter-spacing:1px;
-  background:linear-gradient(135deg, var(--teal), var(--pink) 60%, var(--gold));
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  text-align:center;margin:0;
-  filter:drop-shadow(0 4px 18px rgba(68,232,196,.25));
-}
-.logo-sub{font-family:var(--font-display);color:var(--ink-dim);letter-spacing:3px;font-size:13px;margin-top:-8px;}
-.panel{background:var(--panel);border:1px solid var(--panel-border);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-radius:var(--radius);padding:20px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.35);}
-.btn{font-family:var(--font-display);font-weight:700;font-size:16px;letter-spacing:.3px;color:var(--ink);background:linear-gradient(135deg, #2c2657, #201a44);border:1px solid var(--panel-border);border-radius:14px;padding:14px 20px;width:100%;cursor:pointer;transition:transform .12s ease, box-shadow .12s ease, background .12s ease;user-select:none;-webkit-user-select:none;}
-.btn:hover{transform:translateY(-2px);}
-.btn:active{transform:translateY(1px) scale(.98);}
-.btn.primary{background:linear-gradient(135deg, var(--teal), #21b592); color:#08221c;}
-.btn.accent{background:linear-gradient(135deg, var(--pink), #c93f7d); color:#2a0c19;}
-.btn.gold{background:linear-gradient(135deg, var(--gold), #e0a532); color:#332204;}
-.btn.ghost{background:transparent;}
-.btn.small{padding:10px 14px;font-size:14px;width:auto;}
-.btn[disabled]{opacity:.4;cursor:not-allowed;transform:none;}
-.menu-list{display:flex;flex-direction:column;gap:12px;width:100%;}
-.field{width:100%;padding:14px 16px;border-radius:14px;border:1px solid var(--panel-border);background:rgba(0,0,0,.25);color:var(--ink);font-family:var(--font-body);font-size:16px;outline:none;direction:rtl;}
-.field:focus{border-color:var(--teal);}
-.field.code{direction:ltr;text-align:center;letter-spacing:5px;font-size:22px;text-transform:uppercase;}
-.row{display:flex;gap:10px;width:100%;}
-.row > *{flex:1;}
-.label{font-size:12px;color:var(--ink-dim);letter-spacing:1px;margin-bottom:6px;display:block;}
-.topbar{position:sticky;top:0;z-index:5;width:100%;display:flex;justify-content:flex-start;padding:4px 0;}
-.iconbtn{width:44px;height:44px;border-radius:12px;background:var(--panel);border:1px solid var(--panel-border);color:var(--ink);font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
-.roomcode-box{font-family:var(--font-display);font-size:34px;letter-spacing:6px;text-align:center;padding:16px;border-radius:14px;background:rgba(0,0,0,.3);border:1px dashed var(--panel-border);color:var(--gold);direction:ltr;font-weight:700;}
-.player-slot{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--panel-border);}
-.player-dot{width:12px;height:12px;border-radius:50%;background:var(--ink-dim);flex-shrink:0;}
-.player-dot.on{background:var(--teal);box-shadow:0 0 8px var(--teal);}
-.muted{color:var(--ink-dim);font-size:14px;}
-.title-sm{font-family:var(--font-display);font-size:20px;font-weight:700;margin:0 0 6px;}
-.char-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;}
-.char-card{border-radius:14px;padding:10px 6px;text-align:center;cursor:pointer;background:rgba(255,255,255,.04);border:2px solid transparent;transition:transform .1s ease, border-color .15s ease;}
-.char-card canvas{display:block;margin:0 auto;}
-.char-card span{display:block;font-size:12px;margin-top:4px;color:var(--ink-dim);}
-.char-card.selected{border-color:var(--teal);background:rgba(68,232,196,.1);transform:translateY(-2px);}
-.char-card.taken{opacity:.35;cursor:not-allowed;}
-#gameCanvas{display:block;background:#000;touch-action:none;pointer-events:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);}
-#screen-game{padding:0;overflow:hidden;}
-.hud{position:absolute;inset:0;pointer-events:none;z-index:4;display:flex;flex-direction:column;justify-content:space-between;font-family:var(--font-display);}
-.hud-top{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 12px;gap:8px;}
-.hud-scores{display:flex;gap:6px;flex-wrap:wrap;}
-.score-chip{display:flex;align-items:center;gap:6px;background:rgba(10,8,25,.55);border:1px solid var(--panel-border);border-radius:10px;padding:5px 9px;font-size:13px;backdrop-filter:blur(6px);}
-.score-chip .swatch{width:9px;height:9px;border-radius:50%;}
-.hud-timer{background:rgba(10,8,25,.6);border:1px solid var(--panel-border);border-radius:12px;padding:6px 16px;font-size:22px;font-weight:700;align-self:center;direction:ltr;}
-.hud-timer.rush{color:var(--pink);animation:pulseTimer .5s infinite;}
-@keyframes pulseTimer{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
-.hud-conn{font-size:11px;padding:5px 9px;border-radius:8px;background:rgba(10,8,25,.55);border:1px solid var(--panel-border);}
-.hud-conn.ok{color:var(--teal);}
-.hud-conn.bad{color:var(--danger);}
-.hud-event{position:absolute;top:64px;left:50%;transform:translateX(-50%);background:rgba(10,8,25,.7);border:1px solid var(--gold);color:var(--gold);padding:8px 18px;border-radius:20px;font-size:15px;font-weight:700;opacity:0;transition:opacity .3s ease, top .3s ease;white-space:nowrap;}
-.hud-event.show{opacity:1;top:76px;}
-.hud-bottom{display:flex;justify-content:space-between;align-items:flex-end;padding:12px;pointer-events:none;}
-.joystick-zone{width:130px;height:130px;position:relative;pointer-events:auto;touch-action:none;}
-.joystick-base{position:absolute;inset:0;border-radius:50%;background:rgba(255,255,255,.08);border:1px solid var(--panel-border);}
-.joystick-nub{position:absolute;width:52px;height:52px;border-radius:50%;background:rgba(68,232,196,.55);border:1px solid var(--teal);left:39px;top:39px;pointer-events:none;}
-.action-btns{display:flex;flex-direction:row;gap:10px;align-items:center;pointer-events:auto;}
-.action-btn{width:64px;height:64px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid var(--panel-border);color:var(--ink);font-family:var(--font-display);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;pointer-events:auto;user-select:none;-webkit-user-select:none;position:relative;overflow:hidden;touch-action:none;}
-.action-btn.dash{background:rgba(255,209,102,.25);border-color:var(--gold);}
-.action-btn.ability{background:rgba(255,93,162,.25);border-color:var(--pink);}
-.action-btn .cd{position:absolute;inset:0;background:rgba(0,0,0,.55);pointer-events:none;transform:translateY(0%);}
-.pause-btn{pointer-events:auto;position:absolute;top:56px;left:12px;z-index:6;}
-#rotate-overlay{position:fixed;inset:0;z-index:50;background:var(--bg-0);display:none;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;padding:30px;}
-#rotate-overlay.show{display:flex;}
-.rotate-icon{font-size:52px;animation:rot 1.6s ease-in-out infinite;}
-@keyframes rot{0%,100%{transform:rotate(0deg);}50%{transform:rotate(90deg);}}
-.modal-backdrop{position:fixed;inset:0;background:rgba(5,4,15,.72);z-index:40;display:none;align-items:center;justify-content:center;padding:20px;}
-.modal-backdrop.show{display:flex;}
-.modal{max-width:420px;width:100%;text-align:center;}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(10,8,25,.9);border:1px solid var(--panel-border);padding:12px 20px;border-radius:14px;z-index:60;opacity:0;transition:opacity .25s ease, bottom .25s ease;pointer-events:none;white-space:nowrap;}
-.toast.show{opacity:1;bottom:34px;}
-.settings-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.06);gap:10px;}
-.switch{position:relative;width:46px;height:26px;border-radius:20px;background:rgba(255,255,255,.15);cursor:pointer;flex-shrink:0;}
-.switch .knob{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:var(--ink-dim);transition:right .15s ease, background .15s ease;}
-.switch.on{background:rgba(68,232,196,.35);}
-.switch.on .knob{right:23px;background:var(--teal);}
-.mission-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06);}
-.mission-bar{height:6px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden;width:100%;margin-top:4px;}
-.mission-bar > div{height:100%;background:linear-gradient(90deg,var(--teal),var(--pink));transition:width .3s;}
-.close-x{position:absolute;top:14px;left:14px;background:none;border:none;color:var(--ink-dim);font-size:22px;cursor:pointer;}
-.badge{display:inline-block;padding:3px 9px;border-radius:8px;background:rgba(255,209,102,.15);color:var(--gold);font-size:12px;font-weight:700;}
-a{color:var(--teal);}
-::-webkit-scrollbar{width:6px;}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:4px;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.small-note{font-size:12px;color:var(--ink-dim);text-align:center;line-height:1.6;}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
-.big-result-title{font-family:var(--font-display);font-size:32px;font-weight:800;color:var(--gold);}
-.result-list{width:100%;display:flex;flex-direction:column;gap:8px;}
-.result-row{display:flex;justify-content:space-between;padding:10px 14px;border-radius:12px;background:rgba(255,255,255,.04);}
-.result-row.winner{background:rgba(255,209,102,.14);border:1px solid var(--gold);}
-.spinner{width:38px;height:38px;border-radius:50%;border:4px solid rgba(255,255,255,.15);border-top-color:var(--teal);animation:spin .8s linear infinite;}
-@media (max-width:420px){
-  .logo-title{font-size:34px;}
-  .action-btn{width:56px;height:56px;font-size:12px;}
-  .joystick-zone{width:110px;height:110px;}
-  .joystick-nub{width:44px;height:44px;left:33px;top:33px;}
-}
+  :root{
+    --bg:#0a0917;
+    --bg-alt:#120f26;
+    --panel: rgba(255,255,255,0.045);
+    --panel-strong: rgba(255,255,255,0.07);
+    --panel-border: rgba(255,255,255,0.09);
+    --purple:#8b5cf6;
+    --purple-deep:#5b21e0;
+    --blue:#3b82f6;
+    --green:#39ff9e;
+    --amber:#ffb64c;
+    --red:#ff5c6c;
+    --text:#eef0ff;
+    --text-dim:#a9a6c9;
+    --text-faint:#726f96;
+    --radius:16px;
+    --radius-sm:10px;
+    --mono: 'Consolas','SFMono-Regular','Cascadia Code','Courier New',monospace;
+    --sans: 'Vazirmatn','IRANSansWeb','Tahoma','Segoe UI',Arial,sans-serif;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    font-family:var(--sans);
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(139,92,246,0.20), transparent 60%),
+      radial-gradient(1000px 700px at 100% 10%, rgba(59,130,246,0.16), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    min-height:100vh;
+    line-height:1.8;
+    overflow-x:hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
+  }
+
+  a{color:inherit; text-decoration:none;}
+  ul{list-style:none;}
+
+  ::selection{background:var(--purple); color:#fff;}
+
+  /* scrollbar */
+  ::-webkit-scrollbar{width:10px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:linear-gradient(var(--purple),var(--blue)); border-radius:10px;}
+
+  .wrap{max-width:1180px; margin:0 auto; padding:0 24px;}
+
+  .glass{
+    background:var(--panel);
+    border:1px solid var(--panel-border);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border-radius:var(--radius);
+  }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:12.5px; letter-spacing:0.5px; color:var(--green);
+    font-family:var(--mono); text-transform:uppercase;
+    background:rgba(57,255,158,0.08); border:1px solid rgba(57,255,158,0.25);
+    padding:5px 12px; border-radius:999px; margin-bottom:16px;
+  }
+  .eyebrow::before{content:"●"; font-size:8px;}
+
+  h1,h2,h3,h4{font-weight:800; letter-spacing:-0.02em;}
+
+  .section-title{font-size:clamp(26px,4vw,38px); margin-bottom:10px;}
+  .section-sub{color:var(--text-dim); max-width:640px; font-size:15.5px; margin-bottom:40px;}
+
+  section{padding:90px 0; position:relative;}
+
+  /* ---------- NAV ---------- */
+  header.nav{
+    position:fixed; top:0; right:0; left:0; z-index:100;
+    background:rgba(10,9,23,0.72);
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--panel-border);
+  }
+  .nav-inner{
+    max-width:1180px; margin:0 auto; padding:14px 24px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{display:flex; align-items:center; gap:10px; font-weight:800; font-size:16px;}
+  .brand-mark{
+    width:34px; height:34px; border-radius:9px;
+    background:linear-gradient(135deg,var(--purple),var(--blue));
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-weight:900; font-size:14px; color:#fff;
+    box-shadow:0 0 24px rgba(139,92,246,0.5);
+  }
+  .brand small{display:block; font-weight:400; color:var(--text-faint); font-size:11px; font-family:var(--mono);}
+
+  .nav-links{display:flex; gap:6px; align-items:center;}
+  .nav-links a{
+    padding:9px 14px; border-radius:9px; font-size:14px; color:var(--text-dim);
+    transition:.2s;
+  }
+  .nav-links a:hover{color:#fff; background:var(--panel-strong);}
+  .nav-cta{
+    background:linear-gradient(135deg,var(--purple),var(--blue)) !important;
+    color:#fff !important; font-weight:700;
+  }
+  .nav-toggle{display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none;}
+  .nav-toggle span{width:22px; height:2px; background:#fff; border-radius:2px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding:170px 0 100px;
+    position:relative;
+  }
+  .hero-grid{
+    display:grid; grid-template-columns:1.1fr 0.9fr; gap:50px; align-items:center;
+  }
+  .hero h1{
+    font-size:clamp(34px,5.2vw,58px); line-height:1.15; margin-bottom:20px;
+  }
+  .hero h1 .grad{
+    background:linear-gradient(135deg,var(--purple),var(--blue) 60%, var(--green));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .hero p{color:var(--text-dim); font-size:16.5px; max-width:520px; margin-bottom:32px;}
+
+  .hero-actions{display:flex; gap:14px; flex-wrap:wrap;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:14px 26px; border-radius:12px; font-weight:700; font-size:15px;
+    cursor:pointer; border:none; transition:.2s; font-family:var(--sans);
+  }
+  .btn-primary{
+    background:linear-gradient(135deg,var(--purple),var(--blue));
+    color:#fff; box-shadow:0 10px 30px -8px rgba(139,92,246,0.65);
+  }
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 14px 34px -6px rgba(139,92,246,0.8);}
+  .btn-ghost{
+    background:var(--panel); color:var(--text); border:1px solid var(--panel-border);
+  }
+  .btn-ghost:hover{background:var(--panel-strong);}
+  .btn-sm{padding:9px 16px; font-size:13.5px; border-radius:9px;}
+
+  .stat-row{display:flex; gap:28px; margin-top:40px; flex-wrap:wrap;}
+  .stat b{display:block; font-size:24px; font-family:var(--mono); background:linear-gradient(135deg,var(--green),var(--blue)); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .stat span{font-size:12.5px; color:var(--text-faint);}
+
+  /* HUD signature widget */
+  .hud-shell{
+    position:relative; border-radius:20px; overflow:hidden;
+    background:linear-gradient(160deg,#141126,#0b0a1a 60%);
+    border:1px solid var(--panel-border);
+    box-shadow:0 30px 70px -30px rgba(0,0,0,0.7);
+    padding:0;
+  }
+  .hud-shell::before{
+    content:""; position:absolute; inset:0;
+    background:repeating-linear-gradient(180deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 3px);
+    pointer-events:none; mix-blend-mode:overlay;
+  }
+  .hud-topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:10px 16px; border-bottom:1px solid rgba(255,255,255,0.08);
+    font-family:var(--mono); font-size:11.5px; color:var(--text-faint);
+  }
+  .hud-dots{display:flex; gap:6px;}
+  .hud-dots span{width:9px; height:9px; border-radius:50%; background:#333;}
+  .hud-dots span:nth-child(1){background:var(--red);}
+  .hud-dots span:nth-child(2){background:var(--amber);}
+  .hud-dots span:nth-child(3){background:var(--green);}
+  .hud-screen{
+    position:relative; height:300px;
+    background:
+      radial-gradient(circle at 50% 30%, rgba(139,92,246,0.18), transparent 60%),
+      linear-gradient(180deg, #100e21, #0a0918);
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
+    padding:24px; gap:8px;
+  }
+  .hud-msg{
+    font-family:var(--mono); font-weight:700; font-size:15px;
+    text-shadow:0 0 12px currentColor;
+    opacity:0; transform:translateY(6px);
+    animation:hudpop 4.5s ease-in-out infinite;
+  }
+  .hud-msg.m1{color:var(--amber); animation-delay:0s;}
+  .hud-msg.m2{color:var(--green); animation-delay:1.5s;}
+  .hud-msg.m3{color:#7fd4ff; animation-delay:3s;}
+  @keyframes hudpop{
+    0%{opacity:0; transform:translateY(6px);}
+    8%{opacity:1; transform:translateY(0);}
+    28%{opacity:1;}
+    36%{opacity:0;}
+    100%{opacity:0;}
+  }
+  .hud-console{
+    font-family:var(--mono); font-size:12px; color:var(--text-faint);
+    padding:14px 16px; border-top:1px solid rgba(255,255,255,0.08);
+    background:rgba(0,0,0,0.25);
+  }
+  .hud-console .line{margin-bottom:4px;}
+  .hud-console .k{color:var(--green);}
+  .hud-console .fn{color:#7fd4ff;}
+  .hud-console .str{color:var(--amber);}
+
+  /* ---------- generic panel/card ---------- */
+  .card{
+    background:var(--panel); border:1px solid var(--panel-border);
+    border-radius:var(--radius); padding:26px;
+  }
+
+  /* ---------- CODE EXPLORER ---------- */
+  .explorer-grid{display:grid; grid-template-columns:1fr; gap:20px;}
+  .explorer-input{
+    background:#0d0b1c; border:1px solid var(--panel-border); border-radius:var(--radius);
+    overflow:hidden;
+  }
+  .explorer-input .bar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.07);
+    font-family:var(--mono); font-size:12px; color:var(--text-faint);
+  }
+  textarea#codeInput{
+    width:100%; min-height:220px; resize:vertical; border:none; outline:none;
+    background:transparent; color:var(--text); font-family:var(--mono); font-size:13.5px;
+    padding:18px; direction:ltr; text-align:left; line-height:1.7;
+  }
+  .explorer-actions{display:flex; gap:10px; padding:14px 16px; border-top:1px solid rgba(255,255,255,0.07); flex-wrap:wrap;}
+
+  .explain-output{display:flex; flex-direction:column; gap:10px;}
+  .line-card{
+    display:grid; grid-template-columns:44px 1fr; gap:14px;
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:12px; overflow:hidden;
+    animation:fadeUp .35s ease both;
+  }
+  @keyframes fadeUp{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+  .line-num{
+    background:rgba(255,255,255,0.04); color:var(--text-faint); font-family:var(--mono);
+    font-size:12px; display:flex; align-items:center; justify-content:center;
+    border-left:1px solid var(--panel-border);
+  }
+  .line-body{padding:12px 16px 12px 6px;}
+  .line-code{
+    font-family:var(--mono); font-size:13px; direction:ltr; text-align:left;
+    color:#c9c6ff; background:rgba(0,0,0,0.25); padding:6px 10px; border-radius:7px;
+    display:inline-block; margin-bottom:6px; max-width:100%; overflow-x:auto;
+  }
+  .line-desc{color:var(--text-dim); font-size:14px;}
+  .tag{
+    display:inline-block; font-family:var(--mono); font-size:10.5px; padding:2px 8px;
+    border-radius:999px; margin-inline-end:8px; background:rgba(139,92,246,0.14); color:#c4b5fd;
+    border:1px solid rgba(139,92,246,0.3);
+  }
+  .empty-hint{color:var(--text-faint); font-size:14px; text-align:center; padding:40px 10px;}
+
+  /* ---------- TUTORIALS ---------- */
+  .tut-list{display:flex; flex-direction:column; gap:14px;}
+  .tut-item{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:14px;
+    overflow:hidden;
+  }
+  .tut-head{
+    display:flex; align-items:center; gap:16px; padding:20px 22px; cursor:pointer;
+    user-select:none;
+  }
+  .tut-num{
+    font-family:var(--mono); font-weight:800; font-size:14px; color:var(--green);
+    width:38px; height:38px; border-radius:10px; background:rgba(57,255,158,0.08);
+    border:1px solid rgba(57,255,158,0.25); display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .tut-head h3{font-size:16.5px; flex:1;}
+  .tut-level{
+    font-family:var(--mono); font-size:11px; padding:3px 10px; border-radius:999px;
+    background:rgba(59,130,246,0.12); color:#93c5fd; border:1px solid rgba(59,130,246,0.3);
+    white-space:nowrap;
+  }
+  .tut-level.mid{background:rgba(255,182,76,0.12); color:var(--amber); border-color:rgba(255,182,76,0.3);}
+  .tut-level.high{background:rgba(255,92,108,0.12); color:var(--red); border-color:rgba(255,92,108,0.3);}
+  .chev{transition:.25s; color:var(--text-faint); flex-shrink:0;}
+  .tut-item.open .chev{transform:rotate(180deg);}
+  .tut-body{
+    max-height:0; overflow:hidden; transition:max-height .35s ease;
+    padding:0 22px; color:var(--text-dim); font-size:14.5px;
+  }
+  .tut-item.open .tut-body{padding:0 22px 24px;}
+  .tut-body p{margin-bottom:12px;}
+  .tut-body ul{margin:10px 0 14px; padding-inline-start:20px; list-style:disc;}
+  .tut-body li{margin-bottom:6px;}
+  pre.code-block{
+    direction:ltr; text-align:left; background:#0d0b1c; border:1px solid var(--panel-border);
+    border-radius:10px; padding:16px; font-family:var(--mono); font-size:12.5px; color:#c9c6ff;
+    overflow-x:auto; margin:12px 0;
+  }
+
+  /* ---------- DICTIONARY ---------- */
+  .dict-search{
+    display:flex; align-items:center; gap:10px; background:var(--panel);
+    border:1px solid var(--panel-border); border-radius:12px; padding:12px 16px; margin-bottom:24px;
+  }
+  .dict-search input{
+    flex:1; background:transparent; border:none; outline:none; color:var(--text);
+    font-family:var(--sans); font-size:15px;
+  }
+  .dict-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px;}
+  .dict-card{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:12px; padding:18px;
+    transition:.2s;
+  }
+  .dict-card:hover{border-color:rgba(139,92,246,0.4); transform:translateY(-2px);}
+  .dict-card code{
+    font-family:var(--mono); font-size:14px; color:var(--green); direction:ltr; display:inline-block;
+  }
+  .dict-card p{color:var(--text-dim); font-size:13.5px; margin-top:8px;}
+  .dict-card-top{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .dict-module{font-family:var(--mono); font-size:10px; color:var(--amber); background:rgba(255,182,76,0.1); border:1px solid rgba(255,182,76,0.28); padding:2px 8px; border-radius:999px; white-space:nowrap;}
+  .dict-link{display:inline-block; margin-top:10px; font-size:12px; color:#7fd4ff; direction:ltr; text-align:left;}
+  .dict-link:hover{text-decoration:underline;}
+  .dict-count{color:var(--text-faint); font-size:13px; margin-bottom:16px;}
+
+  /* ---------- PROMPT BUILDER ---------- */
+  .pb-grid{display:grid; grid-template-columns:1fr 1fr; gap:24px;}
+  .field{margin-bottom:18px;}
+  .field label{display:block; font-size:13.5px; color:var(--text-dim); margin-bottom:8px; font-weight:600;}
+  .field input[type=text], .field textarea, .field select{
+    width:100%; background:#0d0b1c; border:1px solid var(--panel-border); border-radius:10px;
+    padding:12px 14px; color:var(--text); font-family:var(--sans); font-size:14.5px; outline:none;
+    transition:.2s;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus{border-color:var(--purple);}
+  .field textarea{min-height:90px; resize:vertical;}
+  .chip-group{display:flex; gap:8px; flex-wrap:wrap;}
+  .chip{
+    padding:8px 14px; border-radius:999px; background:var(--panel); border:1px solid var(--panel-border);
+    font-size:13px; cursor:pointer; color:var(--text-dim); transition:.2s; user-select:none;
+  }
+  .chip.active{background:linear-gradient(135deg,var(--purple),var(--blue)); color:#fff; border-color:transparent;}
+  .pb-output{
+    background:#0d0b1c; border:1px solid var(--panel-border); border-radius:12px; padding:18px;
+    font-family:var(--mono); font-size:13px; color:#c9c6ff; direction:ltr; text-align:left;
+    white-space:pre-wrap; min-height:280px; max-height:420px; overflow-y:auto;
+  }
+  .pb-output.rtl-note{direction:rtl; text-align:right; font-family:var(--sans);}
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top:1px solid var(--panel-border); padding:40px 0; margin-top:40px;
+  }
+  .footer-row{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;}
+  .footer-row p{color:var(--text-faint); font-size:13px;}
+
+  /* Focus visibility */
+  button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible{
+    outline:2px solid var(--green); outline-offset:2px;
+  }
+
+  @media (max-width:900px){
+    .hero-grid{grid-template-columns:1fr;}
+    .pb-grid{grid-template-columns:1fr;}
+    .nav-links{
+      position:fixed; top:64px; right:0; left:0; background:rgba(10,9,23,0.98);
+      flex-direction:column; align-items:stretch; padding:14px; gap:4px;
+      border-bottom:1px solid var(--panel-border);
+      transform:translateY(-130%); transition:.25s; opacity:0;
+    }
+    .nav-links.show{transform:translateY(0); opacity:1;}
+    .nav-toggle{display:flex;}
+    .stat-row{gap:20px;}
+  }
+
+  /* ---------- ACCESS GATE ---------- */
+  #gateOverlay{
+    position:fixed; inset:0; z-index:999; display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(139,92,246,0.25), transparent 60%),
+      radial-gradient(1000px 700px at 100% 10%, rgba(59,130,246,0.2), transparent 55%),
+      var(--bg);
+    padding:24px;
+  }
+  .gate-box{ width:100%; max-width:420px; padding:34px 28px; text-align:center; }
+  .gate-box .brand-mark{ width:52px; height:52px; border-radius:14px; margin:0 auto 18px; font-size:20px; }
+  .gate-box h2{ font-size:22px; margin-bottom:8px; }
+  .gate-box p{ color:var(--text-dim); font-size:14px; margin-bottom:22px; }
+  .gate-input{
+    width:100%; padding:14px 16px; border-radius:10px; border:1px solid var(--panel-border);
+    background:rgba(255,255,255,0.04); color:var(--text); font-family:var(--mono); font-size:15px;
+    text-align:center; letter-spacing:1px; margin-bottom:12px; direction:ltr;
+  }
+  .gate-input:focus{outline:none; border-color:var(--purple);}
+  .gate-msg{ font-size:13px; min-height:18px; margin-bottom:14px; }
+  .gate-msg.err{ color:var(--red); }
+  .gate-msg.ok{ color:var(--green); }
+  .gate-fineprint{ margin-top:22px; font-size:12px; color:var(--text-faint); line-height:1.9; }
+  .gate-admin-link{ display:block; margin-top:16px; font-size:12px; color:var(--text-faint); cursor:pointer; text-decoration:underline; }
+
+  /* ---------- ADMIN PANEL ---------- */
+  #adminOverlay{
+    position:fixed; inset:0; z-index:1000; display:none; align-items:center; justify-content:center;
+    background:rgba(5,4,12,0.88); padding:24px;
+  }
+  #adminOverlay.open{display:flex;}
+  .admin-box{ width:100%; max-width:520px; padding:28px; }
+  .admin-box h3{ font-size:18px; margin-bottom:16px; }
+  .admin-row{ display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+  .admin-row select, .admin-row input{
+    flex:1; min-width:140px; padding:11px 14px; border-radius:9px; border:1px solid var(--panel-border);
+    background:rgba(255,255,255,0.04); color:var(--text); font-family:var(--sans); font-size:14px;
+  }
+  .admin-output{
+    margin-top:14px; padding:14px; border-radius:10px; background:rgba(0,0,0,0.3);
+    font-family:var(--mono); font-size:13px; word-break:break-all; direction:ltr; text-align:left;
+    color:var(--green); min-height:20px;
+  }
+  .admin-close{ margin-top:16px; }
 </style>
 </head>
 <body>
 
-<div id="app">
+<!-- ================= ACCESS GATE ================= -->
+<div id="gateOverlay">
+  <div class="gate-box glass">
+    <div class="brand-mark" style="display:flex;align-items:center;justify-content:center;">AX</div>
+    <h2>ورود به آکادمی</h2>
+    <p>برای استفاده از این پروژه، کد دسترسی خود را وارد کن. اگر کد نداری، آن را از مدیر پروژه بگیر.</p>
+    <input type="text" id="gateCodeInput" class="gate-input" placeholder="کد دسترسی را اینجا وارد کن">
+    <div id="gateMsg" class="gate-msg"></div>
+    <button class="btn btn-primary" id="gateSubmit" style="width:100%; justify-content:center;">🔓 ورود</button>
+    <div class="gate-fineprint">
+      هر کد فقط برای مدتی که مشخص شده (از ۱ ساعت تا ۱ سال) روی همین مرورگر معتبر است.
+      این قفل ساده و سمت کاربر است؛ چون کد پروژه روی گیت‌هاب عمومی است، یک برنامه‌نویس حرفه‌ای می‌تواند آن را دور بزند —
+      هدف این قفل، مدیریت دسترسی برای کاربران عادی است، نه امنیت نظامی.
+    </div>
+    <span class="gate-admin-link" id="openAdminLink">تولید کد جدید (برای مدیر)</span>
+  </div>
+</div>
 
-  <div class="screen active" id="screen-splash">
-    <div class="stars"></div>
-    <div class="wrap" style="text-align:center;">
-      <h1 class="logo-title">DuoDash</h1>
-      <div class="logo-sub">نبرد آرنا آنلاین</div>
-      <div class="muted" style="margin-top:20px;">در حال بارگذاری…</div>
+<!-- ================= ADMIN: CODE GENERATOR ================= -->
+<div id="adminOverlay">
+  <div class="admin-box glass">
+    <h3>🛠️ تولید کد دسترسی</h3>
+    <div class="admin-row">
+      <input type="password" id="adminPass" placeholder="رمز مدیر">
+    </div>
+    <div class="admin-row">
+      <select id="adminDuration">
+        <option value="1">۱ ساعت</option>
+        <option value="24">۱ روز</option>
+        <option value="168">۱ هفته</option>
+        <option value="720">۱ ماه</option>
+        <option value="2160">۳ ماه</option>
+        <option value="8760" selected>۱ سال</option>
+      </select>
+      <button class="btn btn-primary" id="adminGenerate">ساخت کد</button>
+    </div>
+    <div id="adminOutput" class="admin-output">کد اینجا نمایش داده می‌شود...</div>
+    <div class="admin-row">
+      <button class="btn btn-ghost admin-close" id="adminClose">بستن</button>
+      <button class="btn btn-ghost admin-close" id="adminCopy">📋 کپی کد</button>
     </div>
   </div>
+</div>
 
-  <div class="screen" id="screen-nickname">
-    <div class="stars"></div>
-    <div class="wrap">
-      <h1 class="logo-title" style="font-size:30px;">خوش آمدی</h1>
-      <div class="panel">
-        <span class="label">نام نمایشی</span>
-        <input id="nickname-input" class="field" maxlength="14" placeholder="مثلاً: روباه آبی">
-        <div class="row" style="margin-top:10px;">
-          <button class="btn ghost small" id="btn-random-name">🎲 تصادفی</button>
-        </div>
-        <button class="btn primary" id="btn-nickname-continue" style="margin-top:16px;">ادامه</button>
+<div id="siteContent" style="display:none;">
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand">
+      <div class="brand-mark">AX</div>
+      <div>
+        AMX Mod X Academy
+        <small>آکادمی پلاگین‌نویسی</small>
+      </div>
+    </div>
+    <nav class="nav-links" id="navLinks">
+      <a href="#home">خانه</a>
+      <a href="#roadmap">نقشه راه</a>
+      <a href="#tutorials">آموزش‌ها</a>
+      <a href="#explorer">کد اکسپلورر</a>
+      <a href="#dictionary">دیکشنری</a>
+      <a href="#promptbuilder" class="nav-cta">پرامپت‌ساز</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="باز کردن منو">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="home">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Counter-Strike 1.6 &nbsp;•&nbsp; Pawn Language</span>
+      <h1>پلاگین‌نویسی <span class="grad">AMX Mod X</span> را قدم‌به‌قدم یاد بگیر</h1>
+      <p>از اولین <code style="direction:ltr; display:inline-block;">#include</code> تا ساخت یک پلاگین کامل برای سرور کانتر-استرایک ۱.۶؛ کدها را خط‌به‌خط با توضیح فارسی بفهم، در دیکشنری توابع جست‌وجو کن و برای هوش مصنوعی پرامپت حرفه‌ای بساز.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" onclick="document.getElementById('tutorials').scrollIntoView()">🚀 شروع آموزش</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('explorer').scrollIntoView()">کد را توضیح بده</button>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><b>۷</b><span>سرفصل آموزشی</span></div>
+        <div class="stat"><b>۲۵+</b><span>تابع در دیکشنری</span></div>
+        <div class="stat"><b>۱۰۰٪</b><span>توضیح فارسی</span></div>
+      </div>
+    </div>
+
+    <div class="hud-shell">
+      <div class="hud-topbar">
+        <span>server_console.log</span>
+        <div class="hud-dots"><span></span><span></span><span></span></div>
+      </div>
+      <div class="hud-screen">
+        <div class="hud-msg m1">Welcome Player_07 to Dust2 24/7!</div>
+        <div class="hud-msg m2">✔ amx_auto_welcome fired</div>
+        <div class="hud-msg m3">HUD color → random_num(0,3)</div>
+      </div>
+      <div class="hud-console">
+        <div class="line"><span class="k">public</span> <span class="fn">event_ResetHUD</span>(id) {</div>
+        <div class="line">&nbsp;&nbsp;<span class="fn">ShowWelcomeMessage</span>(id)</div>
+        <div class="line">}</div>
       </div>
     </div>
   </div>
+</section>
 
-  <div class="screen" id="screen-menu">
-    <div class="stars"></div>
-    <div class="wrap">
-      <h1 class="logo-title">DuoDash</h1>
-      <div class="logo-sub">نبرد آرنا آنلاین</div>
-      <div class="menu-list panel">
-        <button class="btn primary" id="btn-play-online">▶ بازی سریع آنلاین</button>
-        <button class="btn" id="btn-create-room">ایجاد اتاق</button>
-        <button class="btn" id="btn-join-room">ورود به اتاق</button>
-        <div class="grid2">
-          <button class="btn ghost small" id="btn-howto">آموزش بازی</button>
-          <button class="btn ghost small" id="btn-missions">مأموریت‌ها</button>
-        </div>
-        <div class="grid2">
-          <button class="btn ghost small" id="btn-settings">تنظیمات</button>
-          <button class="btn ghost small" id="btn-about">درباره</button>
-        </div>
-      </div>
-      <div class="small-note">بازیکن: <b id="menu-nickname-display">بازیکن</b> · <span id="menu-level-display">سطح ۱</span></div>
-    </div>
-  </div>
+<!-- ================= CODE EXPLORER ================= -->
+<section id="explorer">
+  <div class="wrap">
+    <span class="eyebrow">Code Explorer</span>
+    <h2 class="section-title">کد پلاگین‌ات را بریز اینجا، خط‌به‌خط توضیح می‌دیم</h2>
+    <p class="section-sub">کد Pawn پلاگین AMX Mod X را در باکس زیر وارد کن و روی «توضیح بده» بزن. هر خط با یک برچسب دسته‌بندی و توضیح فارسی نمایش داده می‌شود.</p>
 
-  <div class="screen" id="screen-create">
-    <div class="stars"></div>
-    <div class="wrap">
-      <div class="topbar"><button class="iconbtn" id="btn-create-back">→</button></div>
-      <h2 class="title-sm">اتاق ساخته شد</h2>
-      <div class="panel" style="text-align:center;">
-        <span class="label">کد اتاق</span>
-        <div class="roomcode-box" id="create-room-code">------</div>
-        <div class="row" style="margin-top:14px;">
-          <button class="btn small" id="btn-copy-code">📋 کپی کد</button>
-          <button class="btn small" id="btn-copy-link">🔗 کپی لینک</button>
-        </div>
-        <div class="small-note" style="margin-top:12px;">کد یا لینک را با حداکثر ۳ دوست به اشتراک بگذار.</div>
-      </div>
-      <button class="btn primary" id="btn-create-go-waiting">ادامه به اتاق انتظار</button>
-    </div>
-  </div>
-
-  <div class="screen" id="screen-join">
-    <div class="stars"></div>
-    <div class="wrap">
-      <div class="topbar"><button class="iconbtn" id="btn-join-back">→</button></div>
-      <h2 class="title-sm">ورود به اتاق</h2>
-      <div class="panel">
-        <span class="label">کد اتاق</span>
-        <input id="join-code-input" class="field code" maxlength="6" placeholder="A7K4P2">
-        <button class="btn primary" id="btn-join-submit" style="margin-top:14px;">ورود</button>
-        <div class="small-note" id="join-error" style="margin-top:10px;color:var(--danger);"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="screen" id="screen-waiting">
-    <div class="stars"></div>
-    <div class="wrap">
-      <h2 class="title-sm">اتاق انتظار</h2>
-      <div class="panel" style="text-align:center;">
-        <span class="label">کد اتاق</span>
-        <div class="roomcode-box" id="waiting-room-code" style="font-size:26px;">------</div>
-      </div>
-      <div class="panel">
-        <span class="label">بازیکنان</span>
-        <div id="waiting-player-list" style="display:flex;flex-direction:column;gap:8px;margin-top:8px;"></div>
-      </div>
-      <button class="btn primary" id="btn-ready" disabled>آماده</button>
-      <button class="btn ghost small" id="btn-leave-waiting">خروج از اتاق</button>
-    </div>
-  </div>
-
-  <div class="screen" id="screen-charselect">
-    <div class="stars"></div>
-    <div class="wrap">
-      <h2 class="title-sm">انتخاب شخصیت</h2>
-      <div class="panel"><div class="char-grid" id="char-grid"></div></div>
-      <div class="panel">
-        <span class="label">وضعیت بازیکنان</span>
-        <div id="charselect-player-list" style="display:flex;flex-direction:column;gap:6px;margin-top:6px;"></div>
-      </div>
-      <button class="btn primary" id="btn-char-ready">من آماده‌ام</button>
-    </div>
-  </div>
-
-  <div class="screen" id="screen-game">
-    <canvas id="gameCanvas"></canvas>
-    <div class="hud">
-      <div class="hud-top">
-        <div class="hud-scores" id="hud-scores"></div>
-        <div class="hud-timer" id="hud-timer">01:30</div>
-        <div class="hud-conn ok" id="hud-conn">● متصل</div>
-      </div>
-      <div class="hud-event" id="hud-event"></div>
-      <div class="hud-conn ok" id="hud-mypowerup" style="position:absolute;top:52px;left:12px;display:none;"></div>
-      <div class="hud-bottom">
-        <div class="joystick-zone" id="joystick-zone">
-          <div class="joystick-base"></div>
-          <div class="joystick-nub" id="joystick-nub"></div>
-        </div>
-        <div class="action-btns">
-          <div class="action-btn ability" id="btn-ability">E<div class="cd" id="ability-cd"></div></div>
-          <div class="action-btn dash" id="btn-dash">دَش<div class="cd" id="dash-cd"></div></div>
+    <div class="explorer-grid">
+      <div class="explorer-input">
+        <div class="bar"><span>code.sma</span><span id="lineCounter">0 خط</span></div>
+        <textarea id="codeInput" spellcheck="false" placeholder="#include <amxmodx>&#10;#include <amxmisc>&#10;&#10;#define PLUGIN &quot;My Plugin&quot;&#10;...&#10;اینجا کد پلاگین خودت را وارد کن"></textarea>
+        <div class="explorer-actions">
+          <button class="btn btn-primary btn-sm" id="explainBtn">📖 توضیح بده</button>
+          <button class="btn btn-ghost btn-sm" id="sampleBtn">🎯 پر کردن با نمونه</button>
+          <button class="btn btn-ghost btn-sm" id="clearBtn">🗑 پاک کردن</button>
         </div>
       </div>
-    </div>
-    <button class="iconbtn pause-btn" id="btn-pause">⏸</button>
-  </div>
 
-  <div class="modal-backdrop" id="screen-countdown">
-    <div class="modal">
-      <div id="countdown-number" style="font-family:var(--font-display);font-size:120px;font-weight:800;color:var(--teal);text-shadow:0 0 40px rgba(68,232,196,.6);">۳</div>
-    </div>
-  </div>
-
-  <div class="screen" id="screen-result">
-    <div class="stars"></div>
-    <div class="wrap">
-      <div class="big-result-title" id="result-title">برنده</div>
-      <div class="panel result-list" id="result-list"></div>
-      <div class="panel" style="text-align:center;">
-        <div>تجربه +<span id="result-xp">۰</span> · سکه +<span id="result-coins">۰</span></div>
-        <div class="mission-bar" style="margin-top:10px;"><div id="result-xp-bar" style="width:0%;"></div></div>
-        <div class="small-note" id="result-level-note" style="margin-top:6px;"></div>
-      </div>
-      <div class="row">
-        <button class="btn primary" id="btn-play-again">بازی مجدد</button>
-        <button class="btn" id="btn-main-menu">منوی اصلی</button>
+      <div class="explain-output" id="explainOutput">
+        <div class="empty-hint">🕹️ منتظر کد شما هستیم... برای شروع سریع می‌توانید روی «پر کردن با نمونه» بزنید.</div>
       </div>
     </div>
   </div>
+</section>
 
-  <div class="screen" id="screen-howto">
-    <div class="stars"></div>
-    <div class="wrap">
-      <div class="topbar"><button class="iconbtn" id="btn-howto-back">→</button></div>
-      <h2 class="title-sm">آموزش بازی</h2>
-      <div class="panel" style="width:100%;">
-        <p><b>هدف:</b> قبل از پایان زمان، بیشتر از رقبا سکه جمع کن. مراقب رویدادهای تصادفی باش!</p>
-        <p><b>حرکت:</b> WASD یا کلیدهای جهت (کیبورد) · جوی‌استیک (لمسی)</p>
-        <p><b>دَش:</b> SPACE یا دکمه دَش — سرعت لحظه‌ای و مصونیت کوتاه.</p>
-        <p><b>توانایی:</b> E یا دکمه توانایی — نبض سکه، سکه‌های اطراف را به سمت تو می‌کشد.</p>
-        <p><b>پاورآپ‌ها:</b> سرعت، سپر، آهنربا، امتیاز دوبرابر، دَش تقویتی، ضریب سکه، دَش اضافه، کند کردن حریف.</p>
-        <p><b>خطرات:</b> تله‌ها کندت می‌کنند. تخته‌های پرش پرتت می‌کنند. سکوهای متحرک حرکت می‌کنند.</p>
-        <p>۱۵ ثانیه آخر <b>حمله نهایی</b> است — سکه بیشتر، هیجان بیشتر!</p>
-      </div>
+<!-- ================= TUTORIALS ================= -->
+<!-- ================= ROADMAP ================= -->
+<section id="roadmap">
+  <div class="wrap">
+    <span class="eyebrow">نقشه راه یک‌ساله</span>
+    <h2 class="section-title">از صفر تا حرفه‌ای در پلاگین‌نویسی AMX Mod X</h2>
+    <p class="section-sub">این مسیر مخصوص کسی طراحی شده که انگلیسی ضعیفی دارد ولی می‌خواهد در کمتر از یک سال، برای سرورهای مچ و زامبی کانتر-استرایک ۱.۶ پلاگین حرفه‌ای بنویسد. هر مرحله را با «کد اکسپلورر» و «پرامپت‌ساز» پایین همین صفحه ترکیب کن.</p>
+    <div class="glass" style="padding:26px; margin-bottom:18px;">
+      <h3 style="margin-bottom:10px;">ماه ۱ تا ۲ — پایه‌ها</h3>
+      <p style="color:var(--text-dim); font-size:14.5px;">نصب AMX Mod X روی یک سرور تست (لوکال یا هاست ارزان)، آشنایی با ساختار فایل .sma، کامپایل با amxxpc، یادگیری متغیر، شرط، حلقه، تابع. هدف: ۳ پلاگین ساده (پیام خوش‌آمد، دستور کنسول، شمارنده کشته‌شده‌ها).</p>
+    </div>
+    <div class="glass" style="padding:26px; margin-bottom:18px;">
+      <h3 style="margin-bottom:10px;">ماه ۳ تا ۵ — رویدادها و مچ‌سرور</h3>
+      <p style="color:var(--text-dim); font-size:14.5px;">کار با register_event، register_forward، مدیریت راند (round start/end)، CVARها، منوها (show_menu)، ذخیره‌سازی امتیاز در فایل. هدف: پلاگین‌های مچ مثل ری‌استارت راند، مدیریت تیم، آمار کیل/دث.</p>
+    </div>
+    <div class="glass" style="padding:26px; margin-bottom:18px;">
+      <h3 style="margin-bottom:10px;">ماه ۶ تا ۸ — پلاگین‌های زامبی</h3>
+      <p style="color:var(--text-dim); font-size:14.5px;">آشنایی با Fun/CStrike modules، تغییر مدل و سلامتی بازیکن، ساخت کلاس‌های زامبی، افکت‌های صوتی و بصری، سیستم امتیاز/سطح. هدف: یک ماد زامبی کوچک با حداقل ۲ کلاس.</p>
+    </div>
+    <div class="glass" style="padding:26px;">
+      <h3 style="margin-bottom:10px;">ماه ۹ تا ۱۲ — حرفه‌ای‌سازی</h3>
+      <p style="color:var(--text-dim); font-size:14.5px;">بهینه‌سازی کد، جلوگیری از کرش و سرریز بافر، کار با دیتابیس (SQLite/MySQL) برای ذخیره آمار بازیکن‌ها، انتشار پلاگین در انجمن‌های فارسی و AlliedModders، گرفتن بازخورد و رفع باگ. هدف نهایی: ساخت و انتشار ۱۰ پلاگین کامل.</p>
     </div>
   </div>
+</section>
 
-  <div class="screen" id="screen-settings">
-    <div class="stars"></div>
-    <div class="wrap">
-      <div class="topbar"><button class="iconbtn" id="btn-settings-back">→</button></div>
-      <h2 class="title-sm">تنظیمات</h2>
-      <div class="panel" style="width:100%;">
-        <div class="settings-row"><span>موسیقی</span><div class="switch" id="sw-music"><div class="knob"></div></div></div>
-        <div class="settings-row"><span>جلوه صوتی</span><div class="switch" id="sw-sound"><div class="knob"></div></div></div>
-        <div class="settings-row"><span>حالت گرافیک پایین</span><div class="switch" id="sw-lowgfx"><div class="knob"></div></div></div>
-        <div class="settings-row"><span>کاهش حرکت</span><div class="switch" id="sw-reducemotion"><div class="knob"></div></div></div>
-        <div class="settings-row"><span>لرزش</span><div class="switch" id="sw-vibration"><div class="knob"></div></div></div>
-        <div class="settings-row"><span>تمام‌صفحه</span><button class="btn small" id="btn-fullscreen">تغییر</button></div>
-      </div>
-      <button class="btn accent" id="btn-reset-progress">بازنشانی پیشرفت</button>
-      <div class="panel" style="width:100%;">
-        <span class="label">سرور بازی (پیشرفته)</span>
-        <p class="small-note" style="text-align:right;margin:4px 0 10px;">اگر اتصال آنلاین مدام قطع می‌شود، آدرس سرور signaling شخصی خود را وارد کن.</p>
-        <input id="custom-host-input" class="field" placeholder="مثلاً: duodash-signaling.onrender.com" style="margin-bottom:8px;direction:ltr;text-align:left;">
-        <div class="row">
-          <input id="custom-port-input" class="field" placeholder="پورت (پیش‌فرض 443)" style="direction:ltr;text-align:left;">
-          <div class="settings-row" style="border:none;padding:0;flex:1;justify-content:flex-start;gap:8px;">
-            <span style="font-size:14px;">امن (TLS)</span>
-            <div class="switch on" id="sw-custom-secure"><div class="knob"></div></div>
+<section id="tutorials" style="background:linear-gradient(180deg, transparent, rgba(139,92,246,0.04), transparent);">
+  <div class="wrap">
+    <span class="eyebrow">Tutorials</span>
+    <h2 class="section-title">مسیر آموزشی، از صفر تا ساخت پلاگین کامل</h2>
+    <p class="section-sub">هفت سرفصل پشت‌سرهم؛ هر کدام روی مطلب قبلی سوار می‌شود. روی هر مورد بزن تا محتوایش باز شود.</p>
+
+    <div class="tut-list" id="tutList"></div>
+  </div>
+</section>
+
+<!-- ================= DICTIONARY ================= -->
+<section id="dictionary">
+  <div class="wrap">
+    <span class="eyebrow">Dictionary</span>
+    <h2 class="section-title">دیکشنری توابع و کلمات کلیدی</h2>
+    <p class="section-sub">بیش از ۲۰۰ تابع، مستقیماً بر اساس ماژول‌های رسمی <code style="direction:ltr; display:inline-block;">amxmodx.org/api</code> — نام هر تابع دقیقاً همان چیزی است که در مستندات رسمی وجود دارد؛ روی هر کارت لینک «مشاهده در مستندات رسمی» هم هست.</p>
+
+    <div class="chip-group" id="dictFilter" style="margin-bottom:16px;"></div>
+
+    <div class="dict-search">
+      <span>🔍</span>
+      <input type="text" id="dictSearch" placeholder="مثلاً: register_event یا رنگ یا cs_get_user...">
+    </div>
+    <div class="dict-count" id="dictCount"></div>
+    <div class="dict-grid" id="dictGrid"></div>
+  </div>
+</section>
+
+<!-- ================= PROMPT BUILDER ================= -->
+<section id="promptbuilder" style="background:linear-gradient(180deg, transparent, rgba(59,130,246,0.05), transparent);">
+  <div class="wrap">
+    <span class="eyebrow">Prompt Builder</span>
+    <h2 class="section-title">پرامپت حرفه‌ای برای ساخت پلاگین بساز</h2>
+    <p class="section-sub">مشخصات پلاگینی که می‌خواهی را وارد کن؛ یک پرامپت کامل و آماده برای هوش مصنوعی تولید می‌شود.</p>
+
+    <div class="pb-grid">
+      <div class="card">
+        <div class="field">
+          <label for="pbName">نام پلاگین</label>
+          <input type="text" id="pbName" placeholder="مثلاً: Auto Welcome Message">
+        </div>
+        <div class="field">
+          <label for="pbDesc">توضیح عملکرد پلاگین</label>
+          <textarea id="pbDesc" placeholder="مثلاً: وقتی بازیکن وارد سرور می‌شود، یک پیام خوش‌آمدگویی رنگی روی HUD نمایش داده شود."></textarea>
+        </div>
+        <div class="field">
+          <label>سطح پلاگین</label>
+          <div class="chip-group" id="pbLevel">
+            <div class="chip active" data-val="ساده">ساده</div>
+            <div class="chip" data-val="متوسط">متوسط</div>
+            <div class="chip" data-val="حرفه‌ای">حرفه‌ای</div>
           </div>
         </div>
-        <div class="row" style="margin-top:10px;">
-          <button class="btn small" id="btn-save-custom-server">ذخیره</button>
-          <button class="btn ghost small" id="btn-clear-custom-server">پیش‌فرض</button>
+        <div class="field">
+          <label>ویژگی‌های خاص (می‌توانید چند مورد انتخاب کنید)</label>
+          <div class="chip-group" id="pbFeatures">
+            <div class="chip" data-val="پیام HUD رنگی">پیام HUD رنگی</div>
+            <div class="chip" data-val="دستور کنسول ادمین">دستور کنسول ادمین</div>
+            <div class="chip" data-val="ذخیره‌سازی در فایل">ذخیره‌سازی در فایل</div>
+            <div class="chip" data-val="کاربرد CVAR قابل تنظیم">CVAR قابل تنظیم</div>
+            <div class="chip" data-val="پشتیبانی چندزبانه">پشتیبانی چندزبانه</div>
+            <div class="chip" data-val="تایمر / زمان‌بندی">تایمر / زمان‌بندی</div>
+          </div>
         </div>
-        <div class="small-note" id="custom-server-status" style="margin-top:8px;"></div>
+        <button class="btn btn-primary" id="pbGenerate" style="width:100%; justify-content:center;">✨ ساخت پرامپت</button>
+      </div>
+
+      <div class="card">
+        <div class="field" style="margin-bottom:12px;">
+          <label>خروجی پرامپت</label>
+        </div>
+        <div class="pb-output" id="pbOutput">با پر کردن فرم و زدن دکمه «ساخت پرامپت»، متن آماده اینجا نمایش داده می‌شود.</div>
+        <div style="margin-top:14px; display:flex; gap:10px;">
+          <button class="btn btn-ghost btn-sm" id="pbCopy">📋 کپی پرامپت</button>
+        </div>
       </div>
     </div>
   </div>
+</section>
 
-  <div class="screen" id="screen-missions">
-    <div class="stars"></div>
-    <div class="wrap">
-      <div class="topbar"><button class="iconbtn" id="btn-missions-back">→</button></div>
-      <h2 class="title-sm">مأموریت‌های روزانه</h2>
-      <div class="panel" style="width:100%;" id="missions-list"></div>
-      <div class="panel" style="text-align:center;">
-        <span class="label">رکورد روزانه</span>
-        <div style="font-family:var(--font-display);font-size:26px;color:var(--gold);" id="streak-display">روز ۱</div>
-      </div>
-    </div>
+<footer>
+  <div class="wrap footer-row">
+    <p>AMX Mod X Academy — ساخته‌شده برای علاقه‌مندان پلاگین‌نویسی کانتر-استرایک ۱.۶ 🎮</p>
+    <p>بدون نیاز به اینترنت اجرا می‌شود • یک فایل، همه‌چیز داخلش</p>
   </div>
+</footer>
 
-  <div class="screen" id="screen-about">
-    <div class="stars"></div>
-    <div class="wrap">
-      <div class="topbar"><button class="iconbtn" id="btn-about-back">→</button></div>
-      <h2 class="title-sm">درباره DuoDash</h2>
-      <div class="panel">
-        <p>DuoDash یک بازی آرنای مرورگری رایگان برای حداکثر ۴ بازیکن است که به صورت peer-to-peer متصل می‌شوند — بدون حساب، بدون نصب.</p>
-        <p class="muted">نسخه ۱٫۱ · کاملاً در یک صفحه استاتیک اجرا می‌شود.</p>
-      </div>
-    </div>
-  </div>
+<script>
+/* =========================================================
+   ACCESS GATE + CODE GENERATOR
+   توجه: این یک قفل سمت کاربر (client-side) است، نه یک سیستم
+   امنیتی واقعی. چون کل کد این صفحه روی گیت‌هاب عمومی است، هر
+   فردی که HTML/JS را بخواند می‌تواند این بخش را دور بزند.
+   این روش فقط برای مدیریت دسترسی کاربران عادیِ آموزش‌بین است.
+   ========================================================= */
+(function(){
+  var SALT = "AMX-ACADEMY-2026-SALT"; // اگر می‌خواهی، این رشته را عوض کن
+  var ADMIN_PASSWORD = "changeme123"; // این را حتماً قبل از انتشار تغییر بده
 
-  <div class="screen" id="screen-error">
-    <div class="stars"></div>
-    <div class="wrap" style="text-align:center;">
-      <div style="font-size:52px;">⚠️</div>
-      <h2 class="title-sm">مشکل اتصال</h2>
-      <div class="panel"><p id="error-message">اتصال آنلاین برقرار نشد. لطفاً اتصال اینترنت را بررسی کن و دوباره امتحان کن.</p></div>
-      <button class="btn primary" id="btn-error-retry">تلاش مجدد</button>
-      <button class="btn ghost small" id="btn-error-back">بازگشت به منو</button>
-    </div>
-  </div>
+  function simpleHash(str){
+    var h = 0;
+    for(var i=0;i<str.length;i++){
+      h = ((h<<5) - h) + str.charCodeAt(i);
+      h |= 0;
+    }
+    return Math.abs(h).toString(36);
+  }
 
-</div>
+  function b64encode(str){ return btoa(unescape(encodeURIComponent(str))); }
+  function b64decode(str){ try{ return decodeURIComponent(escape(atob(str))); }catch(e){ return null; } }
 
-<div id="rotate-overlay">
-  <div class="rotate-icon">📱</div>
-  <div class="title-sm">گوشی را بچرخان</div>
-  <div class="muted">DuoDash در حالت افقی بهتر بازی می‌شود.</div>
-</div>
+  // ------- generate a code for N hours -------
+  function generateCode(hours){
+    var nonce = Math.random().toString(36).slice(2,8);
+    var payload = hours + ":" + nonce;
+    var sig = simpleHash(payload + SALT);
+    return b64encode(payload + ":" + sig);
+  }
 
-<div class="modal-backdrop" id="modal-daily">
-  <div class="modal panel">
-    <button class="close-x" id="daily-close">✕</button>
-    <div class="title-sm">جایزه روزانه</div>
-    <div style="font-family:var(--font-display);font-size:40px;margin:10px 0;" id="daily-reward-icon">🎁</div>
-    <div id="daily-reward-text" class="muted">روز ۱ · +۵۰ سکه</div>
-    <button class="btn primary" id="daily-claim" style="margin-top:14px;">دریافت</button>
-  </div>
-</div>
+  // ------- verify a code, return hours or null -------
+  function verifyCode(code){
+    var raw = b64decode(code.trim());
+    if(!raw) return null;
+    var parts = raw.split(":");
+    if(parts.length !== 3) return null;
+    var hours = parseFloat(parts[0]);
+    var nonce = parts[1];
+    var sig = parts[2];
+    if(isNaN(hours)) return null;
+    var expected = simpleHash(hours + ":" + nonce + SALT);
+    if(expected !== sig) return null;
+    return hours;
+  }
 
-<div class="modal-backdrop" id="modal-disconnect">
-  <div class="modal panel">
-    <div class="title-sm" id="disconnect-title">قطع اتصال حریف</div>
-    <div class="muted" id="disconnect-text">تلاش برای اتصال مجدد…</div>
-    <button class="btn primary" id="disconnect-menu-btn" style="margin-top:14px;">بازگشت به منو</button>
-  </div>
-</div>
+  var STORAGE_KEY = "amxAcademyAccessExpiry";
+  var USED_KEY = "amxAcademyUsedCode";
 
-<div class="modal-backdrop" id="modal-pause">
-  <div class="modal panel">
-    <div class="title-sm">توقف</div>
-    <button class="btn primary" id="btn-resume">ادامه</button>
-    <button class="btn accent" id="btn-quit-match" style="margin-top:10px;">خروج از مسابقه</button>
-  </div>
-</div>
+  function getExpiry(){
+    var v = localStorage.getItem(STORAGE_KEY);
+    return v ? parseInt(v,10) : null;
+  }
 
-<div class="modal-backdrop" id="modal-connecting">
-  <div class="modal panel" style="text-align:center;">
-    <div class="spinner" style="margin:0 auto 14px;"></div>
-    <div class="title-sm" id="connecting-text">در حال اتصال…</div>
-    <div class="muted" style="margin-top:4px;">ممکن است چند ثانیه طول بکشد.</div>
-    <button class="btn ghost small" id="btn-cancel-connecting" style="margin-top:14px;">لغو</button>
-  </div>
-</div>
+  function hasValidAccess(){
+    var exp = getExpiry();
+    return exp && Date.now() < exp;
+  }
 
-<div class="toast" id="toast"></div>
+  function grantAccess(hours){
+    var expiry = Date.now() + hours * 3600 * 1000;
+    localStorage.setItem(STORAGE_KEY, String(expiry));
+  }
 
-<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  function showSite(){
+    document.getElementById("gateOverlay").style.display = "none";
+    document.getElementById("siteContent").style.display = "block";
+  }
+
+  function showGate(){
+    document.getElementById("gateOverlay").style.display = "flex";
+    document.getElementById("siteContent").style.display = "none";
+  }
+
+  // ------- init -------
+  document.addEventListener("DOMContentLoaded", function(){
+    if(hasValidAccess()){
+      showSite();
+    } else {
+      showGate();
+    }
+
+    var input = document.getElementById("gateCodeInput");
+    var msg = document.getElementById("gateMsg");
+    var submitBtn = document.getElementById("gateSubmit");
+
+    function tryEnter(){
+      var code = input.value.trim();
+      if(!code){
+        msg.textContent = "لطفاً یک کد وارد کن.";
+        msg.className = "gate-msg err";
+        return;
+      }
+      var usedList = JSON.parse(localStorage.getItem(USED_KEY) || "[]");
+      if(usedList.indexOf(code) !== -1){
+        // همان کد قبلاً روی همین مرورگر استفاده شده؛ اگر هنوز معتبر است اجازه بده
+        if(hasValidAccess()){ showSite(); return; }
+      }
+      var hours = verifyCode(code);
+      if(hours === null){
+        msg.textContent = "❌ کد نامعتبر است.";
+        msg.className = "gate-msg err";
+        return;
+      }
+      grantAccess(hours);
+      usedList.push(code);
+      localStorage.setItem(USED_KEY, JSON.stringify(usedList));
+      msg.textContent = "✅ کد پذیرفته شد! در حال ورود...";
+      msg.className = "gate-msg ok";
+      setTimeout(showSite, 500);
+    }
+
+    submitBtn.addEventListener("click", tryEnter);
+    input.addEventListener("keydown", function(e){ if(e.key === "Enter") tryEnter(); });
+
+    // ------- admin panel -------
+    var adminOverlay = document.getElementById("adminOverlay");
+    document.getElementById("openAdminLink").addEventListener("click", function(){
+      adminOverlay.classList.add("open");
+    });
+    document.getElementById("adminClose").addEventListener("click", function(){
+      adminOverlay.classList.remove("open");
+    });
+    document.getElementById("adminGenerate").addEventListener("click", function(){
+      var pass = document.getElementById("adminPass").value;
+      var out = document.getElementById("adminOutput");
+      if(pass !== ADMIN_PASSWORD){
+        out.textContent = "رمز مدیر اشتباه است.";
+        out.style.color = "var(--red)";
+        return;
+      }
+      var hours = parseFloat(document.getElementById("adminDuration").value);
+      var code = generateCode(hours);
+      out.textContent = code;
+      out.style.color = "var(--green)";
+    });
+    document.getElementById("adminCopy").addEventListener("click", function(){
+      var text = document.getElementById("adminOutput").textContent;
+      if(navigator.clipboard) navigator.clipboard.writeText(text);
+    });
+  });
+})();
+</script>
+
 <script>
 (function(){
-'use strict';
+  "use strict";
 
-/* =========================================================
-   DuoDash v1.1 — نسخه کامل فارسی
-   ========================================================= */
-
-var ARENA_W = 1800, ARENA_H = 1000;
-var MATCH_SECONDS = 90;
-var FINAL_RUSH_AT = 15;
-var MAX_PLAYERS = 4;
-var TICK_HZ = 30;
-var PLAYER_RADIUS = 24;
-var MOVE_SPEED = 280;
-var DASH_SPEED = 760;
-var DASH_TIME = 0.18;
-var DASH_COOLDOWN = 2.2;
-var ABILITY_COOLDOWN = 5.5;
-var ABILITY_RADIUS = 240;
-
-var PLAYER_COLORS = ['#44e8c4', '#ff5da2', '#ffd166', '#8c7bff'];
-
-var Storage = (function(){
-  var KEY = 'duodash_save_v1';
-  function defaults(){
-    return {
-      nickname: '', xp: 0, coins: 0, level: 1,
-      lastDailyClaim: null, dailyStreak: 0,
-      missionsDate: null, missions: [],
-      settings: { music:true, sound:true, lowGfx:false, reduceMotion:false, vibration:true, customHost:'', customPort:'', customSecure:true },
-      cosmetics: { unlocked: ['default'] },
-      stats: { matches:0, wins:0, coinsCollected:0, powerupsUsed:0 }
-    };
-  }
-  var data = null;
-  function load(){
-    try{
-      var raw = localStorage.getItem(KEY);
-      if(!raw){ data = defaults(); save(); }
-      else{
-        data = JSON.parse(raw);
-        var d = defaults();
-        for(var k in d){ if(!(k in data)) data[k]=d[k]; }
-        for(var k2 in d.settings){ if(!(k2 in data.settings)) data.settings[k2]=d.settings[k2]; }
-      }
-    }catch(e){ data = defaults(); }
-    return data;
-  }
-  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){} }
-  function get(){ return data; }
-  function reset(){ data = defaults(); save(); }
-  return { load:load, save:save, get:get, reset:reset };
-})();
-
-var MISSION_TEMPLATES = [
-  { id:'play1', text:'یک مسابقه بازی کن', target:1, type:'matches' },
-  { id:'play3', text:'سه مسابقه بازی کن', target:3, type:'matches' },
-  { id:'coins50', text:'۵۰ سکه جمع کن', target:50, type:'coins' },
-  { id:'win1', text:'یک مسابقه ببر', target:1, type:'wins' },
-  { id:'powerup3', text:'۳ پاورآپ استفاده کن', target:3, type:'powerups' }
-];
-
-function todayStr(){ return new Date().toDateString(); }
-
-function ensureDailyState(){
-  var s = Storage.get();
-  if(s.missionsDate !== todayStr()){
-    s.missionsDate = todayStr();
-    s.missions = MISSION_TEMPLATES.map(function(m){ return { id:m.id, progress:0, claimed:false }; });
-    Storage.save();
-  }
-  return s;
-}
-
-function checkDailyReward(){
-  var s = Storage.get();
-  if(s.lastDailyClaim === todayStr()) return null;
-  var dayIndex = (s.dailyStreak % 7);
-  var rewards = [
-    {icon:'🪙', text:'روز ۱ · +۵۰ سکه', apply:function(){ s.coins += 50; }},
-    {icon:'⭐', text:'روز ۲ · +۳۰ تجربه', apply:function(){ s.xp += 30; }},
-    {icon:'🎩', text:'روز ۳ · کلاه ویژه', apply:function(){ if(s.cosmetics.unlocked.indexOf('hat')<0) s.cosmetics.unlocked.push('hat'); }},
-    {icon:'🪙', text:'روز ۴ · +۸۰ سکه', apply:function(){ s.coins += 80; }},
-    {icon:'⚡', text:'روز ۵ · ژتون تقویت', apply:function(){ s.coins += 20; s.xp += 20; }},
-    {icon:'🦊', text:'روز ۶ · آواتار ویژه', apply:function(){ if(s.cosmetics.unlocked.indexOf('avatar')<0) s.cosmetics.unlocked.push('avatar'); }},
-    {icon:'🏆', text:'روز ۷ · +۲۰۰ سکه و +۱۰۰ تجربه', apply:function(){ s.coins += 200; s.xp += 100; }}
-  ];
-  return { index:dayIndex, reward: rewards[dayIndex] };
-}
-function claimDailyReward(rewardObj){
-  var s = Storage.get();
-  rewardObj.reward.apply();
-  s.lastDailyClaim = todayStr();
-  s.dailyStreak += 1;
-  Storage.save();
-}
-
-function xpForLevel(level){ return Math.round(50 * Math.pow(level, 1.6)); }
-function addProgress(xpGain, coinsGain){
-  var s = Storage.get();
-  s.xp += xpGain; s.coins += coinsGain;
-  var leveledUp = false;
-  while(s.xp >= xpForLevel(s.level)){
-    s.xp -= xpForLevel(s.level);
-    s.level += 1;
-    leveledUp = true;
-  }
-  Storage.save();
-  return leveledUp;
-}
-
-function updateMissionProgress(type, amount){
-  var s = ensureDailyState();
-  s.missions.forEach(function(m){
-    var tmpl = MISSION_TEMPLATES.filter(function(t){return t.id===m.id;})[0];
-    if(tmpl && tmpl.type === type && !m.claimed){
-      m.progress = Math.min(tmpl.target, m.progress + amount);
-    }
+  /* ---------------- NAV ---------------- */
+  var navToggle = document.getElementById('navToggle');
+  var navLinks = document.getElementById('navLinks');
+  navToggle.addEventListener('click', function(){
+    navLinks.classList.toggle('show');
   });
-  Storage.save();
-}
+  navLinks.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ navLinks.classList.remove('show'); });
+  });
 
-var AudioEngine = (function(){
-  var ctx = null;
-  var musicOn = true, sfxOn = true;
-  function ensureCtx(){
-    if(!ctx){ try{ ctx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ ctx = null; } }
-    if(ctx && ctx.state === 'suspended'){ ctx.resume(); }
-    return ctx;
-  }
-  function setMusic(on){ musicOn = on; if(on) startMusic(); else stopMusic(); }
-  function setSfx(on){ sfxOn = on; }
-  function tone(freq, dur, type, gainVal, delay){
-    if(!sfxOn) return;
-    var c = ensureCtx(); if(!c) return;
-    var t0 = c.currentTime + (delay||0);
-    var osc = c.createOscillator();
-    var gain = c.createGain();
-    osc.type = type || 'sine';
-    osc.frequency.setValueAtTime(freq, t0);
-    gain.gain.setValueAtTime(0.0001, t0);
-    gain.gain.exponentialRampToValueAtTime(gainVal||0.15, t0+0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
-    osc.connect(gain); gain.connect(c.destination);
-    osc.start(t0); osc.stop(t0+dur+0.02);
-  }
-  var sfx = {
-    click: function(){ tone(520,0.08,'square',0.08); },
-    start: function(){ tone(330,0.15,'sawtooth',0.1); tone(660,0.15,'sine',0.08,0.08); },
-    coin: function(){ tone(880,0.08,'square',0.07); tone(1320,0.09,'square',0.06,0.05); },
-    powerup: function(){ tone(440,0.12,'triangle',0.1); tone(880,0.15,'triangle',0.08,0.08); },
-    dash: function(){ tone(200,0.1,'sawtooth',0.09); },
-    victory: function(){ [523,659,784,1046].forEach(function(f,i){ tone(f,0.22,'triangle',0.12,i*0.12); }); },
-    defeat: function(){ [400,340,280].forEach(function(f,i){ tone(f,0.3,'sine',0.1,i*0.15); }); },
-    levelup: function(){ [440,554,659,880].forEach(function(f,i){ tone(f,0.16,'square',0.09,i*0.09); }); }
-  };
-  var musicTimer = null;
-  function startMusic(){
-    if(!musicOn) return;
-    var c = ensureCtx(); if(!c) return;
-    if(musicTimer) return;
-    var notes = [220,262,294,330,294,262];
-    var i = 0;
-    musicTimer = setInterval(function(){
-      if(!musicOn) return;
-      tone(notes[i % notes.length], 0.4, 'sine', 0.035);
-      i++;
-    }, 900);
-  }
-  function stopMusic(){ if(musicTimer){ clearInterval(musicTimer); musicTimer=null; } }
-  return { sfx:sfx, setMusic:setMusic, setSfx:setSfx, startMusic:startMusic, stopMusic:stopMusic, ensureCtx:ensureCtx };
-})();
-
-var CHARACTERS = [
-  { id:'fox', name:'روباه', body:'#ff9a4d', accent:'#ffffff', feature:'ears' },
-  { id:'robot', name:'ربات', body:'#9fb4c7', accent:'#44e8c4', feature:'antenna' },
-  { id:'cat', name:'گربه', body:'#b892ff', accent:'#ffffff', feature:'ears2' },
-  { id:'knight', name:'شوالیه', body:'#7c93c9', accent:'#ffd166', feature:'helmet' },
-  { id:'explorer', name:'کاوشگر', body:'#7fc98a', accent:'#5a3b25', feature:'hat' },
-  { id:'astronaut', name:'فضانورد', body:'#f2f2f2', accent:'#44e8c4', feature:'visor' }
-];
-function getCharacter(id){ for(var i=0;i<CHARACTERS.length;i++) if(CHARACTERS[i].id===id) return CHARACTERS[i]; return CHARACTERS[0]; }
-
-function drawCharacterIcon(canvas, charId, selected){
-  var ctx = canvas.getContext('2d');
-  var w = canvas.width, h = canvas.height;
-  ctx.clearRect(0,0,w,h);
-  drawCharacterBody(ctx, charId, w/2, h/2, w*0.34, 0, false);
-}
-
-function drawCharacterBody(ctx, charId, x, y, r, facing, dashing){
-  var c = getCharacter(charId);
-  ctx.save();
-  ctx.translate(x,y);
-  ctx.beginPath();
-  ctx.ellipse(0, r*0.85, r*0.9, r*0.28, 0, 0, Math.PI*2);
-  ctx.fillStyle = 'rgba(0,0,0,0.28)';
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(0,0,r,0,Math.PI*2);
-  ctx.fillStyle = c.body;
-  ctx.fill();
-  ctx.lineWidth = Math.max(2, r*0.08);
-  ctx.strokeStyle = 'rgba(0,0,0,0.18)';
-  ctx.stroke();
-  ctx.fillStyle = c.accent;
-  if(c.feature === 'ears'){
-    tri(ctx, -r*0.55,-r*0.75, -r*0.15,-r*1.25, -r*0.05,-r*0.55);
-    tri(ctx, r*0.55,-r*0.75, r*0.15,-r*1.25, r*0.05,-r*0.55);
-    ctx.fillStyle = c.body; tri(ctx, -r*0.4,-r*0.8,-r*0.22,-r*1.05,-r*0.12,-r*0.7);
-  } else if(c.feature==='ears2'){
-    tri(ctx, -r*0.5,-r*0.7, -r*0.05,-r*1.15, r*0.02,-r*0.55);
-    tri(ctx, r*0.5,-r*0.7, r*0.05,-r*1.15, -r*0.02,-r*0.55);
-  } else if(c.feature==='antenna'){
-    ctx.beginPath(); ctx.moveTo(0,-r*0.9); ctx.lineTo(0,-r*1.5); ctx.lineWidth=r*0.12; ctx.strokeStyle=c.accent; ctx.stroke();
-    ctx.beginPath(); ctx.arc(0,-r*1.55,r*0.14,0,Math.PI*2); ctx.fill();
-    ctx.fillRect(-r*0.55,-r*0.15,r*1.1,r*0.42);
-  } else if(c.feature==='helmet'){
-    ctx.beginPath(); ctx.arc(0,-r*0.05,r*0.98,Math.PI,Math.PI*2); ctx.fill();
-    ctx.fillRect(-r*0.14,-r*1.05,r*0.28,r*0.35);
-  } else if(c.feature==='hat'){
-    ctx.beginPath(); ctx.ellipse(0,-r*0.75,r*0.85,r*0.22,0,0,Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(0,-r*0.95,r*0.5,Math.PI,Math.PI*2); ctx.fill();
-  } else if(c.feature==='visor'){
-    ctx.beginPath(); ctx.ellipse(0,-r*0.05,r*0.62,r*0.42,0,0,Math.PI*2);
-    ctx.fillStyle = 'rgba(30,30,50,0.6)'; ctx.fill();
-    ctx.strokeStyle = c.accent; ctx.lineWidth=r*0.1; ctx.stroke();
-  }
-  ctx.fillStyle = '#1c1830';
-  var eyeOffset = facing<0 ? -1 : (facing>0 ? 1 : 0);
-  ctx.beginPath(); ctx.arc(-r*0.28+eyeOffset*r*0.08, r*0.05, r*0.13, 0, Math.PI*2); ctx.fill();
-  ctx.beginPath(); ctx.arc(r*0.28+eyeOffset*r*0.08, r*0.05, r*0.13, 0, Math.PI*2); ctx.fill();
-  if(dashing){
-    ctx.strokeStyle = 'rgba(255,255,255,0.55)';
-    ctx.lineWidth = r*0.14;
-    for(var i=1;i<=3;i++){
-      ctx.beginPath(); ctx.arc(0,0,r+ i*7,0,Math.PI*2); ctx.globalAlpha = 0.25/i; ctx.stroke();
-    }
-    ctx.globalAlpha = 1;
-  }
-  ctx.restore();
-}
-function tri(ctx,x1,y1,x2,y2,x3,y3){ ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.lineTo(x3,y3); ctx.closePath(); ctx.fill(); }
-
-var ARENA_THEMES = ['باغ آسمانی','پارک نئون','معبد صحرا','جزیره آبنبات'];
-function buildArena(themeIndex){
-  var theme = ARENA_THEMES[themeIndex % ARENA_THEMES.length];
-  var obstacles = [
-    {x:300,y:240,w:160,h:40}, {x:1340,y:240,w:160,h:40},
-    {x:300,y:720,w:160,h:40}, {x:1340,y:720,w:160,h:40},
-    {x:820,y:120,w:40,h:180}, {x:820,y:700,w:40,h:180},
-    {x:80,y:460,w:40,h:200}, {x:1680,y:460,w:40,h:200},
-    {x:560,y:480,w:160,h:40}, {x:1080,y:480,w:160,h:40}
+  /* ---------------- DICTIONARY DATA ---------------- */
+  /* نام هر تابع دقیقاً از مستندات رسمی AMX Mod X گرفته شده: amxmodx.org/api
+     ماژول‌ها همان include فایل‌های واقعی هستند؛ لینک هر کارت به صفحه رسمی همان تابع می‌رود. */
+  var MODULES = [
+    { id:"amxmodx", title:"ماژول اصلی (amxmodx.inc)", url:"https://www.amxmodx.org/api/amxmodx", items:[
+      {term:"register_plugin", desc:"پلاگین را در سیستم ثبت می‌کند؛ نام، نسخه و نویسنده را مشخص می‌کند."},
+      {term:"register_event", desc:"یک رویداد بازی (مثل ResetHUD) را به تابع شما وصل می‌کند."},
+      {term:"register_event_ex", desc:"نسخه پیشرفته‌تر register_event با پارامترهای اضافی برای فیلتر کردن رویداد."},
+      {term:"register_concmd", desc:"یک دستور کنسول سمت سرور (مثل amx_command) ثبت می‌کند."},
+      {term:"register_clcmd", desc:"یک دستور سمت کلاینت (چیزی که خود بازیکن در کنسول خودش می‌زند) ثبت می‌کند."},
+      {term:"register_srvcmd", desc:"یک دستور کنسول سرور (قابل اجرا فقط از کنسول سرور) ثبت می‌کند."},
+      {term:"register_logevent", desc:"یک الگو در لاگ بازی را ثبت می‌کند تا با رخ دادنش تابعی صدا زده شود."},
+      {term:"register_menucmd", desc:"یک شناسه منو را برای دریافت کلیک‌های بازیکن روی آن ثبت می‌کند."},
+      {term:"register_menuid", desc:"یک شناسه عددی جدید برای منوی سفارشی رزرو می‌کند."},
+      {term:"register_native", desc:"یک تابع native جدید تعریف می‌کند که پلاگین‌های دیگر می‌توانند صدا بزنند."},
+      {term:"register_library", desc:"نام یک کتابخانه را ثبت می‌کند تا پلاگین‌های دیگر بتوانند وجودش را بررسی کنند."},
+      {term:"client_authorized", desc:"فوروارد: وقتی هویت بازیکن توسط استیم تأیید شد صدا زده می‌شود."},
+      {term:"client_command", desc:"فوروارد: هر بار بازیکن یک دستور کلاینتی اجرا کند صدا زده می‌شود."},
+      {term:"client_connect", desc:"فوروارد: زمانی که بازیکن در حال اتصال به سرور است اجرا می‌شود."},
+      {term:"client_disconnect", desc:"فوروارد: وقتی بازیکن سرور را ترک می‌کند اجرا می‌شود."},
+      {term:"client_infochanged", desc:"فوروارد: هرگاه اطلاعات بازیکن (مثل نام) تغییر کند اجرا می‌شود."},
+      {term:"client_putinserver", desc:"فوروارد: زمانی که بازیکن کاملاً وارد بازی شده (spawn شده) اجرا می‌شود."},
+      {term:"plugin_init", desc:"تابع ویژه‌ای که هنگام بارگذاری پلاگین یک‌بار اجرا می‌شود؛ محل مناسب ثبت رویدادها و دستورات."},
+      {term:"plugin_precache", desc:"قبل از plugin_init اجرا می‌شود؛ برای پیش‌بارگذاری مدل و صدا استفاده می‌شود."},
+      {term:"plugin_cfg", desc:"بعد از اجرای فایل‌های کانفیگ سرور صدا زده می‌شود."},
+      {term:"plugin_end", desc:"درست قبل از تخلیه‌شدن پلاگین از حافظه اجرا می‌شود."},
+      {term:"plugin_pause / plugin_unpause", desc:"وقتی پلاگین موقتاً متوقف یا دوباره فعال می‌شود صدا زده می‌شوند."},
+      {term:"set_task", desc:"یک تایمر می‌سازد تا بعد از زمان مشخص (یا تکراری) یک تابع اجرا شود."},
+      {term:"remove_task", desc:"یک تایمر ثبت‌شده با set_task را قبل از اجرا لغو می‌کند."},
+      {term:"task_exists", desc:"بررسی می‌کند تایمری با شناسه مشخص هنوز فعال است یا نه."},
+      {term:"change_task", desc:"زمان‌بندی یک تایمر در حال اجرا را تغییر می‌دهد."},
+      {term:"set_hudmessage", desc:"رنگ، موقعیت، مدت‌زمان و افکت پیام بعدی HUD را تنظیم می‌کند."},
+      {term:"show_hudmessage", desc:"پیام تنظیم‌شده با set_hudmessage را برای یک بازیکن نمایش می‌دهد."},
+      {term:"set_dhudmessage / show_dhudmessage", desc:"مشابه HUD معمولی، اما پیام «داینامیک» است و می‌تواند در طول زمان به‌روزرسانی شود."},
+      {term:"CreateHudSyncObj / ShowSyncHudMsg / ClearSyncHud", desc:"مجموعه‌ای برای مدیریت پیام‌های HUD همگام (Sync) که با هم تداخل نمی‌کنند."},
+      {term:"client_print", desc:"یک پیام متنی در چت یا کنسول بازیکن نمایش می‌دهد."},
+      {term:"client_print_color", desc:"مثل client_print اما امکان رنگی کردن بخشی از متن در چت را می‌دهد."},
+      {term:"console_print", desc:"یک پیام را در کنسول یک بازیکن خاص چاپ می‌کند."},
+      {term:"server_print", desc:"یک پیام را در کنسول سرور چاپ می‌کند."},
+      {term:"log_message / log_amx", desc:"یک پیام را در فایل لاگ استاندارد AMX Mod X ثبت می‌کند."},
+      {term:"log_error", desc:"یک خطای اجرایی پلاگین را در لاگ ثبت می‌کند."},
+      {term:"log_to_file", desc:"یک پیام دلخواه را در یک فایل لاگ مشخص ذخیره می‌کند."},
+      {term:"get_user_name", desc:"نام درون‌بازی یک بازیکن را بر اساس شناسه (id) برمی‌گرداند."},
+      {term:"get_user_index", desc:"شناسه عددی بازیکن را از روی نام او پیدا می‌کند."},
+      {term:"get_user_ip", desc:"آدرس IP بازیکن را برمی‌گرداند."},
+      {term:"get_user_authid", desc:"شناسه استیم (SteamID) بازیکن را برمی‌گرداند."},
+      {term:"get_user_userid", desc:"شناسه یکتای داخلی موتور بازی برای بازیکن را برمی‌گرداند."},
+      {term:"get_user_team", desc:"نام تیم فعلی بازیکن را برمی‌گرداند."},
+      {term:"get_user_flags", desc:"پرچم‌های دسترسی (ادمین) بازیکن را برمی‌گرداند."},
+      {term:"get_user_menu", desc:"شناسه منویی که هم‌اکنون برای بازیکن باز است را برمی‌گرداند."},
+      {term:"get_user_ping", desc:"مقدار پینگ و لاس بازیکن را برمی‌گرداند."},
+      {term:"get_user_time", desc:"مدت‌زمان حضور بازیکن در سرور را برمی‌گرداند."},
+      {term:"get_user_weapon / get_user_weapons", desc:"اسلحه فعلی یا لیست کامل اسلحه‌های بازیکن را برمی‌گرداند."},
+      {term:"get_user_origin", desc:"مختصات فعلی بازیکن (یا نقطه‌ای که به آن نگاه می‌کند) را برمی‌گرداند."},
+      {term:"get_user_info / set_user_info", desc:"مقدار یک کلید اطلاعاتی بازیکن (مثل مدل) را می‌خواند یا تنظیم می‌کند."},
+      {term:"get_players / get_playersnum", desc:"لیست بازیکنان حاضر در سرور یا تعداد آن‌ها را برمی‌گرداند."},
+      {term:"is_user_connected", desc:"بررسی می‌کند بازیکن به سرور متصل است یا نه."},
+      {term:"is_user_alive", desc:"بررسی می‌کند بازیکن زنده است یا نه."},
+      {term:"is_user_bot", desc:"بررسی می‌کند بازیکن یک ربات (Bot) است یا نه."},
+      {term:"is_user_hltv", desc:"بررسی می‌کند اتصال مربوط به HLTV (پخش‌کننده) است یا نه."},
+      {term:"is_map_valid", desc:"بررسی می‌کند نام یک مپ در سرور معتبر و موجود است یا نه."},
+      {term:"get_mapname", desc:"نام مپ فعلی سرور را برمی‌گرداند."},
+      {term:"get_modname", desc:"نام مود بازی در حال اجرا (مثلاً cstrike) را برمی‌گرداند."},
+      {term:"get_maxplayers", desc:"حداکثر ظرفیت بازیکن سرور را برمی‌گرداند."},
+      {term:"get_gametime / get_timeleft", desc:"زمان سپری‌شده از شروع مپ یا زمان باقی‌مانده تا تعویض مپ را برمی‌گرداند."},
+      {term:"get_localinfo / set_localinfo", desc:"مقداری محلی (مخصوص همین پلاگین/سرور) را می‌خواند یا ذخیره می‌کند."},
+      {term:"find_player / find_player_ex", desc:"بازیکنی را بر اساس معیارهایی مثل تیم یا نام پیدا می‌کند."},
+      {term:"random_num", desc:"یک عدد صحیح تصادفی بین دو مقدار مشخص تولید می‌کند."},
+      {term:"random_float", desc:"یک عدد اعشاری تصادفی بین دو مقدار مشخص تولید می‌کند."},
+      {term:"client_cmd", desc:"یک دستور کلاینتی را طوری اجرا می‌کند که انگار خود بازیکن آن را تایپ کرده."},
+      {term:"engclient_cmd", desc:"مشابه client_cmd اما مستقیماً از طریق موتور بازی."},
+      {term:"server_cmd / server_exec", desc:"یک دستور کنسول سرور را صف می‌کند یا بلافاصله اجرا می‌کند."},
+      {term:"change_level / engine_changelevel", desc:"سرور را به مپ دیگری تغییر می‌دهد."},
+      {term:"precache_model / precache_sound / precache_generic", desc:"یک مدل، صدا یا فایل عمومی را از قبل برای استفاده در بازی بارگذاری می‌کند."},
+      {term:"precache_event", desc:"یک رویداد سفارشی موتور را برای استفاده بعدی پیش‌بارگذاری می‌کند."},
+      {term:"emit_sound", desc:"یک فایل صوتی را از یک موجودیت (مثلاً بازیکن) پخش می‌کند."},
+      {term:"user_kill", desc:"بازیکن مشخص‌شده را می‌کشد."},
+      {term:"user_slap", desc:"بازیکن را «تکان» می‌دهد و در صورت تنظیم، مقداری آسیب به او وارد می‌کند."},
+      {term:"read_argc / read_args / read_argv", desc:"تعداد، کل متن یا یک آرگومان خاص از دستور اجراشده را می‌خوانند."},
+      {term:"read_data / read_datanum / read_flags", desc:"داده‌های ارسالی به یک منو یا دستور را می‌خوانند."},
+      {term:"read_logargv / read_logargc / read_logdata", desc:"آرگومان‌های یک خط لاگ ثبت‌شده با register_logevent را می‌خوانند."},
+      {term:"is_module_loaded / is_plugin_loaded", desc:"بررسی می‌کند یک ماژول یا پلاگین خاص در حال حاضر بارگذاری‌شده است."},
+      {term:"get_plugin / get_pluginsnum", desc:"اطلاعات یک پلاگین بارگذاری‌شده یا تعداد کل پلاگین‌ها را برمی‌گرداند."},
+      {term:"format_time / parse_time", desc:"یک بازه زمانی را به متن خوانا تبدیل می‌کند یا برعکس، متن را به ثانیه تبدیل می‌کند."},
+      {term:"md5 / md5_file / hash_string / hash_file", desc:"هش (اثر انگشت دیجیتال) یک رشته یا فایل را محاسبه می‌کنند."},
+      {term:"abort / set_fail_state", desc:"اجرای پلاگین را با یک پیام خطا متوقف می‌کنند."},
+      {term:"CreateMultiForward / CreateOneForward / ExecuteForward / DestroyForward", desc:"مجموعه‌ای برای ساخت و اجرای forward سفارشی بین پلاگین‌ها."}
+    ]},
+    { id:"amxmisc", title:"ابزارهای کمکی (amxmisc.inc)", url:"https://www.amxmodx.org/api/amxmisc", items:[
+      {term:"access", desc:"بررسی می‌کند بازیکن سطح دسترسی مشخصی را دارد یا نه."},
+      {term:"cmd_access", desc:"دسترسی و صحت آرگومان‌های یک دستور کنسول را یک‌جا بررسی می‌کند."},
+      {term:"cmd_target", desc:"هدف یک دستور ادمین (بازیکنی که دستور روی او اجرا می‌شود) را پیدا و اعتبارسنجی می‌کند."},
+      {term:"is_user_admin", desc:"بررسی می‌کند بازیکن حداقل یک سطح دسترسی ادمین دارد."},
+      {term:"has_flag / has_all_flags", desc:"بررسی می‌کند یک مجموعه پرچم شامل پرچم(های) مشخصی است یا نه."},
+      {term:"colored_menus", desc:"بررسی می‌کند کلاینت بازیکن از منوهای رنگی پشتیبانی می‌کند."},
+      {term:"show_activity / show_activity_id / show_activity_key", desc:"یک پیام فعالیت ادمین را طبق تنظیمات amx_show_activity به بازیکنان نمایش می‌دهد."},
+      {term:"register_menu", desc:"یک منوی متنی سفارشی (کلاسیک) با گزینه‌های دلخواه ثبت می‌کند."},
+      {term:"reset_menu", desc:"وضعیت منوی فعلی بازیکن را پاک می‌کند."},
+      {term:"get_players_ex / get_playersnum_ex", desc:"لیست یا تعداد بازیکنان را با فیلترهای پیشرفته‌تر (تیم، زنده/مرده و...) برمی‌گرداند."},
+      {term:"cstrike_running", desc:"بررسی می‌کند مود فعلی سرور، Counter-Strike است."},
+      {term:"AddMenuItem / AddClientMenuItem", desc:"یک گزینه جدید به یک منوی کلاسیک اضافه می‌کند."},
+      {term:"set_task_ex", desc:"نسخه پیشرفته‌تر set_task برای موارد خاص‌تر زمان‌بندی."}
+    ]},
+    { id:"cvars", title:"متغیرهای سرور (cvars.inc)", url:"https://www.amxmodx.org/api/cvars", items:[
+      {term:"register_cvar", desc:"یک CVAR جدید با نام و مقدار پیش‌فرض می‌سازد."},
+      {term:"create_cvar", desc:"نسخه جدیدتر و پیشرفته‌تر register_cvar با پارامترهای بیشتر (توضیح، محدوده و...)."},
+      {term:"get_cvar_string / set_cvar_string", desc:"مقدار متنی یک CVAR (با نام) را می‌خواند یا تنظیم می‌کند."},
+      {term:"get_cvar_num / set_cvar_num", desc:"مقدار عددی صحیح یک CVAR را می‌خواند یا تنظیم می‌کند."},
+      {term:"get_cvar_float", desc:"مقدار اعشاری یک CVAR را می‌خواند."},
+      {term:"get_pcvar_num / set_pcvar_num", desc:"مقدار عددی یک CVAR را از روی هندل آن (سریع‌تر از نام) می‌خواند یا تنظیم می‌کند."},
+      {term:"get_pcvar_float / set_pcvar_float", desc:"مقدار اعشاری یک CVAR را از روی هندل آن می‌خواند یا تنظیم می‌کند."},
+      {term:"get_pcvar_string / set_pcvar_string", desc:"مقدار متنی یک CVAR را از روی هندل آن می‌خواند یا تنظیم می‌کند."},
+      {term:"get_pcvar_bool / set_pcvar_bool", desc:"مقدار یک CVAR را به‌صورت درست/نادرست می‌خواند یا تنظیم می‌کند."},
+      {term:"bind_pcvar_num / bind_pcvar_float / bind_pcvar_string", desc:"یک متغیر پلاگین را مستقیماً به مقدار یک CVAR متصل می‌کند تا همیشه هماهنگ باشند."},
+      {term:"hook_cvar_change / disable_cvar_hook / enable_cvar_hook", desc:"تابعی را برای اجرا هر بار که مقدار یک CVAR تغییر کند وصل یا مدیریت می‌کند."},
+      {term:"cvar_exists", desc:"بررسی می‌کند CVAR‌ای با این نام از قبل وجود دارد."},
+      {term:"get_cvar_pointer / get_pcvar_flags / set_cvar_flags", desc:"هندل یا پرچم‌های دسترسی یک CVAR را می‌خوانند یا تنظیم می‌کنند."},
+      {term:"get_pcvar_bounds / set_pcvar_bounds", desc:"محدوده مجاز (حداقل/حداکثر) مقدار یک CVAR را می‌خواند یا تنظیم می‌کند."}
+    ]},
+    { id:"string", title:"رشته‌ها (string.inc)", url:"https://www.amxmodx.org/api/string", items:[
+      {term:"strlen", desc:"طول یک رشته متنی را برمی‌گرداند."},
+      {term:"copy / copyc", desc:"محتوای یک رشته را در متغیر دیگری کپی می‌کند."},
+      {term:"format / formatex", desc:"یک رشته را بر اساس یک قالب (%s، %d و...) می‌سازد، شبیه sprintf."},
+      {term:"format_args", desc:"آرگومان‌های ورودی یک تابع را طبق یک قالب متنی به هم می‌چسباند."},
+      {term:"add / strcat", desc:"یک رشته را به انتهای رشته دیگری اضافه می‌کند."},
+      {term:"contain / containi", desc:"بررسی می‌کند رشته‌ای درون رشته دیگر وجود دارد (دومی بدون‌حساسیت به حروف بزرگ/کوچک)."},
+      {term:"equal / equali", desc:"دو رشته را با هم مقایسه می‌کند (دومی بدون‌حساسیت به حروف بزرگ/کوچک)."},
+      {term:"strtok / strtok2", desc:"یک رشته را از روی یک جداکننده به دو بخش می‌شکند."},
+      {term:"strtolower / strtoupper", desc:"تمام حروف یک رشته را کوچک یا بزرگ می‌کند."},
+      {term:"trim", desc:"فاصله‌های ابتدا و انتهای یک رشته را حذف می‌کند."},
+      {term:"replace / replace_string / replace_stringex", desc:"بخشی از یک متن را با متن دیگری جایگزین می‌کند (نسخه‌های ساده تا پیشرفته)."},
+      {term:"str_to_num / num_to_str", desc:"رشته عددی را به عدد صحیح تبدیل می‌کند یا برعکس."},
+      {term:"str_to_float / float_to_str", desc:"رشته را به عدد اعشاری تبدیل می‌کند یا برعکس."},
+      {term:"isdigit / isalpha / isalnum / isspace", desc:"بررسی می‌کنند یک کاراکتر عدد، حرف، حرف‌یاعدد یا فاصله است."},
+      {term:"ucfirst", desc:"حرف اول یک رشته را بزرگ می‌کند."},
+      {term:"parse", desc:"یک خط متنی را بر اساس فاصله به چند بخش جداگانه تجزیه می‌کند."},
+      {term:"split_string", desc:"یک رشته را بر اساس یک جداکننده دلخواه به چند بخش تقسیم می‌کند."},
+      {term:"strfind", desc:"موقعیت اولین رخداد یک زیررشته را در یک رشته پیدا می‌کند."},
+      {term:"strcmp / strncmp", desc:"دو رشته را حرف‌به‌حرف (یا تا n کاراکتر) مقایسه می‌کنند."}
+    ]},
+    { id:"string_stocks", title:"ابزار رشته تکمیلی (string_stocks.inc)", url:"https://www.amxmodx.org/api/string_stocks", items:[
+      {term:"replace_all", desc:"تمام رخدادهای یک زیررشته (مثل {NAME}) را در یک متن با مقدار دیگر جایگزین می‌کند."},
+      {term:"explode_string / split", desc:"یک رشته را بر اساس یک جداکننده به آرایه‌ای از بخش‌ها تبدیل می‌کند."},
+      {term:"implode_strings", desc:"چند رشته را با یک جداکننده مشخص به یک رشته واحد می‌چسباند."},
+      {term:"strbreak / argbreak", desc:"یک رشته را از اولین فاصله به دو بخش جدا می‌کند."},
+      {term:"remove_filepath", desc:"مسیر پوشه را از یک آدرس فایل حذف کرده و فقط نام فایل را برمی‌گرداند."}
+    ]},
+    { id:"fun", title:"توابع سرگرمی (fun.inc)", url:"https://www.amxmodx.org/api/fun", items:[
+      {term:"set_user_health", desc:"مقدار سلامتی (Health) بازیکن را تنظیم می‌کند."},
+      {term:"set_user_armor", desc:"مقدار زره (Armor) بازیکن را تنظیم می‌کند."},
+      {term:"set_user_godmode / get_user_godmode", desc:"حالت نامیرایی بازیکن را فعال/غیرفعال یا بررسی می‌کند."},
+      {term:"set_user_gravity / get_user_gravity", desc:"ضریب گرانش وارد بر بازیکن را تنظیم یا می‌خواند."},
+      {term:"set_user_maxspeed / get_user_maxspeed", desc:"حداکثر سرعت حرکت بازیکن را تنظیم یا می‌خواند."},
+      {term:"set_user_noclip / get_user_noclip", desc:"حالت عبور از دیوار (Noclip) را برای بازیکن فعال یا بررسی می‌کند."},
+      {term:"set_user_rendering / get_user_rendering", desc:"جلوه بصری بازیکن (مثلاً شفافیت یا رنگ) را تنظیم یا می‌خواند."},
+      {term:"set_user_origin", desc:"موقعیت بازیکن را در نقشه جابه‌جا می‌کند (تله‌پورت)."},
+      {term:"set_user_frags", desc:"امتیاز کشتار (Frags) بازیکن را تنظیم می‌کند."},
+      {term:"set_user_footsteps / get_user_footsteps", desc:"صدای قدم‌های بازیکن را تغییر می‌دهد یا بررسی می‌کند."},
+      {term:"set_user_hitzones / get_user_hitzones", desc:"مناطق آسیب‌پذیر بدن بازیکن را تنظیم یا می‌خواند."},
+      {term:"strip_user_weapons", desc:"همه اسلحه‌های بازیکن را از او می‌گیرد."},
+      {term:"give_item", desc:"یک آیتم یا اسلحه مشخص را به بازیکن می‌دهد."},
+      {term:"set_client_listen / get_client_listen", desc:"می‌تواند صدای یک بازیکن را برای بازیکن دیگر قطع یا وصل کند."}
+    ]},
+    { id:"cstrike", title:"اختصاصی کانتر-استرایک (cstrike.inc)", url:"https://www.amxmodx.org/api/cstrike", items:[
+      {term:"cs_get_user_money / cs_set_user_money", desc:"مقدار پول بازیکن را می‌خواند یا تنظیم می‌کند."},
+      {term:"cs_get_user_team / cs_set_user_team", desc:"تیم بازیکن (تروریست/ضدتروریست) را می‌خواند یا تغییر می‌دهد."},
+      {term:"cs_get_user_armor / cs_set_user_armor", desc:"نوع و مقدار زره بازیکن (بدون کلاه یا با کلاه) را می‌خواند یا تنظیم می‌کند."},
+      {term:"cs_get_user_deaths / cs_set_user_deaths", desc:"تعداد مرگ‌های بازیکن را می‌خواند یا تنظیم می‌کند."},
+      {term:"cs_get_user_vip / cs_set_user_vip", desc:"وضعیت VIP بودن بازیکن (در مود مخصوص) را می‌خواند یا تنظیم می‌کند."},
+      {term:"cs_get_user_zoom / cs_set_user_zoom", desc:"سطح زوم اسکوپ بازیکن را می‌خواند یا تنظیم می‌کند."},
+      {term:"cs_get_weapon_id", desc:"شناسه عددی یک اسلحه را از روی نام آن پیدا می‌کند."},
+      {term:"cs_get_weapon_info", desc:"اطلاعات کامل یک اسلحه (قیمت، آسیب، اسلات و...) را برمی‌گرداند."},
+      {term:"cs_get_item_id / cs_get_item_alias", desc:"شناسه یا نام مستعار یک آیتم فروشگاه را پیدا می‌کند."},
+      {term:"cs_get_translated_item_alias", desc:"نام آیتم را طبق نسخه بازی (استیم/غیراستیم) تبدیل می‌کند."},
+      {term:"CS_OnBuy / CS_OnBuyAttempt", desc:"فوروارد: هنگام خرید موفق یا تلاش برای خرید یک آیتم در فروشگاه اجرا می‌شود."}
+    ]},
+    { id:"engine", title:"موتور بازی (engine.inc)", url:"https://www.amxmodx.org/api/engine", items:[
+      {term:"entity_get_float / entity_set_float", desc:"یک مقدار اعشاری (مثل سلامتی) را از یک موجودیت می‌خواند یا در آن می‌نویسد."},
+      {term:"entity_get_int / entity_set_int", desc:"یک مقدار عددی صحیح را از یک موجودیت می‌خواند یا در آن می‌نویسد."},
+      {term:"entity_get_string / entity_set_string", desc:"یک مقدار متنی را از یک موجودیت می‌خواند یا در آن می‌نویسد."},
+      {term:"entity_get_vector / entity_set_vector", desc:"یک مقدار برداری (مثل موقعیت یا سرعت) را از موجودیت می‌خواند یا تنظیم می‌کند."},
+      {term:"find_ent_by_class", desc:"موجودیت بعدی با یک نام کلاس مشخص (مثل weapon_ak47) را پیدا می‌کند."},
+      {term:"find_ent_by_owner", desc:"موجودیتی که مالکش یک entity خاص است را پیدا می‌کند."},
+      {term:"is_valid_ent", desc:"بررسی می‌کند شناسه یک موجودیت هنوز معتبر است."},
+      {term:"create_entity / DispatchSpawn / DispatchKeyValue", desc:"یک موجودیت جدید در بازی می‌سازد و مقداردهی و spawn می‌کند."},
+      {term:"remove_entity", desc:"یک موجودیت را از بازی حذف می‌کند."},
+      {term:"trace_line / trace_hull", desc:"یک خط یا حجم فرضی را در دنیای بازی رسم کرده و برخورد آن را بررسی می‌کند."}
+    ]},
+    { id:"messages", title:"پیام‌های شبکه (messages.inc)", url:"https://www.amxmodx.org/api/messages", items:[
+      {term:"register_message", desc:"شنیدن یک پیام شبکه‌ای خاص موتور بازی را ثبت می‌کند."},
+      {term:"message_begin / message_end", desc:"شروع و پایان ساخت یک پیام شبکه‌ای سفارشی برای ارسال به بازیکن."},
+      {term:"write_byte / write_char / write_short / write_long", desc:"یک مقدار عددی با اندازه مشخص را داخل پیام شبکه می‌نویسد."},
+      {term:"write_string / write_coord / write_angle / write_entity", desc:"متن، مختصات، زاویه یا شناسه موجودیت را داخل پیام شبکه می‌نویسد."},
+      {term:"get_msg_arg_int / get_msg_arg_float / get_msg_arg_string", desc:"مقدار یک آرگومان از پیام شبکه‌ی دریافتی را می‌خواند."},
+      {term:"get_msg_args", desc:"تعداد کل آرگومان‌های یک پیام شبکه‌ی دریافتی را برمی‌گرداند."}
+    ]},
+    { id:"file", title:"فایل‌ها (file.inc)", url:"https://www.amxmodx.org/api/file", items:[
+      {term:"fopen / fclose", desc:"یک فایل را برای خواندن/نوشتن باز یا بسته می‌کند."},
+      {term:"fgets / fputs", desc:"یک خط از فایل می‌خواند یا یک خط در فایل می‌نویسد."},
+      {term:"fprintf", desc:"یک متن قالب‌بندی‌شده را مستقیماً در فایل می‌نویسد."},
+      {term:"file_exists / delete_file", desc:"بررسی می‌کند فایلی وجود دارد، یا آن را حذف می‌کند."},
+      {term:"read_file / write_file", desc:"یک خط مشخص از فایل را می‌خواند یا در آن می‌نویسد."},
+      {term:"mkdir / read_dir", desc:"یک پوشه جدید می‌سازد یا محتویات یک پوشه را می‌خواند."}
+    ]},
+    { id:"hamsandwich", title:"هوک توابع بازی (hamsandwich.inc)", url:"https://www.amxmodx.org/api/hamsandwich", items:[
+      {term:"RegisterHam", desc:"یک تابع داخلی موتور بازی (مثل Spawn یا TakeDamage) را برای هوک‌کردن ثبت می‌کند."},
+      {term:"ExecuteHam / ExecuteHamB", desc:"تابع اصلی موتور بازی که هوک شده را به‌صورت دستی اجرا می‌کند."},
+      {term:"GetHamReturnInteger / GetHamReturnFloat / GetHamReturnEntity", desc:"مقدار بازگشتی تابع هوک‌شده موتور بازی را می‌خواند."},
+      {term:"SetHamParamInteger / SetHamParamFloat / SetHamParamEntity", desc:"مقدار یکی از پارامترهای ورودی تابع هوک‌شده را قبل از اجرا تغییر می‌دهد."},
+      {term:"IsHamValid", desc:"بررسی می‌کند این تابع Ham روی نسخه فعلی بازی پشتیبانی می‌شود."}
+    ]},
+    { id:"fakemeta", title:"دسترسی سطح‌پایین (fakemeta.inc)", url:"https://www.amxmodx.org/api/fakemeta", items:[
+      {term:"pev / set_pev", desc:"یک فیلد استاندارد موجودیت (مثل health یا origin) را می‌خواند یا تنظیم می‌کند."},
+      {term:"engfunc", desc:"یکی از توابع داخلی موتور نیم‌لایف را مستقیماً صدا می‌زند."},
+      {term:"dllfunc", desc:"یکی از توابع داخلی DLL بازی (Game DLL) را مستقیماً صدا می‌زند."},
+      {term:"get_pdata_int / set_pdata_int", desc:"یک مقدار عددی خصوصی (private data) موجودیت را در حافظه می‌خواند یا تنظیم می‌کند."},
+      {term:"get_pdata_float / set_pdata_float", desc:"یک مقدار اعشاری خصوصی موجودیت را در حافظه می‌خواند یا تنظیم می‌کند."},
+      {term:"register_forward", desc:"یک forward سطح‌پایین موتور بازی را برای هوک‌کردن ثبت می‌کند."}
+    ]},
+    { id:"cellarray", title:"آرایه‌های پویا (cellarray.inc)", url:"https://www.amxmodx.org/api/cellarray", items:[
+      {term:"ArrayCreate / ArrayDestroy", desc:"یک آرایه پویا (ADT Array) می‌سازد یا آن را از حافظه پاک می‌کند."},
+      {term:"ArrayPushCell / ArrayPushString", desc:"یک مقدار عددی یا رشته‌ای را به انتهای آرایه پویا اضافه می‌کند."},
+      {term:"ArrayGetCell / ArrayGetString", desc:"مقدار یک خانه از آرایه پویا را می‌خواند."},
+      {term:"ArraySetCell / ArraySetString", desc:"مقدار یک خانه از آرایه پویا را تغییر می‌دهد."},
+      {term:"ArraySize", desc:"تعداد عناصر فعلی آرایه پویا را برمی‌گرداند."}
+    ]},
+    { id:"celltrie", title:"دیکشنری کلید-مقدار (celltrie.inc)", url:"https://www.amxmodx.org/api/celltrie", items:[
+      {term:"TrieCreate / TrieDestroy", desc:"یک ساختار کلید-مقدار (شبیه دیکشنری پایتون) می‌سازد یا حذف می‌کند."},
+      {term:"TrieSetCell / TrieSetString", desc:"یک مقدار عددی یا رشته‌ای را برای یک کلید مشخص ذخیره می‌کند."},
+      {term:"TrieGetCell / TrieGetString", desc:"مقدار ذخیره‌شده برای یک کلید مشخص را می‌خواند."},
+      {term:"TrieKeyExists", desc:"بررسی می‌کند کلیدی از قبل در ساختار وجود دارد."}
+    ]},
+    { id:"nvault", title:"ذخیره‌سازی دائمی (nvault.inc)", url:"https://www.amxmodx.org/api/nvault", items:[
+      {term:"nvault_open / nvault_close", desc:"یک فایل ذخیره‌سازی دائمی (vault) روی دیسک باز یا بسته می‌کند."},
+      {term:"nvault_set / nvault_get", desc:"یک مقدار را برای یک کلید در vault ذخیره یا بازیابی می‌کند؛ داده حتی بعد از ری‌استارت سرور می‌ماند."},
+      {term:"nvault_remove", desc:"یک کلید مشخص را از vault حذف می‌کند."}
+    ]},
+    { id:"regex", title:"عبارات باقاعده (regex.inc)", url:"https://www.amxmodx.org/api/regex", items:[
+      {term:"regex_match / regex_match_simple", desc:"بررسی می‌کند یک رشته با یک الگوی Regex مطابقت دارد."},
+      {term:"regex_match_all", desc:"تمام تطابق‌های یک الگوی Regex در یک رشته را پیدا می‌کند."},
+      {term:"regex_compile", desc:"یک الگوی Regex را از قبل کامپایل می‌کند تا استفاده‌های بعدی سریع‌تر باشند."},
+      {term:"regex_substr", desc:"یکی از گروه‌های تطبیق‌یافته توسط Regex را استخراج می‌کند."}
+    ]},
+    { id:"sockets", title:"شبکه (sockets.inc)", url:"https://www.amxmodx.org/api/sockets", items:[
+      {term:"socket_open / socket_close", desc:"یک اتصال شبکه (Socket) به سرور دیگر باز یا بسته می‌کند."},
+      {term:"socket_send", desc:"داده‌ای را از طریق اتصال باز شده ارسال می‌کند."},
+      {term:"socket_recv", desc:"داده دریافتی از طرف دیگر اتصال را می‌خواند."}
+    ]},
+    { id:"json", title:"داده JSON (json.inc)", url:"https://www.amxmodx.org/api/json", items:[
+      {term:"json_parse", desc:"یک متن JSON را می‌خواند و به یک ساختار قابل‌استفاده تبدیل می‌کند."},
+      {term:"json_object_get_string / json_object_set_string", desc:"یک مقدار متنی را از یک شیء JSON می‌خواند یا در آن می‌نویسد."},
+      {term:"json_init_object / json_free", desc:"یک شیء JSON جدید می‌سازد یا حافظه آن را آزاد می‌کند."},
+      {term:"json_serial_to_string", desc:"یک ساختار JSON را به رشته متنی قابل‌ذخیره تبدیل می‌کند."}
+    ]},
+    { id:"lang", title:"چندزبانه (lang.inc)", url:"https://www.amxmodx.org/api/lang", items:[
+      {term:"register_dictionary", desc:"یک فایل ترجمه (.txt) را برای استفاده در پلاگین بارگذاری می‌کند."},
+      {term:"LookupLangKey", desc:"متن ترجمه‌شده یک کلید زبان را برای یک بازیکن خاص برمی‌گرداند."}
+    ]},
+    { id:"sqlx", title:"پایگاه داده (sqlx.inc)", url:"https://www.amxmodx.org/api/sqlx", items:[
+      {term:"SQL_Connect", desc:"یک اتصال به پایگاه داده (MySQL/SQLite) برقرار می‌کند."},
+      {term:"SQL_Execute / SQL_ThreadQuery", desc:"یک کوئری SQL را اجرا می‌کند (نسخه دوم به‌صورت غیرمسدودکننده/Thread)."},
+      {term:"SQL_NextRow / SQL_ReadResult", desc:"به سطر بعدی نتیجه کوئری می‌رود یا مقدار یک ستون را می‌خواند."},
+      {term:"SQL_FreeHandle", desc:"حافظه اختصاص‌یافته به یک اتصال یا نتیجه کوئری را آزاد می‌کند."}
+    ]},
+    { id:"geoip", title:"موقعیت جغرافیایی (geoip.inc)", url:"https://www.amxmodx.org/api/geoip", items:[
+      {term:"geoip_country / geoip_country_ex", desc:"نام کشور مربوط به یک آدرس IP را برمی‌گرداند."},
+      {term:"geoip_code2 / geoip_code3", desc:"کد دو یا سه‌حرفی کشور مربوط به یک IP را برمی‌گرداند."},
+      {term:"geoip_city", desc:"نام شهر مربوط به یک آدرس IP را برمی‌گرداند (در صورت وجود دیتابیس شهر)."}
+    ]}
   ];
-  var traps = [ {x:520,y:300,r:34}, {x:1280,y:700,r:34}, {x:900,y:500,r:34} ];
-  var jumpPads = [ {x:900,y:160,r:30}, {x:900,y:840,r:30} ];
-  var movingPlatform = { path:[{x:480,y:880},{x:1320,y:880}], t:0, speed:0.15, r:40, x:480, y:880, vx:0, vy:0 };
-  return { theme:theme, obstacles:obstacles, traps:traps, jumpPads:jumpPads, movingPlatform:movingPlatform };
-}
-var THEME_PALETTES = {
-  'باغ آسمانی': { sky1:'#8fd6f0', sky2:'#eaf9ff', ground:'#5fbf6b', deco:'#3d8f4a' },
-  'پارک نئون': { sky1:'#1b1140', sky2:'#2c1a5e', ground:'#241653', deco:'#ff5da2' },
-  'معبد صحرا': { sky1:'#f0b46a', sky2:'#ffe3ad', ground:'#d99a51', deco:'#8a5a2e' },
-  'جزیره آبنبات': { sky1:'#ffd6ec', sky2:'#fff0f7', ground:'#ff9fc7', deco:'#ffffff' }
-};
 
-var POWERUP_TYPES = [
-  {id:'speed', label:'سرعت', icon:'⚡', dur:6, color:'#ffd166'},
-  {id:'shield', label:'سپر', icon:'🛡', dur:7, color:'#44e8c4'},
-  {id:'magnet', label:'آهنربا', icon:'🧲', dur:7, color:'#ff5da2'},
-  {id:'doublescore', label:'امتیاز ۲×', icon:'۲×', dur:8, color:'#8c7bff'},
-  {id:'dashboost', label:'دَش تقویتی', icon:'💨', dur:8, color:'#5ad1ff'},
-  {id:'coinmult', label:'ضریب سکه ۳×', icon:'۳×', dur:6, color:'#ffb84d'},
-  {id:'extradash', label:'دَش اضافه', icon:'🌀', dur:9, color:'#c1ff72'},
-  {id:'slowopp', label:'کند کردن حریف', icon:'🐌', dur:5, color:'#ff6b6b'}
-];
-function randPowerup(){ return POWERUP_TYPES[Math.floor(Math.random()*POWERUP_TYPES.length)]; }
+  var dictionary = [];
+  MODULES.forEach(function(mod){
+    mod.items.forEach(function(it){
+      var firstTerm = it.term.split(' / ')[0].split(' ')[0];
+      dictionary.push({
+        term: it.term,
+        desc: it.desc,
+        module: mod.id,
+        moduleTitle: mod.title,
+        link: mod.url + '/' + encodeURIComponent(firstTerm)
+      });
+    });
+  });
 
-/* --- شبکه: سرور شخصی signaling --- */
-var PEER_SERVER_CONFIG = null;
-var ICE_SERVERS = [
-  { urls: 'stun:stun.l.google.com:19302' },
-  { urls: 'stun:stun1.l.google.com:19302' },
-  { urls: 'stun:stun.cloudflare.com:3478' },
-  { urls: 'stun:stun.antisip.com:3478' },
-  { urls: 'stun:stun.voipbuster.com:3478' },
-  { urls: 'stun:stun.sipgate.net:3478' },
-  { urls: 'turn:openrelay.metered.ca:80', username:'openrelayproject', credential:'openrelayproject' },
-  { urls: 'turn:openrelay.metered.ca:443', username:'openrelayproject', credential:'openrelayproject' },
-  { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username:'openrelayproject', credential:'openrelayproject' },
-  { urls: 'turn:relay1.expressturn.com:3478', username:'efK5HRLWWPMM5Z7YR2', credential:'BQjEMKKZXsRZFuFt' }
-];
-function peerOptions(extra){
-  var opts = Object.assign({ debug:0, config: { iceServers: ICE_SERVERS } }, extra||{});
-  var s = (typeof Storage !== 'undefined' && Storage.get) ? Storage.get() : null;
-  var custom = s && s.settings && s.settings.customHost ? s.settings : null;
-  if(custom){
-    opts.host = custom.customHost;
-    opts.port = custom.customPort ? parseInt(custom.customPort,10) : 443;
-    opts.path = '/';
-    opts.secure = custom.customSecure !== false;
-  } else if(PEER_SERVER_CONFIG){
-    opts.host = PEER_SERVER_CONFIG.host;
-    opts.port = PEER_SERVER_CONFIG.port;
-    opts.path = PEER_SERVER_CONFIG.path || '/';
-    opts.secure = PEER_SERVER_CONFIG.secure !== false;
-  }
-  return opts;
-}
+  var dictGrid = document.getElementById('dictGrid');
+  var dictCount = document.getElementById('dictCount');
+  var dictSearch = document.getElementById('dictSearch');
+  var dictFilter = document.getElementById('dictFilter');
+  var activeModule = 'all';
 
-var Network = (function(){
-  var peer = null;
-  var isHost = false;
-  var roomCode = '';
-  var myId = '';
-  var myNickname = '';
-  var connections = {};
-  var hostConn = null;
-  var handlers = {};
-  var reconnectAttempts = 0;
+  var allChip = document.createElement('div');
+  allChip.className = 'chip active';
+  allChip.textContent = 'همه (' + dictionary.length + ')';
+  allChip.dataset.val = 'all';
+  dictFilter.appendChild(allChip);
+  MODULES.forEach(function(mod){
+    var chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.textContent = mod.title.split(' (')[0] + ' ('+mod.items.length+')';
+    chip.dataset.val = mod.id;
+    dictFilter.appendChild(chip);
+  });
+  dictFilter.querySelectorAll('.chip').forEach(function(chip){
+    chip.addEventListener('click', function(){
+      dictFilter.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('active'); });
+      chip.classList.add('active');
+      activeModule = chip.dataset.val;
+      applyDictFilters();
+    });
+  });
 
-  function on(evt, fn){ handlers[evt] = fn; }
-  function emit(evt, data){ if(handlers[evt]) handlers[evt](data); }
-
-  function makeRoomCode(){
-    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    var out = '';
-    for(var i=0;i<6;i++) out += chars[Math.floor(Math.random()*chars.length)];
-    return out;
-  }
-  function safePeerId(prefix){ return prefix + '-' + Math.random().toString(36).slice(2,10); }
-
-  function createRoom(nickname, cb, errCb){
-    isHost = true;
-    myNickname = nickname;
-    roomCode = makeRoomCode();
-    myId = 'p1';
-    var pid = 'duodash-room-' + roomCode;
-    try{ peer = new Peer(pid, peerOptions()); }catch(e){ errCb && errCb(e); return; }
-    var settled = false;
-    function safeErrCb(err){ if(settled) return; settled = true; clearTimeout(timeout); errCb && errCb(err); }
-    var timeout = setTimeout(function(){
-      safeErrCb(new Error('timeout: سرور signaling پاسخ نداد'));
-    }, 10000);
-    peer.on('open', function(){ if(settled) return; settled = true; clearTimeout(timeout); cb && cb(roomCode); });
-    peer.on('connection', function(conn){ handleIncomingConnection(conn); });
-    peer.on('error', function(err){ handlePeerError(err, safeErrCb); });
-    peer.on('disconnected', function(){ attemptPeerReconnect(); });
+  function renderDict(list){
+    dictGrid.innerHTML = '';
+    if(list.length === 0){
+      dictGrid.innerHTML = '<div class="empty-hint">چیزی پیدا نشد 🤔</div>';
+    }
+    list.forEach(function(item){
+      var card = document.createElement('div');
+      card.className = 'dict-card';
+      card.innerHTML =
+        '<div class="dict-card-top"><code>'+item.term+'</code><span class="dict-module">'+item.module+'</span></div>' +
+        '<p>'+item.desc+'</p>' +
+        '<a class="dict-link" href="'+item.link+'" target="_blank" rel="noopener">مشاهده در مستندات رسمی ↗</a>';
+      dictGrid.appendChild(card);
+    });
+    dictCount.textContent = list.length + ' نتیجه از ' + dictionary.length + ' مورد';
   }
 
-  function handleIncomingConnection(conn){
-    var currentCount = Object.keys(connections).length;
-    if(currentCount >= MAX_PLAYERS - 1){
-      conn.on('open', function(){ conn.send({t:'roomFull'}); setTimeout(function(){ conn.close(); }, 300); });
+  function applyDictFilters(){
+    var q = dictSearch.value.trim().toLowerCase();
+    var filtered = dictionary.filter(function(item){
+      var moduleOk = (activeModule === 'all' || item.module === activeModule);
+      var searchOk = !q || item.term.toLowerCase().indexOf(q) !== -1 || item.desc.toLowerCase().indexOf(q) !== -1;
+      return moduleOk && searchOk;
+    });
+    renderDict(filtered);
+  }
+
+  renderDict(dictionary);
+  dictSearch.addEventListener('input', applyDictFilters);
+
+  /* ---------------- TUTORIALS DATA ---------------- */
+  var tutorials = [
+    {
+      level:"low", levelLabel:"مبتدی",
+      title:"آشنایی با AMX Mod X",
+      body: "<p>AMX Mod X (به‌اختصار AMXX) یک افزونه (SDK) برای موتور بازی نیم‌لایف است که به شما اجازه می‌دهد بدون تغییر کد اصلی بازی، رفتار سرور کانتر-استرایک ۱.۶ را با نوشتن پلاگین تغییر دهید.</p>" +
+        "<ul>" +
+        "<li>پلاگین‌ها با زبان <b>Pawn</b> نوشته می‌شوند؛ زبانی ساده و شبیه C.</li>" +
+        "<li>فایل نهایی با پسوند <code>.sma</code> نوشته و به <code>.amxx</code> کامپایل می‌شود.</li>" +
+        "<li>پلاگین‌ها روی سرور اجرا می‌شوند، نه روی کلاینت بازیکن‌ها.</li>" +
+        "</ul>" +
+        "<p>در ادامه با نصب، ساختار پایه و توابع مهم آشنا می‌شویم.</p>"
+    },
+    {
+      level:"low", levelLabel:"مبتدی",
+      title:"نصب و راه‌اندازی",
+      body: "<p>برای شروع پلاگین‌نویسی به این موارد نیاز دارید:</p>" +
+        "<ul>" +
+        "<li>یک سرور کانتر-استرایک ۱.۶ با متاماد (Metamod) و AMX Mod X نصب‌شده.</li>" +
+        "<li>ویرایشگر کد مناسب برای Pawn (پیشوند رنگ‌بندی .sma).</li>" +
+        "<li>کامپایلر <code>amxxpc</code> که در پوشه scripting همراه AMXX قرار دارد.</li>" +
+        "</ul>" +
+        "<p>فایل <code>.sma</code> خود را در پوشه <code>scripting</code> قرار می‌دهید، آن را کامپایل می‌کنید و فایل <code>.amxx</code> خروجی را در پوشه <code>plugins</code> کپی و در فایل <code>plugins.ini</code> فعال می‌کنید.</p>"
+    },
+    {
+      level:"low", levelLabel:"مبتدی",
+      title:"ساختار یک پلاگین",
+      body: "<p>هر پلاگین معمولاً از این بخش‌ها تشکیل شده:</p>" +
+        "<pre class='code-block'>#include &lt;amxmodx&gt;\n\n#define PLUGIN \"My First Plugin\"\n#define VERSION \"1.0\"\n#define AUTHOR \"Your Name\"\n\npublic plugin_init() {\n    register_plugin(PLUGIN, VERSION, AUTHOR)\n}</pre>" +
+        "<ul>" +
+        "<li><b>include ها</b>: کتابخانه‌های مورد نیاز را وارد می‌کنند.</li>" +
+        "<li><b>define ها</b>: ثابت‌هایی مثل نام و نسخه پلاگین را تعریف می‌کنند.</li>" +
+        "<li><b>plugin_init</b>: نقطه شروع اجرای پلاگین است.</li>" +
+        "</ul>"
+    },
+    {
+      level:"mid", levelLabel:"متوسط",
+      title:"توابع مهم: register_plugin, register_event, register_concmd",
+      body: "<p>این سه تابع پرکاربردترین نقاط شروع در بیشتر پلاگین‌ها هستند:</p>" +
+        "<pre class='code-block'>public plugin_init() {\n    register_plugin(\"My Plugin\", \"1.0\", \"Author\")\n    register_event(\"ResetHUD\", \"onSpawn\", \"b\")\n    register_concmd(\"amx_hello\", \"cmdHello\", ADMIN_CFG, \"- say hello\")\n}</pre>" +
+        "<ul>" +
+        "<li><code>register_plugin</code> پلاگین را معرفی می‌کند.</li>" +
+        "<li><code>register_event</code> یک رویداد بازی را به تابع خودتان وصل می‌کند.</li>" +
+        "<li><code>register_concmd</code> یک دستور کنسول جدید تعریف می‌کند.</li>" +
+        "</ul>"
+    },
+    {
+      level:"mid", levelLabel:"متوسط",
+      title:"متغیرها و آرایه‌ها",
+      body: "<p>در Pawn متغیرها با کلمه‌ی <code>new</code> تعریف می‌شوند:</p>" +
+        "<pre class='code-block'>new g_Score = 0                 // متغیر عددی ساده\nnew g_PlayerName[32]            // آرایه رشته‌ای (حداکثر ۳۱ کاراکتر)\nnew g_PlayerIP[33][16]          // آرایه دوبعدی: تا ۳۲ بازیکن، هرکدام ۱۵ کاراکتر</pre>" +
+        "<p>برای رشته‌ها همیشه یک خانه‌ی اضافه برای کاراکتر پایانی (null terminator) در نظر بگیرید.</p>"
+    },
+    {
+      level:"mid", levelLabel:"متوسط",
+      title:"کار با رنگ‌ها و HUD",
+      body: "<p>پیام‌های HUD رنگی یکی از محبوب‌ترین ویژگی‌های پلاگین‌های کانتر-استرایک ۱.۶ هستند:</p>" +
+        "<pre class='code-block'>set_hudmessage(255, 0, 0, -1.0, 0.35, 0, 6.0, 4.0, 0.1, 0.2, -1)\nshow_hudmessage(id, \"%s\", \"Welcome!\")</pre>" +
+        "<ul>" +
+        "<li>سه عدد اول رنگ RGB هستند (قرمز، سبز، آبی).</li>" +
+        "<li>دو عدد بعدی موقعیت افقی و عمودی روی صفحه‌اند (-1.0 یعنی وسط‌چین خودکار).</li>" +
+        "<li>پارامترهای بعدی مدت زمان محو شدن و ماندگاری پیام را تعیین می‌کنند.</li>" +
+        "</ul>"
+    },
+    {
+      level:"high", levelLabel:"حرفه‌ای",
+      title:"ساخت پلاگین کامل",
+      body: "<p>در این مرحله همه‌چیز را کنار هم می‌گذاریم: ثبت پلاگین، شنیدن یک رویداد، خواندن اطلاعات بازیکن و نمایش پیام رنگی روی HUD.</p>" +
+        "<pre class='code-block'>#include &lt;amxmodx&gt;\n#include &lt;amxmisc&gt;\n\n#define PLUGIN \"Auto Welcome\"\n#define VERSION \"1.0\"\n#define AUTHOR \"You\"\n\npublic plugin_init() {\n    register_plugin(PLUGIN, VERSION, AUTHOR)\n    register_event(\"ResetHUD\", \"onSpawn\", \"b\")\n}\n\npublic onSpawn(id) {\n    new name[32]\n    get_user_name(id, name, charsmax(name))\n\n    set_hudmessage(0, 255, 100, -1.0, 0.55, 0, 6.0, 4.0, 0.1, 0.2, -1)\n    show_hudmessage(id, \"Welcome, %s!\", name)\n}</pre>" +
+        "<p>از اینجا می‌توانید ویژگی‌هایی مثل CVAR قابل تنظیم، ذخیره در فایل یا دستور کنسول ادمین اضافه کنید — دقیقاً همان مواردی که در بخش «پرامپت‌ساز» می‌توانید برای هوش مصنوعی مشخص کنید.</p>"
+    }
+  ];
+
+  var tutList = document.getElementById('tutList');
+  tutorials.forEach(function(t, i){
+    var item = document.createElement('div');
+    item.className = 'tut-item';
+    var lvlClass = t.level === 'mid' ? 'mid' : (t.level === 'high' ? 'high' : '');
+    item.innerHTML =
+      '<div class="tut-head">' +
+        '<div class="tut-num">'+ String(i+1).padStart(2,'0') +'</div>' +
+        '<h3>'+ t.title +'</h3>' +
+        '<span class="tut-level '+lvlClass+'">'+ t.levelLabel +'</span>' +
+        '<span class="chev">▾</span>' +
+      '</div>' +
+      '<div class="tut-body"><div>'+ t.body +'</div></div>';
+
+    var head = item.querySelector('.tut-head');
+    var body = item.querySelector('.tut-body');
+    head.addEventListener('click', function(){
+      var isOpen = item.classList.contains('open');
+      tutList.querySelectorAll('.tut-item').forEach(function(other){
+        other.classList.remove('open');
+        other.querySelector('.tut-body').style.maxHeight = null;
+      });
+      if(!isOpen){
+        item.classList.add('open');
+        body.style.maxHeight = body.scrollHeight + 40 + 'px';
+      }
+    });
+    tutList.appendChild(item);
+  });
+
+  /* ---------------- CODE EXPLORER LOGIC ---------------- */
+  var codeInput = document.getElementById('codeInput');
+  var explainOutput = document.getElementById('explainOutput');
+  var lineCounter = document.getElementById('lineCounter');
+
+  var sampleCode =
+"#include <amxmodx>\n" +
+"#include <amxmisc>\n" +
+"\n" +
+"#define PLUGIN \"Auto Welcome\"\n" +
+"#define VERSION \"1.0\"\n" +
+"#define AUTHOR \"AMX Mod X\"\n" +
+"\n" +
+"new pcvar_enable\n" +
+"\n" +
+"public plugin_init() {\n" +
+"    register_plugin(PLUGIN, VERSION, AUTHOR)\n" +
+"    pcvar_enable = register_cvar(\"amx_auto_welcome\", \"1\")\n" +
+"    register_event(\"ResetHUD\", \"event_ResetHUD\", \"b\")\n" +
+"}\n" +
+"\n" +
+"public event_ResetHUD(id) {\n" +
+"    if (!is_user_connected(id))\n" +
+"        return PLUGIN_CONTINUE\n" +
+"\n" +
+"    new name[32]\n" +
+"    get_user_name(id, name, charsmax(name))\n" +
+"\n" +
+"    set_hudmessage(255, 255, 255, -1.0, 0.65, 0, 0.5, 5.0, 0.5, 0.5, 1)\n" +
+"    show_hudmessage(id, \"Welcome %s!\", name)\n" +
+"    return PLUGIN_CONTINUE\n" +
+"}";
+
+  document.getElementById('sampleBtn').addEventListener('click', function(){
+    codeInput.value = sampleCode;
+    updateLineCounter();
+  });
+  document.getElementById('clearBtn').addEventListener('click', function(){
+    codeInput.value = '';
+    updateLineCounter();
+    explainOutput.innerHTML = '<div class="empty-hint">🕹️ منتظر کد شما هستیم... برای شروع سریع می‌توانید روی «پر کردن با نمونه» بزنید.</div>';
+  });
+  codeInput.addEventListener('input', updateLineCounter);
+  function updateLineCounter(){
+    var lines = codeInput.value.split('\n').filter(function(l){return l.trim() !== '';});
+    lineCounter.textContent = lines.length + ' خط';
+  }
+
+  // ordered rule set: {regex, tag, explain(match)}
+  var rules = [
+    {re:/^\s*\/\/(.*)$/, tag:'کامنت', explain:function(m){ return 'این یک توضیح (کامنت) است و توسط کامپایلر اجرا نمی‌شود؛ فقط برای یادداشت برنامه‌نویس است.'; }},
+    {re:/^\s*#include\s*<amxmodx>/, tag:'include', explain:function(){ return 'کتابخانه اصلی AMX Mod X را وارد می‌کند؛ تقریباً در همه پلاگین‌ها لازم است.'; }},
+    {re:/^\s*#include\s*<amxmisc>/, tag:'include', explain:function(){ return 'کتابخانه ابزارهای کمکی و توابع متفرقه AMX Mod X را وارد می‌کند.'; }},
+    {re:/^\s*#include\s*<cstrike>/, tag:'include', explain:function(){ return 'کتابخانه اختصاصی Counter-Strike را وارد می‌کند؛ شامل توابع مخصوص این بازی مثل تیم و پول بازیکن.'; }},
+    {re:/^\s*#include\s*<fun>/, tag:'include', explain:function(){ return 'کتابخانه توابع سرگرمی و کاربردی (مثل تغییر گرانش یا سلامتی) را وارد می‌کند.'; }},
+    {re:/^\s*#include\s*<colorchat>/, tag:'include', explain:function(){ return 'کتابخانه‌ای برای نمایش پیام‌های رنگی در چت بازی وارد می‌کند.'; }},
+    {re:/^\s*#include\s*<([a-zA-Z0-9_]+)>/, tag:'include', explain:function(m){ return 'کتابخانه «'+m[1]+'» را وارد پروژه می‌کند تا به توابع آن دسترسی داشته باشید.'; }},
+    {re:/^\s*#define\s+PLUGIN\s+"(.*)"/, tag:'define', explain:function(m){ return 'یک ثابت به‌نام PLUGIN تعریف می‌کند با مقدار «'+m[1]+'»؛ این نام پلاگین شماست.'; }},
+    {re:/^\s*#define\s+VERSION\s+"(.*)"/, tag:'define', explain:function(m){ return 'ثابت VERSION را برابر «'+m[1]+'» قرار می‌دهد؛ شماره نسخه پلاگین.'; }},
+    {re:/^\s*#define\s+AUTHOR\s+"(.*)"/, tag:'define', explain:function(m){ return 'ثابت AUTHOR را برابر «'+m[1]+'» قرار می‌دهد؛ نام نویسنده پلاگین.'; }},
+    {re:/^\s*#define\s+([A-Za-z0-9_]+)\s+(.*)$/, tag:'define', explain:function(m){ return 'یک ثابت به‌نام «'+m[1]+'» تعریف می‌کند با مقدار «'+m[2].trim()+'»؛ هرجا این نام استفاده شود، با این مقدار جایگزین می‌شود.'; }},
+    {re:/^\s*enum\s*\{?/, tag:'enum', explain:function(){ return 'شروع تعریف یک enum است؛ مجموعه‌ای از مقادیر ثابت مرتبط که به‌صورت خودکار شماره‌گذاری می‌شوند (۰، ۱، ۲، ...).'; }},
+    {re:/^\s*public\s+plugin_init\s*\(\s*\)/, tag:'تابع اصلی', explain:function(){ return 'نقطه شروع اجرای پلاگین است؛ این تابع دقیقاً یک‌بار، هنگام بارگذاری پلاگین، اجرا می‌شود.'; }},
+    {re:/^\s*public\s+plugin_precache\s*\(\s*\)/, tag:'تابع اصلی', explain:function(){ return 'قبل از plugin_init اجرا می‌شود و برای پیش‌بارگذاری مدل‌ها، صداها و منابع دیگر استفاده می‌شود.'; }},
+    {re:/^\s*register_plugin\s*\(\s*([^)]*)\)/, tag:'register_plugin', explain:function(m){ return 'پلاگین را در سیستم AMX Mod X ثبت می‌کند؛ آرگومان‌ها ('+m[1].trim()+') به‌ترتیب نام، نسخه و نویسنده هستند.'; }},
+    {re:/^\s*register_event\s*\(\s*"([^"]*)"\s*,\s*"([^"]*)"/, tag:'register_event', explain:function(m){ return 'رویداد «'+m[1]+'» را ثبت می‌کند؛ هر بار این رویداد رخ دهد، تابع «'+m[2]+'» اجرا می‌شود.'; }},
+    {re:/^\s*register_concmd\s*\(\s*"([^"]*)"\s*,\s*"([^"]*)"/, tag:'register_concmd', explain:function(m){ return 'یک دستور کنسول جدید به‌نام «'+m[1]+'» ثبت می‌کند که با اجرا شدن، تابع «'+m[2]+'» را صدا می‌زند.'; }},
+    {re:/^\s*register_clcmd\s*\(\s*"([^"]*)"\s*,\s*"([^"]*)"/, tag:'register_clcmd', explain:function(m){ return 'یک دستور سمت کلاینت به‌نام «'+m[1]+'» ثبت می‌کند که تابع «'+m[2]+'» را اجرا می‌کند.'; }},
+    {re:/(\w+)\s*=\s*register_cvar\s*\(\s*"([^"]*)"\s*,\s*"([^"]*)"/, tag:'register_cvar', explain:function(m){ return 'یک متغیر پیکربندی سرور (CVAR) به‌نام «'+m[2]+'» با مقدار پیش‌فرض «'+m[3]+'» می‌سازد و هندل آن را در متغیر «'+m[1]+'» ذخیره می‌کند.'; }},
+    {re:/^\s*set_hudmessage\s*\(([^)]*)\)/, tag:'set_hudmessage', explain:function(m){ return 'رنگ، موقعیت روی صفحه، مدت‌زمان محو شدن و سایر ویژگی‌های ظاهری پیام بعدی HUD را با مقادیر ('+m[1].trim()+') تنظیم می‌کند.'; }},
+    {re:/^\s*show_hudmessage\s*\(\s*([^,]*)\s*,/, tag:'show_hudmessage', explain:function(m){ return 'پیام تنظیم‌شده با set_hudmessage را برای بازیکن با شناسه «'+m[1].trim()+'» روی صفحه نمایش می‌دهد.'; }},
+    {re:/^\s*client_print\s*\(\s*([^,]*)\s*,/, tag:'client_print', explain:function(m){ return 'یک پیام متنی در چت یا کنسول بازیکن «'+m[1].trim()+'» چاپ می‌کند.'; }},
+    {re:/get_user_name\s*\(\s*([^,]*)\s*,\s*([^,]*)/, tag:'get_user_name', explain:function(m){ return 'نام بازیکن با شناسه «'+m[1].trim()+'» را می‌خواند و در متغیر «'+m[2].trim()+'» ذخیره می‌کند.'; }},
+    {re:/get_cvar_string\s*\(\s*"([^"]*)"\s*,\s*([^,]*)/, tag:'get_cvar_string', explain:function(m){ return 'مقدار متنی CVAR سرور «'+m[1]+'» را می‌خواند و در متغیر «'+m[2].trim()+'» ذخیره می‌کند.'; }},
+    {re:/get_cvar_num\s*\(\s*"([^"]*)"/, tag:'get_cvar_num', explain:function(m){ return 'مقدار عددی CVAR سرور «'+m[1]+'» را می‌خواند.'; }},
+    {re:/get_pcvar_num\s*\(\s*([^)]*)\)/, tag:'get_pcvar_num', explain:function(m){ return 'مقدار عددی CVAR ثبت‌شده با هندل «'+m[1].trim()+'» را برمی‌گرداند.'; }},
+    {re:/get_pcvar_float\s*\(\s*([^)]*)\)/, tag:'get_pcvar_float', explain:function(m){ return 'مقدار اعشاری CVAR ثبت‌شده با هندل «'+m[1].trim()+'» را برمی‌گرداند.'; }},
+    {re:/replace_all\s*\(\s*([^,]*)\s*,\s*[^,]*,\s*"([^"]*)"\s*,\s*([^)]*)\)/, tag:'replace_all', explain:function(m){ return 'در متغیر «'+m[1].trim()+'» تمام رخدادهای «'+m[2]+'» را با مقدار «'+m[3].trim()+'» جایگزین می‌کند.'; }},
+    {re:/formatex\s*\(\s*([^,]*)\s*,/, tag:'formatex', explain:function(m){ return 'متن جدیدی بر اساس یک قالب می‌سازد و آن را در متغیر «'+m[1].trim()+'» ذخیره می‌کند.'; }},
+    {re:/random_num\s*\(\s*([^,]*)\s*,\s*([^)]*)\)/, tag:'random_num', explain:function(m){ return 'یک عدد تصادفی بین «'+m[1].trim()+'» و «'+m[2].trim()+'» تولید می‌کند.'; }},
+    {re:/is_user_connected\s*\(\s*([^)]*)\)/, tag:'is_user_connected', explain:function(m){ return 'بررسی می‌کند بازیکن با شناسه «'+m[1].trim()+'» در حال حاضر به سرور متصل است یا نه.'; }},
+    {re:/is_user_alive\s*\(\s*([^)]*)\)/, tag:'is_user_alive', explain:function(m){ return 'بررسی می‌کند بازیکن با شناسه «'+m[1].trim()+'» زنده است یا نه.'; }},
+    {re:/charsmax\s*\(\s*([^)]*)\)/, tag:'charsmax', explain:function(m){ return 'حداکثر اندیس قابل استفاده در آرایه «'+m[1].trim()+'» را محاسبه می‌کند تا از سرریز بافر جلوگیری شود.'; }},
+    {re:/^\s*return\s+(.*);?\s*$/, tag:'return', explain:function(m){ return 'مقدار «'+m[1].trim()+'» را برمی‌گرداند و اجرای تابع را همان‌جا پایان می‌دهد.'; }},
+    {re:/^\s*if\s*\((.*)\)\s*\{?\s*$/, tag:'شرط', explain:function(m){ return 'یک شرط بررسی می‌کند: «'+m[1].trim()+'»؛ اگر درست باشد، بلوک بعدی اجرا می‌شود.'; }},
+    {re:/^\s*new\s+(\w+)\s*\[\s*(\d+)\s*\]\s*\[\s*(\d+)\s*\]/, tag:'متغیر (آرایه دوبعدی)', explain:function(m){ return 'یک آرایه دوبعدی به‌نام «'+m[1]+'» تعریف می‌کند با ابعاد '+m[2]+' × '+m[3]+'؛ مثلاً برای ذخیره یک مقدار متنی برای هر بازیکن.'; }},
+    {re:/^\s*new\s+(\w+)\s*\[\s*(\d+)\s*\]/, tag:'متغیر (آرایه)', explain:function(m){ return 'یک آرایه به‌نام «'+m[1]+'» با حداکثر '+m[2]+' خانه تعریف می‌کند؛ معمولاً برای نگه‌داری یک رشته متنی به‌کار می‌رود.'; }},
+    {re:/^\s*new\s+(\w+)\s*=\s*(.*)$/, tag:'متغیر', explain:function(m){ return 'یک متغیر عددی به‌نام «'+m[1]+'» تعریف می‌کند و مقدار اولیه «'+m[2].trim()+'» را در آن قرار می‌دهد.'; }},
+    {re:/^\s*new\s+(\w+)\s*$/, tag:'متغیر', explain:function(m){ return 'یک متغیر عددی جدید به‌نام «'+m[1]+'» تعریف می‌کند (بدون مقدار اولیه، پیش‌فرض صفر است).'; }},
+    {re:/^\s*public\s+(\w+)\s*\(([^)]*)\)/, tag:'تابع public', explain:function(m){ return 'یک تابع عمومی به‌نام «'+m[1]+'» تعریف می‌کند که موتور بازی یا AMX Mod X می‌تواند مستقیماً آن را صدا بزند. پارامترها: ('+m[2].trim()+')'; }},
+    {re:/^\s*(\w+)\s*\(([^)]*)\)\s*\{?\s*$/, tag:'تابع', explain:function(m){ return 'یک تابع معمولی به‌نام «'+m[1]+'» تعریف می‌کند با پارامترهای ('+m[2].trim()+').'; }},
+    {re:/^\s*\}\s*$/, tag:'پایان بلوک', explain:function(){ return 'پایان یک بلوک کد (تابع، شرط یا حلقه) را نشان می‌دهد.'; }},
+    {re:/^\s*\{\s*$/, tag:'شروع بلوک', explain:function(){ return 'شروع یک بلوک کد جدید را نشان می‌دهد.'; }},
+    {re:/^\s*$/, tag:'خالی', explain:function(){ return 'یک خط خالی است؛ فقط برای خوانایی بیشتر کد استفاده می‌شود.'; }}
+  ];
+
+  function explainLine(line){
+    for(var i=0;i<rules.length;i++){
+      var m = line.match(rules[i].re);
+      if(m){
+        return {tag:rules[i].tag, desc:rules[i].explain(m)};
+      }
+    }
+    return {tag:'نامشخص', desc:'این خط با الگوهای شناخته‌شده مطابقت نداشت؛ احتمالاً بخشی از یک عبارت پیچیده‌تر یا تابع خاص است. می‌توانید در بخش دیکشنری نام تابع را جست‌وجو کنید.'};
+  }
+
+  function runExplain(){
+    var raw = codeInput.value;
+    var lines = raw.split('\n');
+    // trim excessive trailing empty lines
+    while(lines.length && lines[lines.length-1].trim() === '' ) lines.pop();
+
+    if(lines.length === 0){
+      explainOutput.innerHTML = '<div class="empty-hint">ابتدا کدی وارد کنید 🙂</div>';
       return;
     }
-    var slot = 'p' + (currentCount + 2);
-    conn.on('open', function(){ connections[slot] = conn; conn._slot = slot; emit('peerConnected', { slot:slot, conn:conn }); });
-    conn.on('data', function(data){ emit('data', { from:slot, data:data }); });
-    conn.on('close', function(){ emit('peerDisconnected', { slot: conn._slot || slot }); delete connections[conn._slot || slot]; });
-    conn.on('error', function(){ emit('peerDisconnected', { slot: conn._slot || slot }); });
-  }
 
-  function joinRoom(nickname, code, cb, errCb){
-    isHost = false;
-    myNickname = nickname;
-    roomCode = (code||'').toUpperCase();
-    var myPid = safePeerId('duodash-client');
-    try{ peer = new Peer(myPid, peerOptions()); }catch(e){ errCb && errCb(e); return; }
-    var outerSettled = false;
-    function safeOuterErrCb(err){ if(outerSettled) return; outerSettled = true; clearTimeout(outerTimeout); errCb && errCb(err); }
-    var outerTimeout = setTimeout(function(){ safeOuterErrCb(new Error('timeout: سرور signaling پاسخ نداد')); }, 10000);
-    peer.on('open', function(){
-      if(outerSettled) return; outerSettled = true; clearTimeout(outerTimeout);
-      var conn = peer.connect('duodash-room-' + roomCode, { reliable:true });
-      hostConn = conn;
-      var settled = false;
-      var timeout = setTimeout(function(){ if(!settled){ settled = true; errCb && errCb(new Error('timeout: اتاق پاسخ نداد')); } }, 10000);
-      conn.on('open', function(){ if(settled) return; settled = true; clearTimeout(timeout); myId = 'pending'; cb && cb(); });
-      conn.on('data', function(data){
-        if(data && data.t === 'roomFull'){ emit('roomFull'); return; }
-        if(data && data.t === 'assignSlot'){ myId = data.slot; }
-        emit('data', { from:'host', data:data });
-      });
-      conn.on('close', function(){ emit('hostDisconnected'); });
-      conn.on('error', function(err){ if(!settled){ settled = true; clearTimeout(timeout); errCb && errCb(err); } emit('hostDisconnected'); });
+    explainOutput.innerHTML = '';
+    lines.forEach(function(line, idx){
+      var result = explainLine(line);
+      var card = document.createElement('div');
+      card.className = 'line-card';
+      card.style.animationDelay = (idx*0.02)+'s';
+      var escaped = line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      card.innerHTML =
+        '<div class="line-num">'+(idx+1)+'</div>' +
+        '<div class="line-body">' +
+          '<span class="tag">'+result.tag+'</span>' +
+          '<div class="line-code">'+ (escaped.trim() === '' ? '&nbsp;' : escaped) +'</div>' +
+          '<div class="line-desc">'+ result.desc +'</div>' +
+        '</div>';
+      explainOutput.appendChild(card);
     });
-    peer.on('error', function(err){ handlePeerError(err, safeOuterErrCb); });
-    peer.on('disconnected', function(){ attemptPeerReconnect(); });
   }
 
-  function handlePeerError(err, errCb){
-    var msg = (err && err.type) || 'unknown';
-    if(msg === 'peer-unavailable'){ emit('roomNotFound'); }
-    else { emit('networkError', err); }
-    errCb && errCb(err);
-  }
-  function attemptPeerReconnect(){
-    reconnectAttempts++;
-    emit('reconnecting', reconnectAttempts);
-    if(peer && reconnectAttempts <= 5){ try{ peer.reconnect(); }catch(e){} }
-    else { emit('reconnectFailed'); }
-  }
-  function broadcast(data){ if(!isHost) return; for(var k in connections){ try{ connections[k].send(data); }catch(e){} } }
-  function sendToHost(data){ if(isHost || !hostConn) return; try{ hostConn.send(data); }catch(e){} }
-  function sendTo(slot, data){ if(connections[slot]){ try{ connections[slot].send(data); }catch(e){} } }
-  function destroy(){
-    try{
-      for(var k in connections){ connections[k].close(); }
-      connections = {};
-      if(hostConn) hostConn.close();
-      if(peer) peer.destroy();
-    }catch(e){}
-    peer = null; hostConn = null; isHost=false; roomCode=''; myId=''; reconnectAttempts=0;
-  }
+  document.getElementById('explainBtn').addEventListener('click', runExplain);
 
-  return {
-    on:on, createRoom:createRoom, joinRoom:joinRoom, broadcast:broadcast,
-    sendToHost:sendToHost, sendTo:sendTo, destroy:destroy,
-    isHost:function(){return isHost;}, getRoomCode:function(){return roomCode;},
-    getMyId:function(){return myId;}, setMyId:function(v){myId=v;},
-    getConnectionsCount:function(){return Object.keys(connections).length;},
-    getConnections:function(){return connections;}
-  };
-})();
+  /* ---------------- PROMPT BUILDER ---------------- */
+  var levelChips = document.querySelectorAll('#pbLevel .chip');
+  var selectedLevel = 'ساده';
+  levelChips.forEach(function(chip){
+    chip.addEventListener('click', function(){
+      levelChips.forEach(function(c){ c.classList.remove('active'); });
+      chip.classList.add('active');
+      selectedLevel = chip.dataset.val;
+    });
+  });
 
-var Game = {
-  lobby: { players: {} },
-  arenaThemeIndex: 0, arena: null,
-  players: {}, coins: [], powerups: [],
-  timer: MATCH_SECONDS, phase: 'idle', event: null,
-  nextCoinId: 1, nextPowerupId: 1,
-  lastTickTime: 0, accumulator: 0,
-  matchStats: {},
-  localInput: { x:0, y:0, dash:false, ability:false },
-  camScale: 1
-};
+  var featureChips = document.querySelectorAll('#pbFeatures .chip');
+  var selectedFeatures = [];
+  featureChips.forEach(function(chip){
+    chip.addEventListener('click', function(){
+      chip.classList.toggle('active');
+      var v = chip.dataset.val;
+      var idx = selectedFeatures.indexOf(v);
+      if(chip.classList.contains('active') && idx === -1) selectedFeatures.push(v);
+      if(!chip.classList.contains('active') && idx !== -1) selectedFeatures.splice(idx,1);
+    });
+  });
 
-function resetLobby(){ Game.lobby.players = {}; }
+  var pbOutput = document.getElementById('pbOutput');
 
-function newPlayerState(slot, nickname, character){
-  var idx = Object.keys(Game.lobby.players).indexOf(slot);
-  var spawns = [ {x:160,y:160}, {x:1640,y:160}, {x:160,y:840}, {x:1640,y:840} ];
-  var pos = spawns[Math.max(0, Object.keys(Game.players).length) % 4];
-  return {
-    slot:slot, nickname:nickname, character:character || 'fox',
-    x:pos.x, y:pos.y, vx:0, vy:0, facing:0,
-    score:0, dashCooldown:0, abilityCooldown:0,
-    dashTimeLeft:0, dashDirX:0, dashDirY:0,
-    powerup:null, powerupEnd:0, slowUntil:0, extraDash:0,
-    slowActiveUntilReal: 0,
-    connected:true, color: PLAYER_COLORS[idx % PLAYER_COLORS.length]
-  };
-}
+  document.getElementById('pbGenerate').addEventListener('click', function(){
+    var name = document.getElementById('pbName').value.trim() || 'پلاگین بدون‌نام';
+    var desc = document.getElementById('pbDesc').value.trim() || 'توضیح عملکرد مشخص نشده است.';
+    var featuresText = selectedFeatures.length ? selectedFeatures.join('، ') : 'ویژگی خاصی انتخاب نشده';
 
-function dist(x1,y1,x2,y2){ var dx=x2-x1, dy=y2-y1; return Math.sqrt(dx*dx+dy*dy); }
-function circleRectCollide(cx,cy,cr,rx,ry,rw,rh){
-  var nx = Math.max(rx, Math.min(cx, rx+rw));
-  var ny = Math.max(ry, Math.min(cy, ry+rh));
-  return dist(cx,cy,nx,ny) < cr;
-}
+    var prompt =
+"یک پلاگین AMX Mod X برای Counter-Strike 1.6 به زبان Pawn بنویس با مشخصات زیر:\n\n" +
+"نام پلاگین: " + name + "\n" +
+"توضیح عملکرد: " + desc + "\n" +
+"سطح پیچیدگی کد: " + selectedLevel + "\n" +
+"ویژگی‌های خاص مورد نیاز: " + featuresText + "\n\n" +
+"الزامات فنی:\n" +
+"- از include های استاندارد مناسب (amxmodx, amxmisc و در صورت نیاز cstrike/fun) استفاده کن.\n" +
+"- ثابت‌های PLUGIN, VERSION, AUTHOR را در ابتدای فایل تعریف کن.\n" +
+"- کد را با کامنت‌های کوتاه توضیح بده.\n" +
+"- از نام‌گذاری استاندارد متغیرها و توابع در Pawn پیروی کن.\n" +
+"- در صورت استفاده از رشته‌ها، همیشه از charsmax برای جلوگیری از سرریز بافر استفاده کن.\n" +
+"- کد نهایی باید بدون خطای کامپایل در amxxpc قابل کامپایل باشد.";
 
-/* --- چک اینکه یک نقطه با obstacle/trap/jump pad برخورد نداره --- */
-function isFreeSpot(x, y, r){
-  for(var i=0;i<Game.arena.obstacles.length;i++){
-    var o = Game.arena.obstacles[i];
-    if(circleRectCollide(x,y,r,o.x,o.y,o.w,o.h)) return false;
-  }
-  for(var j=0;j<Game.arena.traps.length;j++){
-    var t = Game.arena.traps[j];
-    if(dist(x,y,t.x,t.y) < t.r + r + 12) return false;
-  }
-  for(var k=0;k<Game.arena.jumpPads.length;k++){
-    var jp = Game.arena.jumpPads[k];
-    if(dist(x,y,jp.x,jp.y) < jp.r + r + 12) return false;
-  }
-  return true;
-}
+    pbOutput.textContent = prompt;
+  });
 
-/* --- سکه: چک می‌کنه که داخل دیوار نیفته --- */
-function spawnCoin(){
-  var margin = 60, tries = 0;
-  while(tries++ < 80){
-    var x = margin + Math.random()*(ARENA_W-margin*2);
-    var y = margin + Math.random()*(ARENA_H-margin*2);
-    if(isFreeSpot(x, y, 20)){
-      Game.coins.push({ id:Game.nextCoinId++, x:x, y:y });
-      return;
-    }
-  }
-}
-function spawnPowerup(){
-  var margin = 80, tries = 0;
-  while(tries++ < 80){
-    var x = margin + Math.random()*(ARENA_W-margin*2);
-    var y = margin + Math.random()*(ARENA_H-margin*2);
-    if(isFreeSpot(x, y, 28)){
-      var type = randPowerup();
-      Game.powerups.push({ id:Game.nextPowerupId++, x:x, y:y, type:type.id });
-      return;
-    }
-  }
-}
-
-function resolveObstacleCollisions(p){
-  Game.arena.obstacles.forEach(function(o){
-    if(circleRectCollide(p.x,p.y,PLAYER_RADIUS,o.x,o.y,o.w,o.h)){
-      var cx = Math.max(o.x, Math.min(p.x, o.x+o.w));
-      var cy = Math.max(o.y, Math.min(p.y, o.y+o.h));
-      var dx = p.x-cx, dy = p.y-cy;
-      var d = Math.sqrt(dx*dx+dy*dy) || 0.01;
-      var push = PLAYER_RADIUS - d;
-      if(push > 0){ p.x += (dx/d)*push; p.y += (dy/d)*push; }
+  document.getElementById('pbCopy').addEventListener('click', function(){
+    var text = pbOutput.textContent;
+    if(!text || text.indexOf('با پر کردن فرم') !== -1){ return; }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){
+        var btn = document.getElementById('pbCopy');
+        var old = btn.textContent;
+        btn.textContent = '✅ کپی شد';
+        setTimeout(function(){ btn.textContent = old; }, 1600);
+      });
     }
   });
-}
-
-function startMatch(themeIndex, playersInfo){
-  Game.arenaThemeIndex = themeIndex;
-  Game.arena = buildArena(themeIndex);
-  Game.players = {};
-  Game.matchStats = {};
-  playersInfo.forEach(function(pi){
-    Game.players[pi.slot] = newPlayerState(pi.slot, pi.nickname, pi.character);
-    Game.matchStats[pi.slot] = { coins:0, powerups:0, isWinner:false };
-  });
-  Game.coins = [];
-  Game.powerups = [];
-  for(var i=0;i<16;i++) spawnCoin();
-  Game.timer = MATCH_SECONDS;
-  Game.phase = 'playing';
-  Game.event = null;
-  Game.lastTickTime = performance.now();
-  Game.accumulator = 0;
-  Game._eventTimer = 8;
-  Game._coinSpawnTimer = 1.6;
-  Game._powerupSpawnTimer = 5;
-}
-
-function applyPowerupEffect(p, typeId){
-  var def = POWERUP_TYPES.filter(function(t){return t.id===typeId;})[0];
-  if(!def) return;
-  p.powerup = typeId;
-  p.powerupEnd = Game.timer - def.dur;
-  Game.matchStats[p.slot].powerups++;
-  updateMissionProgress('powerups', 1);
-  if(typeId === 'extradash') p.extraDash = Math.min(2, p.extraDash+1);
-  if(typeId === 'slowopp'){
-    for(var s in Game.players){
-      if(s !== p.slot) Game.players[s].slowActiveUntilReal = performance.now() + 5000;
-    }
-  }
-}
-
-function hasActivePowerup(p, id){ return p.powerup === id && Game.timer > p.powerupEnd; }
-
-function coinValue(p){
-  var v = 1;
-  if(hasActivePowerup(p,'doublescore')) v *= 2;
-  if(hasActivePowerup(p,'coinmult')) v *= 3;
-  if(Game.event && Game.event.type==='doublecoins') v *= 2;
-  return v;
-}
-
-function tickPhysics(dt, inputsBySlot){
-  if(Game.phase !== 'playing') return;
-  var isFinal = Game.timer <= FINAL_RUSH_AT;
-  var now = performance.now();
-
-  for(var slot in Game.players){
-    var p = Game.players[slot];
-    var input = inputsBySlot[slot] || {x:0,y:0,dash:false,ability:false};
-    var slowed = (p.slowActiveUntilReal && p.slowActiveUntilReal > now);
-    var speed = MOVE_SPEED;
-    if(p.powerup==='speed' && Game.timer > p.powerupEnd) speed *= 1.55;
-    if(Game.event && Game.event.type==='speedmode') speed *= 1.3;
-    if(slowed) speed *= 0.45;
-
-    if(p.dashTimeLeft > 0){
-      p.x += p.dashDirX * DASH_SPEED * dt;
-      p.y += p.dashDirY * DASH_SPEED * dt;
-      p.dashTimeLeft -= dt;
-    } else {
-      var mx = input.x, my = input.y;
-      var len = Math.sqrt(mx*mx+my*my);
-      if(len > 1){ mx/=len; my/=len; }
-      p.x += mx * speed * dt;
-      p.y += my * speed * dt;
-      if(len > 0.1){ p.facing = mx < -0.1 ? -1 : (mx > 0.1 ? 1 : p.facing); }
-      if(input.dash && p.dashCooldown <= 0 && len > 0.05){
-        p.dashTimeLeft = DASH_TIME;
-        p.dashDirX = mx; p.dashDirY = my;
-        var cdBonus = (p.powerup==='dashboost' && Game.timer > p.powerupEnd) ? 0.5 : 0;
-        var maxCd = DASH_COOLDOWN - cdBonus - (p.extraDash?0.6*p.extraDash:0);
-        p.dashCooldown = Math.max(0.6, maxCd);
-        AudioEngine.sfx.dash();
-        Renderer.addParticles(p.x, p.y, p.color, 8, {speed:100, life:0.3, size:3});
-      }
-      if(input.ability && p.abilityCooldown <= 0){
-        p.abilityCooldown = ABILITY_COOLDOWN;
-        Game.coins.forEach(function(c){
-          var d = dist(p.x,p.y,c.x,c.y);
-          if(d < ABILITY_RADIUS && d>1){
-            var pull = (1 - d/ABILITY_RADIUS) * 300 * dt * 6;
-            c.x += (p.x-c.x)/d * pull * 0.02;
-            c.y += (p.y-c.y)/d * pull * 0.02;
-          }
-        });
-      }
-    }
-    if(p.dashCooldown > 0) p.dashCooldown = Math.max(0, p.dashCooldown - dt);
-    if(p.abilityCooldown > 0) p.abilityCooldown = Math.max(0, p.abilityCooldown - dt);
-
-    if(p.powerup==='magnet' && Game.timer > p.powerupEnd){
-      Game.coins.forEach(function(c){
-        var d = dist(p.x,p.y,c.x,c.y);
-        if(d < 200 && d>1){
-          c.x += (p.x-c.x)/d * 160 * dt;
-          c.y += (p.y-c.y)/d * 160 * dt;
-        }
-      });
-    }
-
-    /* --- مرزهای آرنا: جلوی نوار سیاه رو می‌گیره --- */
-    p.x = Math.max(PLAYER_RADIUS, Math.min(ARENA_W-PLAYER_RADIUS, p.x));
-    p.y = Math.max(PLAYER_RADIUS, Math.min(ARENA_H-PLAYER_RADIUS, p.y));
-    resolveObstacleCollisions(p);
-
-    /* --- trap: کند می‌کنه --- */
-    var shielded = (p.powerup==='shield' && Game.timer > p.powerupEnd) || p.dashTimeLeft>0;
-    if(!shielded){
-      Game.arena.traps.forEach(function(t){
-        if(dist(p.x,p.y,t.x,t.y) < t.r + PLAYER_RADIUS*0.7){
-          p.slowActiveUntilReal = now + 1500;
-        }
-      });
-    }
-
-    /* --- jump pad: کنترل‌شده، پرت نمی‌کنه --- */
-    Game.arena.jumpPads.forEach(function(jp){
-      if(dist(p.x,p.y,jp.x,jp.y) < jp.r + PLAYER_RADIUS*0.6){
-        var dx = p.x-jp.x, dy = p.y-jp.y, d = Math.sqrt(dx*dx+dy*dy)||1;
-        p.dashTimeLeft = 0.14;
-        p.dashDirX = dx/d; p.dashDirY = dy/d;
-      }
-    });
-
-    /* --- سکوی متحرک: بازیکن روش سوار می‌شه --- */
-    var mpS = Game.arena.movingPlatform;
-    if(mpS.x !== undefined && dist(p.x,p.y,mpS.x,mpS.y) < mpS.r + PLAYER_RADIUS){
-      p.x += mpS.vx * dt;
-      p.y += mpS.vy * dt;
-    }
-
-    /* --- برداشت سکه --- */
-    for(var i=Game.coins.length-1;i>=0;i--){
-      var c = Game.coins[i];
-      if(dist(p.x,p.y,c.x,c.y) < PLAYER_RADIUS+12){
-        var val = coinValue(p);
-        p.score += val;
-        Game.matchStats[slot].coins += val;
-        Game.coins.splice(i,1);
-        updateMissionProgress('coins', 1);
-        AudioEngine.sfx.coin();
-        Renderer.addParticles(c.x, c.y, '#ffd166', 10, {speed:120, life:0.4, size:3});
-      }
-    }
-    /* --- برداشت پاورآپ --- */
-    for(var j=Game.powerups.length-1;j>=0;j--){
-      var pu = Game.powerups[j];
-      if(dist(p.x,p.y,pu.x,pu.y) < PLAYER_RADIUS+14){
-        applyPowerupEffect(p, pu.type);
-        Game.powerups.splice(j,1);
-        AudioEngine.sfx.powerup();
-        Renderer.addParticles(pu.x, pu.y, p.color, 14, {speed:160, life:0.5, size:4});
-      }
-    }
-  }
-
-  /* --- حرکت سکوی متحرک --- */
-  var mp = Game.arena.movingPlatform;
-  var oldX = mp.x, oldY = mp.y;
-  mp.t += dt*mp.speed;
-  var tt = (Math.sin(mp.t*Math.PI*2)+1)/2;
-  mp.x = mp.path[0].x + (mp.path[1].x-mp.path[0].x)*tt;
-  mp.y = mp.path[0].y + (mp.path[1].y-mp.path[0].y)*tt;
-  if(dt>0){ mp.vx = (mp.x-oldX)/dt; mp.vy = (mp.y-oldY)/dt; }
-
-  /* --- spawn سکه --- */
-  Game._coinSpawnTimer -= dt;
-  var coinCap = isFinal ? 22 : 14;
-  if(Game._coinSpawnTimer <= 0 && Game.coins.length < coinCap){
-    spawnCoin();
-    Game._coinSpawnTimer = isFinal ? 0.5 : 1.6;
-  }
-  Game._powerupSpawnTimer -= dt;
-  if(Game._powerupSpawnTimer <= 0 && Game.powerups.length < 3){
-    spawnPowerup();
-    Game._powerupSpawnTimer = 6 + Math.random()*3;
-  }
-
-  Game._eventTimer -= dt;
-  if(Game.event && Game.timer <= Game.event.endsAt){ Game.event = null; }
-  if(Game._eventTimer <= 0 && !isFinal){
-    triggerRandomEvent();
-    Game._eventTimer = 14 + Math.random()*8;
-  }
-  if(isFinal && (!Game.event || Game.event.type !== 'finalrush')){
-    Game.event = { type:'finalrush', text:'⚡ حمله نهایی! ⚡', endsAt:-999 };
-  }
-
-  Game.timer -= dt;
-  if(Game.timer <= 0){ Game.timer = 0; endMatch(); }
-}
-
-function triggerRandomEvent(){
-  var options = [
-    { type:'doublecoins', text:'💰 سکه دوبرابر!' },
-    { type:'speedmode', text:'⚡ حالت سرعت!' },
-    { type:'coinrain', text:'🌧 باران سکه!' },
-    { type:'powerrush', text:'✨ هجوم پاورآپ!' }
-  ];
-  var pick = options[Math.floor(Math.random()*options.length)];
-  Game.event = { type:pick.type, text:pick.text, endsAt: Game.timer - 9 };
-  if(pick.type === 'coinrain'){ for(var i=0;i<10;i++) spawnCoin(); }
-  if(pick.type === 'powerrush'){ for(var j=0;j<3;j++) spawnPowerup(); }
-}
-
-function endMatch(){
-  Game.phase = 'ended';
-  var best = -1, winners = [];
-  for(var slot in Game.players){
-    var p = Game.players[slot];
-    if(p.score > best){ best = p.score; winners = [slot]; }
-    else if(p.score === best){ winners.push(slot); }
-  }
-  winners.forEach(function(w){ if(Game.matchStats[w]) Game.matchStats[w].isWinner = true; });
-  Game._winners = winners;
-}
-
-var Renderer = (function(){
-  var canvas, ctx;
-  var particles = [];
-  function init(c){ canvas = c; ctx = c.getContext('2d'); }
-
-  function resize(){
-    var vw = window.innerWidth, vh = window.innerHeight;
-    var scale = Math.min(vw/ARENA_W, vh/ARENA_H);
-    canvas.style.width = (ARENA_W*scale)+'px';
-    canvas.style.height = (ARENA_H*scale)+'px';
-    var dpr = Math.min(2, window.devicePixelRatio || 1);
-    canvas.width = ARENA_W * dpr;
-    canvas.height = ARENA_H * dpr;
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-
-  function addParticles(x,y,color,count,opts){
-    opts = opts||{};
-    var s = Storage.get();
-    if(s.settings.reduceMotion) count = Math.min(count,3);
-    if(s.settings.lowGfx) count = Math.min(count, 4);
-    for(var i=0;i<count;i++){
-      var ang = Math.random()*Math.PI*2;
-      var spd = (opts.speed||80) * (0.4+Math.random()*0.8);
-      particles.push({
-        x:x,y:y, vx:Math.cos(ang)*spd, vy:Math.sin(ang)*spd,
-        life: opts.life||0.5, maxLife: opts.life||0.5, color:color, size: opts.size||4
-      });
-    }
-  }
-  function updateParticles(dt){
-    for(var i=particles.length-1;i>=0;i--){
-      var p = particles[i];
-      p.x += p.vx*dt; p.y += p.vy*dt; p.vx *= 0.9; p.vy *= 0.9;
-      p.life -= dt;
-      if(p.life<=0) particles.splice(i,1);
-    }
-  }
-  function drawParticles(){
-    particles.forEach(function(p){
-      ctx.globalAlpha = Math.max(0, p.life/p.maxLife);
-      ctx.fillStyle = p.color;
-      ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
-    });
-    ctx.globalAlpha = 1;
-  }
-
-  function drawBackground(theme, time){
-    var pal = THEME_PALETTES[theme];
-    var grad = ctx.createLinearGradient(0,0,0,ARENA_H);
-    grad.addColorStop(0, pal.sky1); grad.addColorStop(1, pal.sky2);
-    ctx.fillStyle = grad;
-    ctx.fillRect(0,0,ARENA_W,ARENA_H);
-    ctx.globalAlpha = 0.5;
-    for(var i=0;i<6;i++){
-      var bx = ((i*300 + time*10)% (ARENA_W+200)) - 100;
-      ctx.beginPath();
-      if(theme==='پارک نئون'){ ctx.strokeStyle = pal.deco; ctx.lineWidth=2; ctx.strokeRect(bx, 40+i*8, 60,60); }
-      else if(theme==='معبد صحرا'){ ctx.fillStyle = pal.deco; tri(ctx, bx,140, bx+40,60, bx+80,140); }
-      else if(theme==='جزیره آبنبات'){ ctx.fillStyle = pal.deco; ctx.beginPath(); ctx.arc(bx,70+i*6,26,0,Math.PI*2); ctx.fill(); }
-      else { ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.ellipse(bx,80+i*10,36,16,0,0,Math.PI*2); ctx.fill(); }
-    }
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = pal.ground;
-    ctx.fillRect(0, ARENA_H*0.16, ARENA_W, ARENA_H*0.84);
-    ctx.globalAlpha = 0.08;
-    ctx.strokeStyle = '#000';
-    for(var gx=0; gx<ARENA_W; gx+=80){ ctx.beginPath(); ctx.moveTo(gx,ARENA_H*0.16); ctx.lineTo(gx,ARENA_H); ctx.stroke(); }
-    for(var gy=ARENA_H*0.16; gy<ARENA_H; gy+=80){ ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(ARENA_W,gy); ctx.stroke(); }
-    ctx.globalAlpha = 1;
-    /* مرز آرنا */
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-    ctx.lineWidth = 4;
-    ctx.strokeRect(2, 2, ARENA_W-4, ARENA_H-4);
-  }
-
-  function drawObstacles(arena){
-    arena.obstacles.forEach(function(o){
-      ctx.fillStyle = 'rgba(0,0,0,0.25)';
-      ctx.fillRect(o.x+4,o.y+6,o.w,o.h);
-      ctx.fillStyle = '#3a3160';
-      ctx.fillRect(o.x,o.y,o.w,o.h);
-      ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-      ctx.strokeRect(o.x,o.y,o.w,o.h);
-    });
-    /* trap: pulsing + آیکون */
-    arena.traps.forEach(function(t){
-      var pulse = 0.35 + Math.sin(performance.now()/300)*0.15;
-      ctx.beginPath(); ctx.arc(t.x,t.y,t.r,0,Math.PI*2);
-      ctx.fillStyle = 'rgba(255,90,90,'+pulse+')'; ctx.fill();
-      ctx.strokeStyle = '#ff5a5a'; ctx.lineWidth=3; ctx.stroke();
-      ctx.font = 'bold 20px Vazirmatn, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillStyle = '#ff5a5a';
-      ctx.fillText('⚠', t.x, t.y);
-    });
-    /* jump pad: آیکون */
-    arena.jumpPads.forEach(function(jp){
-      ctx.beginPath(); ctx.arc(jp.x,jp.y,jp.r,0,Math.PI*2);
-      ctx.fillStyle = 'rgba(68,232,196,0.4)'; ctx.fill();
-      ctx.strokeStyle = '#44e8c4'; ctx.lineWidth=3; ctx.stroke();
-      ctx.font = 'bold 22px Vazirmatn, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillStyle = '#44e8c4';
-      ctx.fillText('↑', jp.x, jp.y);
-    });
-    /* moving platform */
-    var mp = arena.movingPlatform;
-    ctx.beginPath(); ctx.arc(mp.x, mp.y, mp.r, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,209,102,0.4)'; ctx.fill();
-    ctx.strokeStyle = '#ffd166'; ctx.lineWidth=3; ctx.stroke();
-  }
-
-  function drawCoins(coins, time){
-    coins.forEach(function(c){
-      var bob = Math.sin(time*4 + c.id)*3;
-      ctx.beginPath(); ctx.arc(c.x, c.y+bob, 12, 0, Math.PI*2);
-      ctx.fillStyle = '#ffd166';
-      ctx.shadowColor = '#ffd166'; ctx.shadowBlur = 10;
-      ctx.fill();
-      ctx.shadowBlur = 0;
-      ctx.strokeStyle = '#a87a1c'; ctx.lineWidth=2; ctx.stroke();
-    });
-  }
-  function drawPowerups(powerups, time){
-    powerups.forEach(function(pu){
-      var def = POWERUP_TYPES.filter(function(t){return t.id===pu.type;})[0];
-      var bob = Math.sin(time*3 + pu.id)*4;
-      ctx.beginPath(); ctx.arc(pu.x, pu.y+bob, 18, 0, Math.PI*2);
-      ctx.fillStyle = def ? def.color : '#fff';
-      ctx.globalAlpha = 0.9; ctx.fill(); ctx.globalAlpha=1;
-      ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.lineWidth=2; ctx.stroke();
-      ctx.font = 'bold 16px Vazirmatn, sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillStyle = '#1c1830';
-      ctx.fillText(def?def.icon:'?', pu.x, pu.y+bob+1);
-    });
-  }
-
-  function drawPlayers(players){
-    for(var slot in players){
-      var p = players[slot];
-      drawCharacterBody(ctx, p.character, p.x, p.y, PLAYER_RADIUS, p.facing, p.dashTimeLeft>0);
-      ctx.font = '700 13px Vazirmatn, Inter, sans-serif';
-      ctx.textAlign='center';
-      ctx.textBaseline='alphabetic';
-      ctx.fillStyle = 'rgba(0,0,0,0.55)';
-      ctx.fillRect(p.x-40, p.y-PLAYER_RADIUS-26, 80, 18);
-      ctx.fillStyle = p.color;
-      ctx.fillText(p.nickname.slice(0,10), p.x, p.y-PLAYER_RADIUS-13);
-      if(p.powerup && Game.timer > p.powerupEnd){
-        ctx.beginPath(); ctx.arc(p.x, p.y, PLAYER_RADIUS+6, 0, Math.PI*2);
-        ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.lineWidth=2; ctx.stroke();
-      }
-    }
-  }
-
-  function render(time){
-    if(!ctx) return;
-    ctx.clearRect(0,0,ARENA_W,ARENA_H);
-    drawBackground(Game.arena.theme, time);
-    drawObstacles(Game.arena);
-    drawCoins(Game.coins, time);
-    drawPowerups(Game.powerups, time);
-    drawPlayers(Game.players);
-    drawParticles();
-  }
-
-  return { init:init, resize:resize, render:render, addParticles:addParticles, updateParticles:updateParticles };
-})();
-
-var Input = (function(){
-  var keys = {};
-  var joyVec = {x:0,y:0};
-  var dashPressed = false, abilityPressed = false;
-  var joyActive = false, joyCenter = {x:0,y:0};
-
-  function bindKeyboard(){
-    window.addEventListener('keydown', function(e){
-      if(e.target.tagName === 'INPUT') return;
-      keys[e.code] = true;
-      if(e.code === 'Space'){ dashPressed = true; e.preventDefault(); }
-      if(e.code === 'KeyE'){ abilityPressed = true; }
-      if(e.code === 'Escape'){ UI.togglePause(); }
-      if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].indexOf(e.code)>=0) e.preventDefault();
-    });
-    window.addEventListener('keyup', function(e){ keys[e.code] = false; });
-  }
-
-  function bindTouch(joyZoneEl, nubEl, dashEl, abilityEl){
-    joyZoneEl.addEventListener('pointerdown', function(e){
-      e.preventDefault();
-      joyActive = true;
-      var rect = joyZoneEl.getBoundingClientRect();
-      joyCenter = { x: rect.left+rect.width/2, y: rect.top+rect.height/2 };
-      updateJoy(e.clientX, e.clientY);
-      try{ joyZoneEl.setPointerCapture(e.pointerId); }catch(err){}
-    });
-    joyZoneEl.addEventListener('pointermove', function(e){
-      if(!joyActive) return;
-      e.preventDefault();
-      updateJoy(e.clientX, e.clientY);
-    });
-    function endJoy(){
-      joyActive = false; joyVec = {x:0,y:0};
-      nubEl.style.left = '39px'; nubEl.style.top = '39px';
-    }
-    joyZoneEl.addEventListener('pointerup', endJoy);
-    joyZoneEl.addEventListener('pointercancel', endJoy);
-    joyZoneEl.addEventListener('pointerleave', endJoy);
-    function updateJoy(cx,cy){
-      var dx = cx - joyCenter.x, dy = cy - joyCenter.y;
-      var max = 40;
-      var d = Math.sqrt(dx*dx+dy*dy);
-      if(d > max){ dx = dx/d*max; dy = dy/d*max; }
-      joyVec = { x: dx/max, y: dy/max };
-      nubEl.style.left = (39+dx)+'px';
-      nubEl.style.top = (39+dy)+'px';
-    }
-    function bindBtn(el, onDown){
-      el.addEventListener('pointerdown', function(e){ e.preventDefault(); onDown(); });
-      el.addEventListener('touchstart', function(e){ e.preventDefault(); onDown(); }, {passive:false});
-    }
-    bindBtn(dashEl, function(){ dashPressed = true; });
-    bindBtn(abilityEl, function(){ abilityPressed = true; });
-  }
-
-  function poll(){
-    var x = 0, y = 0;
-    if(keys['KeyA']||keys['ArrowLeft']) x -= 1;
-    if(keys['KeyD']||keys['ArrowRight']) x += 1;
-    if(keys['KeyW']||keys['ArrowUp']) y -= 1;
-    if(keys['KeyS']||keys['ArrowDown']) y += 1;
-    if(joyActive || joyVec.x || joyVec.y){ x += joyVec.x; y += joyVec.y; }
-    var len = Math.sqrt(x*x+y*y);
-    if(len>1){ x/=len; y/=len; }
-    var out = { x:x, y:y, dash: dashPressed, ability: abilityPressed };
-    dashPressed = false; abilityPressed = false;
-    return out;
-  }
-
-  return { bindKeyboard:bindKeyboard, bindTouch:bindTouch, poll:poll };
-})();
-
-var UI = (function(){
-  var screens = {};
-  var currentScreen = null;
-  var myNickname = '';
-  var mySelectedCharacter = 'fox';
-  var paused = false;
-  var rafId = null;
-  var localInputState = {x:0,y:0,dash:false,ability:false};
-
-  function $(id){ return document.getElementById(id); }
-
-  function showScreen(id){
-    Object.keys(screens).forEach(function(k){ screens[k].classList.remove('active'); });
-    if(screens[id]){ screens[id].classList.add('active'); currentScreen = id; }
-  }
-  function toast(msg, ms){
-    var t = $('toast');
-    t.textContent = msg;
-    t.classList.add('show');
-    clearTimeout(t._timer);
-    t._timer = setTimeout(function(){ t.classList.remove('show'); }, ms||2200);
-  }
-
-  function randomNickname(){
-    var adj = ['روباه','گرگ','آبی','سریع','توربو','قوی','کیهانی','نقره‌ای','طلایی','وحشی'];
-    var noun = ['آتشین','توفان','شکاری','ربات','ببر','دنباله‌دار','کاوشگر','پاندا','نوا','سایه'];
-    return adj[Math.floor(Math.random()*adj.length)] + ' ' + noun[Math.floor(Math.random()*noun.length)];
-  }
-
-  function init(){
-    ['splash','nickname','menu','create','join','waiting','charselect','game','result','howto','settings','missions','about','error'].forEach(function(id){
-      screens[id] = $('screen-'+id);
-    });
-    Renderer.init($('gameCanvas'));
-    Input.bindKeyboard();
-    Input.bindTouch($('joystick-zone'), $('joystick-nub'), $('btn-dash'), $('btn-ability'));
-    window.addEventListener('resize', onResize);
-    window.addEventListener('orientationchange', onResize);
-    onResize();
-
-    bindMenus();
-    bindSettingsUI();
-
-    var s = Storage.load();
-    applySettingsToEngine();
-    $('menu-nickname-display').textContent = s.nickname || 'بازیکن';
-    $('menu-level-display').textContent = 'سطح ' + s.level;
-
-    setTimeout(function(){
-      if(s.nickname && s.nickname.length>0){
-        myNickname = s.nickname;
-        showScreen('menu');
-        maybeShowDailyReward();
-      } else {
-        showScreen('nickname');
-      }
-    }, 700);
-
-    Network.on('data', onNetworkData);
-    Network.on('peerConnected', onPeerConnected);
-    Network.on('peerDisconnected', onPeerDisconnected);
-    Network.on('hostDisconnected', onHostDisconnected);
-    Network.on('roomFull', function(){ showScreen('join'); $('join-error').textContent = 'اتاق پر است'; });
-    Network.on('roomNotFound', function(){ showScreen('join'); $('join-error').textContent = 'اتاق یافت نشد. کد را بررسی کن.'; });
-    Network.on('networkError', function(err){ showError('خطای شبکه: ' + ((err&&err.type)||'نامشخص') + '. لطفاً اتصال اینترنت را بررسی کن.'); });
-    Network.on('reconnecting', function(){ setConnStatus('bad','در حال اتصال مجدد'); });
-    Network.on('reconnectFailed', function(){ showDisconnectModal('اتصال قطع شد', 'اتصال مجدد ممکن نشد.'); });
-  }
-
-  function onResize(){ Renderer.resize(); checkOrientation(); }
-  function checkOrientation(){
-    var isSmall = Math.min(window.innerWidth, window.innerHeight) < 560;
-    var portrait = window.innerHeight > window.innerWidth;
-    if(currentScreen === 'game' && isSmall && portrait){
-      $('rotate-overlay').classList.add('show');
-    } else {
-      $('rotate-overlay').classList.remove('show');
-    }
-  }
-
-  function applySettingsToEngine(){
-    var s = Storage.get();
-    AudioEngine.setMusic(s.settings.music);
-    AudioEngine.setSfx(s.settings.sound);
-  }
-
-  function maybeShowDailyReward(){
-    ensureDailyState();
-    var d = checkDailyReward();
-    if(d){
-      $('daily-reward-icon').textContent = d.reward.icon;
-      $('daily-reward-text').textContent = d.reward.text;
-      $('modal-daily').classList.add('show');
-      $('daily-claim').onclick = function(){
-        claimDailyReward(d);
-        $('modal-daily').classList.remove('show');
-        toast('جایزه دریافت شد!');
-      };
-      $('daily-close').onclick = function(){ $('modal-daily').classList.remove('show'); };
-    }
-  }
-
-  function bindMenus(){
-    $('btn-random-name').onclick = function(){ $('nickname-input').value = randomNickname(); };
-    $('btn-nickname-continue').onclick = function(){
-      var v = $('nickname-input').value.trim();
-      if(!v) v = randomNickname();
-      v = v.slice(0,14);
-      myNickname = v;
-      var s = Storage.get(); s.nickname = v; Storage.save();
-      $('menu-nickname-display').textContent = v;
-      showScreen('menu');
-      maybeShowDailyReward();
-    };
-
-    $('btn-play-online').onclick = function(){ doCreateRoom(); };
-    $('btn-create-room').onclick = function(){ doCreateRoom(); };
-    $('btn-join-room').onclick = function(){ showScreen('join'); $('join-error').textContent=''; };
-    $('btn-howto').onclick = function(){ showScreen('howto'); };
-    $('btn-settings').onclick = function(){ showScreen('settings'); refreshSettingsUI(); };
-    $('btn-missions').onclick = function(){ showScreen('missions'); refreshMissionsUI(); };
-    $('btn-about').onclick = function(){ showScreen('about'); };
-    $('btn-howto-back').onclick = function(){ showScreen('menu'); };
-    $('btn-settings-back').onclick = function(){ showScreen('menu'); };
-    $('btn-missions-back').onclick = function(){ showScreen('menu'); };
-    $('btn-about-back').onclick = function(){ showScreen('menu'); };
-    $('btn-error-back').onclick = function(){ Network.destroy(); showScreen('menu'); };
-    $('btn-error-retry').onclick = function(){ location.reload(); };
-
-    $('btn-create-back').onclick = function(){ Network.destroy(); showScreen('menu'); };
-    $('btn-copy-code').onclick = function(){ copyText(Network.getRoomCode()); toast('کد کپی شد'); };
-    $('btn-copy-link').onclick = function(){
-      var link = location.href.split('?')[0] + '?room=' + Network.getRoomCode();
-      copyText(link); toast('لینک دعوت کپی شد');
-    };
-    $('btn-create-go-waiting').onclick = function(){ enterWaitingRoom(); };
-
-    $('btn-join-back').onclick = function(){ showScreen('menu'); };
-    $('btn-join-submit').onclick = function(){ doJoinRoom(); };
-    $('join-code-input').addEventListener('input', function(){ this.value = this.value.toUpperCase(); });
-
-    $('btn-leave-waiting').onclick = function(){ Network.destroy(); resetLobby(); showScreen('menu'); };
-    $('btn-cancel-connecting').onclick = function(){ hideConnecting(); Network.destroy(); };
-    $('btn-ready').onclick = function(){ goToCharSelect(); };
-    $('btn-char-ready').onclick = function(){ confirmCharSelect(); };
-    $('btn-play-again').onclick = function(){ requestRematch(); };
-    $('btn-main-menu').onclick = function(){ Network.destroy(); resetLobby(); showScreen('menu'); refreshMenuStats(); };
-    $('btn-pause').onclick = function(){ togglePause(); };
-    $('btn-resume').onclick = function(){ togglePause(); };
-    $('btn-quit-match').onclick = function(){ Network.destroy(); paused=false; $('modal-pause').classList.remove('show'); resetLobby(); showScreen('menu'); };
-    $('disconnect-menu-btn').onclick = function(){ $('modal-disconnect').classList.remove('show'); Network.destroy(); resetLobby(); showScreen('menu'); };
-
-    var params = new URLSearchParams(location.search);
-    var roomParam = params.get('room');
-    if(roomParam){
-      setTimeout(function(){
-        if(Storage.get().nickname){ showScreen('join'); $('join-code-input').value = roomParam.toUpperCase(); }
-      }, 900);
-    }
-  }
-
-  function copyText(t){
-    if(navigator.clipboard){ navigator.clipboard.writeText(t).catch(function(){ fallbackCopy(t); }); }
-    else fallbackCopy(t);
-  }
-  function fallbackCopy(t){
-    var ta = document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select();
-    try{ document.execCommand('copy'); }catch(e){}
-    document.body.removeChild(ta);
-  }
-
-  function refreshMenuStats(){
-    var s = Storage.get();
-    $('menu-nickname-display').textContent = s.nickname;
-    $('menu-level-display').textContent = 'سطح ' + s.level;
-  }
-
-  function doCreateRoom(){
-    resetLobby(); Network.destroy(); AudioEngine.ensureCtx();
-    showConnecting('در حال ساخت اتاق…');
-    Network.createRoom(myNickname, function(code){
-      hideConnecting();
-      Network.setMyId('p1');
-      Game.lobby.players['p1'] = { nickname: myNickname, character:null, ready:false };
-      $('create-room-code').textContent = code;
-      $('waiting-room-code').textContent = code;
-      showScreen('create');
-    }, function(err){
-      hideConnecting();
-      showError('ساخت اتاق ممکن نشد (' + ((err&&err.message)||(err&&err.type)||'خطای اتصال') + '). لطفاً اینترنت را بررسی کن.');
-    });
-  }
-
-  function doJoinRoom(){
-    var code = $('join-code-input').value.trim().toUpperCase();
-    if(code.length !== 6){ $('join-error').textContent = 'کد ۶ حرفی وارد کن.'; return; }
-    $('join-error').textContent = '';
-    AudioEngine.ensureCtx();
-    Network.destroy(); resetLobby();
-    showConnecting('در حال ورود به اتاق…');
-    Network.joinRoom(myNickname, code, function(){
-      hideConnecting();
-      Network.sendToHost({ t:'join', nickname: myNickname });
-      $('waiting-room-code').textContent = code;
-      enterWaitingRoom();
-    }, function(err){
-      hideConnecting();
-      showError('ورود به اتاق ممکن نشد (' + ((err&&err.message)||(err&&err.type)||'خطای اتصال') + '). کد را بررسی کن.');
-    });
-  }
-
-  function showConnecting(text){ $('connecting-text').textContent = text || 'در حال اتصال…'; $('modal-connecting').classList.add('show'); }
-  function hideConnecting(){ $('modal-connecting').classList.remove('show'); }
-
-  function enterWaitingRoom(){
-    showScreen('waiting'); renderWaitingRoom();
-    if(Network.isHost()){ $('btn-ready').disabled = false; $('btn-ready').textContent = 'شروع وقتی آماده‌ام →'; }
-  }
-
-  function renderWaitingRoom(){
-    var list = $('waiting-player-list'); list.innerHTML = '';
-    var slots = Object.keys(Game.lobby.players);
-    slots.forEach(function(slot){
-      var pl = Game.lobby.players[slot];
-      var row = document.createElement('div'); row.className = 'player-slot';
-      row.innerHTML = '<div class="player-dot on"></div><div>'+escapeHtml(pl.nickname)+(slot==='p1'?' <span class="badge">میزبان</span>':'')+'</div>';
-      list.appendChild(row);
-    });
-    for(var i=slots.length;i<MAX_PLAYERS;i++){
-      var row2 = document.createElement('div'); row2.className = 'player-slot';
-      row2.innerHTML = '<div class="player-dot"></div><div class="muted">در انتظار بازیکن…</div>';
-      list.appendChild(row2);
-    }
-    if(Network.isHost()){ $('btn-ready').disabled = slots.length < 2; }
-  }
-
-  function goToCharSelect(){
-    if(Network.isHost()){ Network.broadcast({ t:'goCharSelect' }); enterCharSelect(); }
-  }
-  function enterCharSelect(){ showScreen('charselect'); buildCharGrid(); renderCharSelectList(); }
-
-  function buildCharGrid(){
-    var grid = $('char-grid'); grid.innerHTML = '';
-    CHARACTERS.forEach(function(c){
-      var card = document.createElement('div'); card.className = 'char-card'; card.dataset.id = c.id;
-      var canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 64;
-      card.appendChild(canvas);
-      var label = document.createElement('span'); label.textContent = c.name; card.appendChild(label);
-      drawCharacterIcon(canvas, c.id, false);
-      card.onclick = function(){ selectCharacter(c.id); };
-      grid.appendChild(card);
-    });
-    refreshCharGridState();
-  }
-
-  function refreshCharGridState(){
-    var taken = {};
-    Object.keys(Game.lobby.players).forEach(function(s){
-      var pl = Game.lobby.players[s];
-      if(pl.character && s !== Network.getMyId()) taken[pl.character] = true;
-    });
-    Array.prototype.forEach.call($('char-grid').children, function(card){
-      card.classList.toggle('selected', card.dataset.id === mySelectedCharacter);
-      card.classList.toggle('taken', !!taken[card.dataset.id] && card.dataset.id !== mySelectedCharacter);
-    });
-  }
-
-  function selectCharacter(id){
-    mySelectedCharacter = id;
-    var me = Game.lobby.players[Network.getMyId()];
-    if(me) me.character = id;
-    refreshCharGridState();
-    if(Network.isHost()){ broadcastLobbyState(); }
-    else { Network.sendToHost({ t:'charSelect', character:id }); }
-    renderCharSelectList();
-  }
-
-  function renderCharSelectList(){
-    var list = $('charselect-player-list'); list.innerHTML = '';
-    Object.keys(Game.lobby.players).forEach(function(slot){
-      var pl = Game.lobby.players[slot];
-      var row = document.createElement('div'); row.className = 'player-slot';
-      row.innerHTML = '<div class="player-dot '+(pl.ready?'on':'')+'"></div><div>'+escapeHtml(pl.nickname)+' — '+(pl.character?getCharacter(pl.character).name:'در حال انتخاب…')+(pl.ready?' ✓':'')+'</div>';
-      list.appendChild(row);
-    });
-  }
-
-  function confirmCharSelect(){
-    if(!mySelectedCharacter){ toast('اول یک شخصیت انتخاب کن'); return; }
-    var me = Game.lobby.players[Network.getMyId()];
-    if(me) me.ready = true;
-    $('btn-char-ready').disabled = true;
-    if(Network.isHost()){ broadcastLobbyState(); checkAllReadyAndStart(); }
-    else { Network.sendToHost({ t:'ready' }); }
-    renderCharSelectList();
-  }
-
-  function checkAllReadyAndStart(){
-    var slots = Object.keys(Game.lobby.players);
-    var allReady = slots.length >= 2 && slots.every(function(s){ return Game.lobby.players[s].ready && Game.lobby.players[s].character; });
-    if(allReady){
-      var themeIndex = Math.floor(Math.random()*ARENA_THEMES.length);
-      var playersInfo = slots.map(function(s){ return { slot:s, nickname:Game.lobby.players[s].nickname, character:Game.lobby.players[s].character }; });
-      Network.broadcast({ t:'startMatch', themeIndex:themeIndex, players:playersInfo });
-      launchCountdown(themeIndex, playersInfo);
-    }
-  }
-
-  function broadcastLobbyState(){ Network.broadcast({ t:'lobbyState', players: Game.lobby.players }); }
-
-  function launchCountdown(themeIndex, playersInfo){
-    startMatch(themeIndex, playersInfo);
-    Game.phase = 'countdown';
-    showScreen('game'); checkOrientation();
-    var n = 3;
-    $('screen-countdown').classList.add('show');
-    $('countdown-number').textContent = '۳';
-    AudioEngine.sfx.start();
-    var labels = ['۳','۲','۱','برو!'];
-    var iv = setInterval(function(){
-      n--;
-      if(n>0){ $('countdown-number').textContent = labels[3-n] || n; AudioEngine.sfx.click(); }
-      else if(n===0){ $('countdown-number').textContent = 'برو!'; AudioEngine.sfx.start(); }
-      else{
-        clearInterval(iv);
-        $('screen-countdown').classList.remove('show');
-        Game.phase = 'playing';
-        Game.lastTickTime = performance.now();
-        startGameLoop();
-      }
-    }, 800);
-  }
-
-  var loopRunning = false;
-  function startGameLoop(){
-    if(loopRunning) return;
-    loopRunning = true;
-    var last = performance.now();
-    function frame(now){
-      if(!loopRunning) return;
-      var dt = Math.min(0.05, (now-last)/1000);
-      last = now;
-      if(!paused){
-        var input = Input.poll();
-        localInputState = input;
-        if(Network.isHost()){
-          var inputsBySlot = {};
-          inputsBySlot[Network.getMyId()] = input;
-          for(var s in Game._remoteInputs){ inputsBySlot[s] = Game._remoteInputs[s]; }
-          tickPhysics(dt, inputsBySlot);
-          broadcastState();
-          if(Game.phase === 'ended'){ loopRunning = false; onMatchEndedLocal(); return; }
-        } else {
-          Network.sendToHost({ t:'input', input:input });
-        }
-        Renderer.updateParticles(dt);
-        updateHUD();
-      }
-      Renderer.render(now/1000);
-      rafId = requestAnimationFrame(frame);
-    }
-    Game._remoteInputs = Game._remoteInputs || {};
-    rafId = requestAnimationFrame(frame);
-  }
-  function stopGameLoop(){ loopRunning = false; if(rafId) cancelAnimationFrame(rafId); }
-
-  function broadcastState(){
-    var snapshot = {
-      t:'state',
-      players: serializePlayers(),
-      coins: Game.coins, powerups: Game.powerups,
-      timer: Game.timer, event: Game.event, phase: Game.phase
-    };
-    Network.broadcast(snapshot);
-  }
-  function serializePlayers(){
-    var out = {};
-    for(var s in Game.players){
-      var p = Game.players[s];
-      out[s] = { slot:p.slot, nickname:p.nickname, character:p.character, x:p.x,y:p.y, facing:p.facing,
-        score:p.score, dashCooldown:p.dashCooldown, abilityCooldown:p.abilityCooldown, dashTimeLeft:p.dashTimeLeft,
-        powerup:p.powerup, powerupEnd:p.powerupEnd, color:p.color };
-    }
-    return out;
-  }
-
-  function applyRemoteState(snapshot){
-    Game.players = {};
-    for(var s in snapshot.players){ Game.players[s] = snapshot.players[s]; }
-    Game.coins = snapshot.coins; Game.powerups = snapshot.powerups;
-    Game.timer = snapshot.timer; Game.event = snapshot.event;
-    if(snapshot.phase === 'ended' && Game.phase !== 'ended'){
-      Game.phase = 'ended';
-      onMatchEndedLocal();
-    }
-    updateHUD();
-  }
-
-  function updateHUD(){
-    var scoresEl = $('hud-scores'); scoresEl.innerHTML = '';
-    var slots = Object.keys(Game.players);
-    slots.forEach(function(s){
-      var p = Game.players[s];
-      var chip = document.createElement('div'); chip.className = 'score-chip';
-      chip.innerHTML = '<span class="swatch" style="background:'+p.color+'"></span>'+escapeHtml(p.nickname.slice(0,8))+': '+Math.floor(p.score);
-      scoresEl.appendChild(chip);
-    });
-    var mm = Math.floor(Game.timer/60), ss = Math.floor(Game.timer%60);
-    $('hud-timer').textContent = (mm<10?'0':'')+mm+':'+(ss<10?'0':'')+ss;
-    $('hud-timer').classList.toggle('rush', Game.timer <= FINAL_RUSH_AT);
-    var evtEl = $('hud-event');
-    if(Game.event){ evtEl.textContent = Game.event.text; evtEl.classList.add('show'); }
-    else evtEl.classList.remove('show');
-
-    var me = Game.players[Network.getMyId()];
-    if(me){
-      var dashPct = Math.max(0, Math.min(1, me.dashCooldown/DASH_COOLDOWN));
-      $('dash-cd').style.transform = 'translateY('+((1-dashPct)*100)+'%)';
-      var abPct = Math.max(0, Math.min(1, me.abilityCooldown/ABILITY_COOLDOWN));
-      $('ability-cd').style.transform = 'translateY('+((1-abPct)*100)+'%)';
-      var puEl = $('hud-mypowerup');
-      if(me.powerup && Game.timer > me.powerupEnd){
-        var def = POWERUP_TYPES.filter(function(t){return t.id===me.powerup;})[0];
-        puEl.style.display = 'block';
-        puEl.textContent = (def?def.icon+' '+def.label:me.powerup);
-      } else { puEl.style.display = 'none'; }
-    }
-  }
-
-  function setConnStatus(cls, text){ var el = $('hud-conn'); el.className = 'hud-conn '+cls; el.textContent = '● '+text; }
-
-  function onMatchEndedLocal(){ stopGameLoop(); AudioEngine.stopMusic(); setTimeout(function(){ showResults(); }, 900); }
-
-  function showResults(){
-    var slots = Object.keys(Game.players);
-    var mine = Network.getMyId();
-    var iWon = Game.matchStats[mine] && Game.matchStats[mine].isWinner;
-    $('result-title').textContent = iWon ? 'تو بردی!' : 'پایان مسابقه';
-    if(iWon) AudioEngine.sfx.victory(); else AudioEngine.sfx.defeat();
-    var list = $('result-list'); list.innerHTML = '';
-    slots.sort(function(a,b){ return Game.players[b].score - Game.players[a].score; });
-    slots.forEach(function(s){
-      var p = Game.players[s];
-      var row = document.createElement('div');
-      row.className = 'result-row' + (Game.matchStats[s] && Game.matchStats[s].isWinner ? ' winner':'');
-      row.innerHTML = '<span>'+escapeHtml(p.nickname)+'</span><span>'+Math.floor(p.score)+' سکه</span>';
-      list.appendChild(row);
-    });
-    var myStats = Game.matchStats[mine] || {coins:0};
-    var xpGain = 20 + myStats.coins*2 + (iWon?50:0);
-    var coinsGain = 10 + myStats.coins + (iWon?30:0);
-    var s = Storage.get();
-    var leveledUp = addProgress(xpGain, coinsGain);
-    $('result-xp').textContent = xpGain;
-    $('result-coins').textContent = coinsGain;
-    var pct = Math.min(100, Math.round((s.xp/xpForLevel(s.level))*100));
-    $('result-xp-bar').style.width = pct+'%';
-    $('result-level-note').textContent = leveledUp ? ('به سطح '+s.level+' رسیدی!') : ('سطح '+s.level+' — '+ (xpForLevel(s.level)-s.xp) +' تجربه تا سطح بعدی');
-    if(leveledUp) setTimeout(function(){ AudioEngine.sfx.levelup(); }, 400);
-    s.stats.matches++;
-    if(iWon) s.stats.wins++;
-    s.stats.coinsCollected += myStats.coins;
-    Storage.save();
-    updateMissionProgress('matches', 1);
-    if(iWon) updateMissionProgress('wins', 1);
-    showScreen('result');
-  }
-
-  function requestRematch(){
-    if(Network.isHost()){
-      Object.keys(Game.lobby.players).forEach(function(s){ Game.lobby.players[s].ready = false; });
-      Network.broadcast({ t:'toCharSelect' });
-      enterCharSelect();
-    } else { toast('در انتظار میزبان…'); }
-  }
-
-  function togglePause(){
-    if(currentScreen !== 'game') return;
-    paused = !paused;
-    $('modal-pause').classList.toggle('show', paused);
-  }
-
-  function onPeerConnected(evt){ if(!Network.isHost()) return; }
-  function onPeerDisconnected(evt){
-    if(currentScreen === 'game' && Game.phase === 'playing'){
-      showDisconnectModal('قطع اتصال حریف', 'شاید دوباره وصل شود…');
-      if(Game.players[evt.slot]) Game.players[evt.slot].connected = false;
-      setConnStatus('bad', 'قطع شد');
-    } else if(currentScreen === 'waiting' || currentScreen === 'charselect'){
-      delete Game.lobby.players[evt.slot];
-      renderWaitingRoom(); renderCharSelectList();
-      toast('یک بازیکن خارج شد');
-    }
-  }
-  function onHostDisconnected(){
-    if(currentScreen === 'game'){
-      showDisconnectModal('قطع اتصال میزبان', 'ادامه مسابقه ممکن نیست.');
-      setConnStatus('bad', 'قطع شد');
-    } else { toast('اتصال به میزبان قطع شد'); showScreen('menu'); }
-  }
-  function showDisconnectModal(title, text){
-    $('disconnect-title').textContent = title;
-    $('disconnect-text').textContent = text;
-    $('modal-disconnect').classList.add('show');
-  }
-  function showError(msg){
-    $('error-message').textContent = msg || 'اتصال آنلاین برقرار نشد. لطفاً اینترنت را بررسی کن.';
-    showScreen('error');
-  }
-  function showLibraryLoadError(){
-    showError('کتابخانه چندنفره از هیچ منبعی بارگذاری نشد. ممکن است شبکه یا فایروال شما این آدرس‌ها را بلاک کرده باشد. از شبکه یا VPN دیگری امتحان کن.');
-  }
-
-  function onNetworkData(evt){
-    var data = evt.data;
-    if(!data || !data.t) return;
-    if(Network.isHost()){ handleHostReceive(evt.from, data); }
-    else { handleClientReceive(data); }
-  }
-
-  function handleHostReceive(fromSlot, data){
-    if(data.t === 'join'){
-      Game.lobby.players[fromSlot] = { nickname: (data.nickname||'بازیکن').slice(0,14), character:null, ready:false };
-      Network.sendTo(fromSlot, { t:'assignSlot', slot: fromSlot });
-      broadcastLobbyState();
-      if(currentScreen==='waiting') renderWaitingRoom();
-    } else if(data.t === 'charSelect'){
-      if(Game.lobby.players[fromSlot]) Game.lobby.players[fromSlot].character = data.character;
-      broadcastLobbyState();
-      if(currentScreen==='charselect'){ renderCharSelectList(); refreshCharGridState(); }
-    } else if(data.t === 'ready'){
-      if(Game.lobby.players[fromSlot]) Game.lobby.players[fromSlot].ready = true;
-      broadcastLobbyState();
-      if(currentScreen==='charselect') renderCharSelectList();
-      checkAllReadyAndStart();
-    } else if(data.t === 'input'){
-      Game._remoteInputs = Game._remoteInputs || {};
-      Game._remoteInputs[fromSlot] = data.input;
-    }
-  }
-
-  function handleClientReceive(data){
-    if(data.t === 'lobbyState'){
-      Game.lobby.players = data.players;
-      if(currentScreen==='waiting') renderWaitingRoom();
-      if(currentScreen==='charselect'){ renderCharSelectList(); refreshCharGridState(); }
-    } else if(data.t === 'goCharSelect'){ enterCharSelect(); }
-    else if(data.t === 'startMatch'){ launchCountdown(data.themeIndex, data.players); }
-    else if(data.t === 'state'){ applyRemoteState(data); }
-    else if(data.t === 'toCharSelect'){
-      showScreen('charselect');
-      $('btn-char-ready').disabled = false;
-      buildCharGrid(); renderCharSelectList();
-    }
-  }
-
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, function(c){
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
-    });
-  }
-
-  function bindSwitch(el, key){
-    el.onclick = function(){
-      var s = Storage.get();
-      s.settings[key] = !s.settings[key];
-      Storage.save(); applySettingsToEngine(); refreshSettingsUI();
-    };
-  }
-  function bindSettingsUI(){
-    bindSwitch($('sw-music'), 'music');
-    bindSwitch($('sw-sound'), 'sound');
-    bindSwitch($('sw-lowgfx'), 'lowGfx');
-    bindSwitch($('sw-reducemotion'), 'reduceMotion');
-    bindSwitch($('sw-vibration'), 'vibration');
-    $('btn-fullscreen').onclick = function(){
-      if(!document.fullscreenElement){ document.documentElement.requestFullscreen().catch(function(){}); }
-      else { document.exitFullscreen().catch(function(){}); }
-    };
-    $('btn-reset-progress').onclick = function(){
-      if(confirm('همه پیشرفت پاک شود؟ این کار برگشت‌پذیر نیست.')){
-        Storage.reset(); refreshSettingsUI(); refreshMenuStats(); toast('پیشرفت پاک شد');
-      }
-    };
-    $('sw-custom-secure').onclick = function(){ this.classList.toggle('on'); };
-    $('btn-save-custom-server').onclick = function(){
-      var s = Storage.get();
-      var host = $('custom-host-input').value.trim().replace(/^https?:\/\//,'').replace(/\/$/,'');
-      s.settings.customHost = host;
-      s.settings.customPort = $('custom-port-input').value.trim();
-      s.settings.customSecure = $('sw-custom-secure').classList.contains('on');
-      Storage.save();
-      $('custom-server-status').textContent = host ? ('سرور شخصی: '+host) : 'سرور عمومی پیش‌فرض.';
-      toast('تنظیمات سرور ذخیره شد');
-    };
-    $('btn-clear-custom-server').onclick = function(){
-      var s = Storage.get();
-      s.settings.customHost = ''; s.settings.customPort = ''; s.settings.customSecure = true;
-      Storage.save(); refreshSettingsUI(); toast('بازگشت به سرور پیش‌فرض');
-    };
-  }
-  function refreshSettingsUI(){
-    var s = Storage.get();
-    ['music','sound','lowGfx','reduceMotion','vibration'].forEach(function(key){
-      var elId = { music:'sw-music', sound:'sw-sound', lowGfx:'sw-lowgfx', reduceMotion:'sw-reducemotion', vibration:'sw-vibration' }[key];
-      $(elId).classList.toggle('on', !!s.settings[key]);
-    });
-    $('custom-host-input').value = s.settings.customHost || '';
-    $('custom-port-input').value = s.settings.customPort || '';
-    $('sw-custom-secure').classList.toggle('on', s.settings.customSecure !== false);
-    $('custom-server-status').textContent = s.settings.customHost ? ('سرور شخصی: '+s.settings.customHost) : 'سرور عمومی پیش‌فرض.';
-  }
-  function refreshMissionsUI(){
-    var s = ensureDailyState();
-    var list = $('missions-list'); list.innerHTML = '';
-    s.missions.forEach(function(m){
-      var tmpl = MISSION_TEMPLATES.filter(function(t){return t.id===m.id;})[0];
-      if(!tmpl) return;
-      var pct = Math.min(100, Math.round((m.progress/tmpl.target)*100));
-      var item = document.createElement('div'); item.className = 'mission-item';
-      item.innerHTML = '<div style="flex:1;"><div>'+tmpl.text+' ('+m.progress+'/'+tmpl.target+')</div>'+
-        '<div class="mission-bar"><div style="width:'+pct+'%;"></div></div></div>'+
-        (pct>=100 ? '<span class="badge">تمام</span>' : '');
-      list.appendChild(item);
-    });
-    $('streak-display').textContent = 'روز ' + (s.dailyStreak+1);
-  }
-
-  return { init:init, togglePause:togglePause, showLibraryLoadError:showLibraryLoadError };
-})();
-
-var PEERJS_SOURCES = [
-  'https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',
-  'https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js',
-  'https://esm.sh/peerjs@1.5.4',
-  'https://cdn.statically.io/gh/peers/peerjs/master/dist/peerjs.min.js'
-];
-var LibraryLoader = (function(){
-  function loadScript(src, timeoutMs){
-    return new Promise(function(resolve, reject){
-      var s = document.createElement('script');
-      var done = false;
-      var timer = setTimeout(function(){
-        if(!done){ done = true; s.remove(); reject(new Error('timeout: '+src)); }
-      }, timeoutMs || 7000);
-      s.src = src;
-      s.onload = function(){
-        if(done) return; done = true; clearTimeout(timer);
-        if(typeof Peer === 'undefined'){ reject(new Error('loaded but Peer undefined: '+src)); }
-        else resolve();
-      };
-      s.onerror = function(){
-        if(done) return; done = true; clearTimeout(timer); reject(new Error('failed: '+src));
-      };
-      document.head.appendChild(s);
-    });
-  }
-  function loadPeerJs(onProgress){
-    var i = 0;
-    function tryNext(){
-      if(typeof Peer !== 'undefined') return Promise.resolve();
-      if(i >= PEERJS_SOURCES.length) return Promise.reject(new Error('all sources failed'));
-      var src = PEERJS_SOURCES[i];
-      onProgress && onProgress(i+1, PEERJS_SOURCES.length);
-      i++;
-      return loadScript(src).catch(function(err){
-        console.warn('DuoDash: PeerJS source failed, trying next mirror ->', err.message);
-        return tryNext();
-      });
-    }
-    return tryNext();
-  }
-  return { loadPeerJs:loadPeerJs };
-})();
-
-function bootDuoDash(){
-  var splashNote = document.querySelector('#screen-splash .muted');
-  function setNote(txt){ if(splashNote) splashNote.textContent = txt; }
-  setNote('در حال اتصال به سرویس چندنفره…');
-  LibraryLoader.loadPeerJs(function(attempt, total){
-    setNote('در حال بارگذاری… (منبع ' + attempt + '/' + total + ')');
-  }).then(function(){
-    UI.init();
-  }).catch(function(err){
-    console.error('DuoDash: could not load the multiplayer library from any source.', err);
-    UI.init();
-    setTimeout(function(){
-      if(typeof Peer === 'undefined'){ UI.showLibraryLoadError(); }
-    }, 300);
-  });
-}
-
-window.addEventListener('DOMContentLoaded', bootDuoDash);
 
 })();
 </script>
+
+</div><!-- /#siteContent -->
+
 </body>
 </html>
