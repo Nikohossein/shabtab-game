@@ -1,781 +1,1280 @@
 <!DOCTYPE html>
+<!--
+=====================================================================
+  اَشکِن PRO — بازی آنلاین دو نفره آجرشکن (نسخه حرفه‌ای)
+=====================================================================
+
+  ▌ سرویس آنلاین: PeerJS (WebRTC) — کاملاً رایگان، بدون ثبت‌نام،
+    بدون API Key و بدون بک‌اند. فقط همین یک فایل را روی هاست استاتیک
+    (GitHub Pages / Netlify) قرار دهید و با دوستتان بازی کنید.
+
+  ▌ حالت‌های بازی:
+    • داستانی (مراحل): ۶ مرحله با چیدمان‌های متفاوت و سختی فزاینده
+    • آنلاین دو نفره (Co-op): میزبان پَدل پایین، مهمان پَدل بالا
+    • بی‌نهایت: امتیاز تا جایی که می‌توانید
+
+  ▌ امکانات حرفه‌ای:
+    • موتور صوتی Web Audio (بدون فایل صوتی خارجی)
+    • پاورآپ‌ها: سه توپ، پَدل بزرگ، لیزر، آهنربا، جان اضافه، کندی
+    • سیستم کمبو و ضرب‌گر امتیاز
+    • ذخیره رکورد در مرورگر (localStorage)
+    • لرزش صفحه، دنباله توپ، انیمیشن شکستن آجرها
+    • منوی اصلی، تنظیمات (صدا/لرزش)، آموزش، توقف
+    • واکنش‌گرا برای دسکتاپ و موبایل + لمسی
+
+  ▌ نحوه اجرا:
+    ۱) این فایل را روی GitHub Pages قرار دهید (راهنما در پایین).
+    ۲) بازیکن اول «ساخت اتاق» را بزند و کد را به دوستش بدهد.
+    ۳) بازیکن دوم کد را وارد کرده و «پیوستن» را بزند.
+=====================================================================
+-->
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AMX Mod X Academy | نسخه دمو</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0f0c29">
+<title>اَشکِن PRO | بازی آجرشکن آنلاین</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#0a0917;
-    --bg-alt:#120f26;
-    --panel: rgba(255,255,255,0.045);
-    --panel-strong: rgba(255,255,255,0.07);
-    --panel-border: rgba(255,255,255,0.09);
-    --purple:#8b5cf6;
-    --purple-deep:#5b21e0;
-    --blue:#3b82f6;
-    --green:#39ff9e;
-    --amber:#ffb64c;
-    --red:#ff5c6c;
-    --text:#eef0ff;
-    --text-dim:#a9a6c9;
-    --text-faint:#726f96;
-    --radius:16px;
-    --radius-sm:10px;
-    --mono: 'Consolas','SFMono-Regular','Cascadia Code','Courier New',monospace;
-    --sans: 'Vazirmatn','IRANSansWeb','Tahoma','Segoe UI',Arial,sans-serif;
-  }
-
-  *{box-sizing:border-box; margin:0; padding:0;}
-
-  html{scroll-behavior:smooth;}
-
-  body{
-    font-family:var(--sans);
-    background:
-      radial-gradient(1200px 600px at 15% -10%, rgba(139,92,246,0.20), transparent 60%),
-      radial-gradient(1000px 700px at 100% 10%, rgba(59,130,246,0.16), transparent 55%),
-      var(--bg);
-    color:var(--text);
-    min-height:100vh;
-    line-height:1.8;
-    overflow-x:hidden;
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important;}
-  }
-
-  a{color:inherit; text-decoration:none;}
-  ul{list-style:none;}
-
-  ::selection{background:var(--purple); color:#fff;}
-
-  ::-webkit-scrollbar{width:10px;}
-  ::-webkit-scrollbar-track{background:var(--bg);}
-  ::-webkit-scrollbar-thumb{background:linear-gradient(var(--purple),var(--blue)); border-radius:10px;}
-
-  .wrap{max-width:1180px; margin:0 auto; padding:0 24px;}
-
-  .glass{
-    background:var(--panel);
-    border:1px solid var(--panel-border);
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
-    border-radius:var(--radius);
-  }
-
-  .eyebrow{
-    display:inline-flex; align-items:center; gap:8px;
-    font-size:12.5px; letter-spacing:0.5px; color:var(--green);
-    font-family:var(--mono); text-transform:uppercase;
-    background:rgba(57,255,158,0.08); border:1px solid rgba(57,255,158,0.25);
-    padding:5px 12px; border-radius:999px; margin-bottom:16px;
-  }
-  .eyebrow::before{content:"●"; font-size:8px;}
-
-  h1,h2,h3,h4{font-weight:800; letter-spacing:-0.02em;}
-
-  .section-title{font-size:clamp(26px,4vw,38px); margin-bottom:10px;}
-  .section-sub{color:var(--text-dim); max-width:640px; font-size:15.5px; margin-bottom:40px;}
-
-  section{padding:90px 0; position:relative;}
-
-  /* ---------- NAV ---------- */
-  header.nav{
-    position:fixed; top:0; right:0; left:0; z-index:100;
-    background:rgba(10,9,23,0.72);
-    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-    border-bottom:1px solid var(--panel-border);
-  }
-  .nav-inner{
-    max-width:1180px; margin:0 auto; padding:14px 24px;
-    display:flex; align-items:center; justify-content:space-between;
-  }
-  .brand{display:flex; align-items:center; gap:10px; font-weight:800; font-size:16px;}
-  .brand-mark{
-    width:34px; height:34px; border-radius:9px;
-    background:linear-gradient(135deg,var(--purple),var(--blue));
-    display:flex; align-items:center; justify-content:center;
-    font-family:var(--mono); font-weight:900; font-size:14px; color:#fff;
-    box-shadow:0 0 24px rgba(139,92,246,0.5);
-  }
-  .brand small{display:block; font-weight:400; color:var(--text-faint); font-size:11px; font-family:var(--mono);}
-
-  .nav-links{display:flex; gap:6px; align-items:center;}
-  .nav-links a{
-    padding:9px 14px; border-radius:9px; font-size:14px; color:var(--text-dim);
-    transition:.2s;
-  }
-  .nav-links a:hover{color:#fff; background:var(--panel-strong);}
-  .nav-cta{
-    background:linear-gradient(135deg,var(--purple),var(--blue)) !important;
-    color:#fff !important; font-weight:700;
-  }
-  .nav-toggle{display:none; flex-direction:column; gap:5px; cursor:pointer; background:none; border:none;}
-  .nav-toggle span{width:22px; height:2px; background:#fff; border-radius:2px;}
-
-  /* ---------- HERO ---------- */
-  .hero{
-    padding:170px 0 100px;
-    position:relative;
-  }
-  .hero-grid{
-    display:grid; grid-template-columns:1.1fr 0.9fr; gap:50px; align-items:center;
-  }
-  .hero h1{
-    font-size:clamp(34px,5.2vw,58px); line-height:1.15; margin-bottom:20px;
-  }
-  .hero h1 .grad{
-    background:linear-gradient(135deg,var(--purple),var(--blue) 60%, var(--green));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-  }
-  .hero p{color:var(--text-dim); font-size:16.5px; max-width:520px; margin-bottom:32px;}
-
-  .hero-actions{display:flex; gap:14px; flex-wrap:wrap;}
-  .btn{
-    display:inline-flex; align-items:center; gap:8px;
-    padding:14px 26px; border-radius:12px; font-weight:700; font-size:15px;
-    cursor:pointer; border:none; transition:.2s; font-family:var(--sans);
-  }
-  .btn-primary{
-    background:linear-gradient(135deg,var(--purple),var(--blue));
-    color:#fff; box-shadow:0 10px 30px -8px rgba(139,92,246,0.65);
-  }
-  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 14px 34px -6px rgba(139,92,246,0.8);}
-  .btn-ghost{
-    background:var(--panel); color:var(--text); border:1px solid var(--panel-border);
-  }
-  .btn-ghost:hover{background:var(--panel-strong);}
-  .btn-sm{padding:9px 16px; font-size:13.5px; border-radius:9px;}
-
-  .stat-row{display:flex; gap:28px; margin-top:40px; flex-wrap:wrap;}
-  .stat b{display:block; font-size:24px; font-family:var(--mono); background:linear-gradient(135deg,var(--green),var(--blue)); -webkit-background-clip:text; background-clip:text; color:transparent;}
-  .stat span{font-size:12.5px; color:var(--text-faint);}
-
-  /* HUD signature widget */
-  .hud-shell{
-    position:relative; border-radius:20px; overflow:hidden;
-    background:linear-gradient(160deg,#141126,#0b0a1a 60%);
-    border:1px solid var(--panel-border);
-    box-shadow:0 30px 70px -30px rgba(0,0,0,0.7);
-    padding:0;
-  }
-  .hud-shell::before{
-    content:""; position:absolute; inset:0;
-    background:repeating-linear-gradient(180deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 1px, transparent 1px, transparent 3px);
-    pointer-events:none; mix-blend-mode:overlay;
-  }
-  .hud-topbar{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:10px 16px; border-bottom:1px solid rgba(255,255,255,0.08);
-    font-family:var(--mono); font-size:11.5px; color:var(--text-faint);
-  }
-  .hud-dots{display:flex; gap:6px;}
-  .hud-dots span{width:9px; height:9px; border-radius:50%; background:#333;}
-  .hud-dots span:nth-child(1){background:var(--red);}
-  .hud-dots span:nth-child(2){background:var(--amber);}
-  .hud-dots span:nth-child(3){background:var(--green);}
-  .hud-screen{
-    position:relative; height:300px;
-    background:
-      radial-gradient(circle at 50% 30%, rgba(139,92,246,0.18), transparent 60%),
-      linear-gradient(180deg, #100e21, #0a0918);
-    display:flex; flex-direction:column; align-items:center; justify-content:flex-end;
-    padding:24px; gap:8px;
-  }
-  .hud-msg{
-    font-family:var(--mono); font-weight:700; font-size:15px;
-    text-shadow:0 0 12px currentColor;
-    opacity:0; transform:translateY(6px);
-    animation:hudpop 4.5s ease-in-out infinite;
-  }
-  .hud-msg.m1{color:var(--amber); animation-delay:0s;}
-  .hud-msg.m2{color:var(--green); animation-delay:1.5s;}
-  .hud-msg.m3{color:#7fd4ff; animation-delay:3s;}
-  @keyframes hudpop{
-    0%{opacity:0; transform:translateY(6px);}
-    8%{opacity:1; transform:translateY(0);}
-    28%{opacity:1;}
-    36%{opacity:0;}
-    100%{opacity:0;}
-  }
-  .hud-console{
-    font-family:var(--mono); font-size:12px; color:var(--text-faint);
-    padding:14px 16px; border-top:1px solid rgba(255,255,255,0.08);
-    background:rgba(0,0,0,0.25);
-  }
-  .hud-console .line{margin-bottom:4px;}
-  .hud-console .k{color:var(--green);}
-  .hud-console .fn{color:#7fd4ff;}
-  .hud-console .str{color:var(--amber);}
-
-  /* ---------- generic panel/card ---------- */
-  .card{
-    background:var(--panel); border:1px solid var(--panel-border);
-    border-radius:var(--radius); padding:26px;
-  }
-
-  /* ---------- DEMO LOCK ---------- */
-  .demo-lock{
-    background:var(--panel); border:1px solid var(--panel-border); border-radius:var(--radius);
-    padding:60px 30px; text-align:center; position:relative; overflow:hidden;
-  }
-  .demo-lock::before{
-    content:""; position:absolute; inset:0;
-    background:repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.015) 10px, rgba(255,255,255,0.015) 20px);
-    pointer-events:none;
-  }
-  .demo-lock-icon{font-size:48px; margin-bottom:16px; display:block;}
-  .demo-lock h3{font-size:22px; margin-bottom:12px;}
-  .demo-lock p{color:var(--text-dim); max-width:500px; margin:0 auto 24px; font-size:15px;}
-  .demo-lock .btn{position:relative; z-index:1;}
-
-  /* ---------- TUTORIALS ---------- */
-  .tut-list{display:flex; flex-direction:column; gap:14px;}
-  .tut-item{
-    background:var(--panel); border:1px solid var(--panel-border); border-radius:14px;
-    overflow:hidden;
-  }
-  .tut-head{
-    display:flex; align-items:center; gap:16px; padding:20px 22px; cursor:pointer;
-    user-select:none;
-  }
-  .tut-num{
-    font-family:var(--mono); font-weight:800; font-size:14px; color:var(--green);
-    width:38px; height:38px; border-radius:10px; background:rgba(57,255,158,0.08);
-    border:1px solid rgba(57,255,158,0.25); display:flex; align-items:center; justify-content:center;
-    flex-shrink:0;
-  }
-  .tut-head h3{font-size:16.5px; flex:1;}
-  .tut-level{
-    font-family:var(--mono); font-size:11px; padding:3px 10px; border-radius:999px;
-    background:rgba(59,130,246,0.12); color:#93c5fd; border:1px solid rgba(59,130,246,0.3);
-    white-space:nowrap;
-  }
-  .tut-level.mid{background:rgba(255,182,76,0.12); color:var(--amber); border-color:rgba(255,182,76,0.3);}
-  .tut-level.high{background:rgba(255,92,108,0.12); color:var(--red); border-color:rgba(255,92,108,0.3);}
-  .chev{transition:.25s; color:var(--text-faint); flex-shrink:0;}
-  .tut-item.open .chev{transform:rotate(180deg);}
-  .tut-body{
-    max-height:0; overflow:hidden; transition:max-height .35s ease;
-    padding:0 22px; color:var(--text-dim); font-size:14.5px;
-  }
-  .tut-item.open .tut-body{padding:0 22px 24px;}
-  .tut-body p{margin-bottom:12px;}
-  .tut-body ul{margin:10px 0 14px; padding-inline-start:20px; list-style:disc;}
-  .tut-body li{margin-bottom:6px;}
-  pre.code-block{
-    direction:ltr; text-align:left; background:#0d0b1c; border:1px solid var(--panel-border);
-    border-radius:10px; padding:16px; font-family:var(--mono); font-size:12.5px; color:#c9c6ff;
-    overflow-x:auto; margin:12px 0;
-  }
-
-  /* ---------- DICTIONARY ---------- */
-  .dict-search{
-    display:flex; align-items:center; gap:10px; background:var(--panel);
-    border:1px solid var(--panel-border); border-radius:12px; padding:12px 16px; margin-bottom:24px;
-  }
-  .dict-search input{
-    flex:1; background:transparent; border:none; outline:none; color:var(--text);
-    font-family:var(--sans); font-size:15px;
-  }
-  .dict-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px;}
-  .dict-card{
-    background:var(--panel); border:1px solid var(--panel-border); border-radius:12px; padding:18px;
-    transition:.2s;
-  }
-  .dict-card:hover{border-color:rgba(139,92,246,0.4); transform:translateY(-2px);}
-  .dict-card code{
-    font-family:var(--mono); font-size:14px; color:var(--green); direction:ltr; display:inline-block;
-  }
-  .dict-card p{color:var(--text-dim); font-size:13.5px; margin-top:8px;}
-  .dict-card-top{display:flex; align-items:center; justify-content:space-between; gap:8px;}
-  .dict-module{font-family:var(--mono); font-size:10px; color:var(--amber); background:rgba(255,182,76,0.1); border:1px solid rgba(255,182,76,0.28); padding:2px 8px; border-radius:999px; white-space:nowrap;}
-  .dict-link{display:inline-block; margin-top:10px; font-size:12px; color:#7fd4ff; direction:ltr; text-align:left;}
-  .dict-link:hover{text-decoration:underline;}
-  .dict-count{color:var(--text-faint); font-size:13px; margin-bottom:16px;}
-  .chip-group{display:flex; gap:8px; flex-wrap:wrap;}
-  .chip{
-    padding:8px 14px; border-radius:999px; background:var(--panel); border:1px solid var(--panel-border);
-    font-size:13px; cursor:pointer; color:var(--text-dim); transition:.2s; user-select:none;
-  }
-  .chip.active{background:linear-gradient(135deg,var(--purple),var(--blue)); color:#fff; border-color:transparent;}
-  .empty-hint{color:var(--text-faint); font-size:14px; text-align:center; padding:40px 10px;}
-
-  /* ---------- PROMPT BUILDER ---------- */
-  .pb-grid{display:grid; grid-template-columns:1fr 1fr; gap:24px;}
-  .field{margin-bottom:18px;}
-  .field label{display:block; font-size:13.5px; color:var(--text-dim); margin-bottom:8px; font-weight:600;}
-  .field input[type=text], .field textarea, .field select{
-    width:100%; background:#0d0b1c; border:1px solid var(--panel-border); border-radius:10px;
-    padding:12px 14px; color:var(--text); font-family:var(--sans); font-size:14.5px; outline:none;
-    transition:.2s;
-  }
-  .field input:focus, .field textarea:focus, .field select:focus{border-color:var(--purple);}
-  .field textarea{min-height:90px; resize:vertical;}
-  .pb-output{
-    background:#0d0b1c; border:1px solid var(--panel-border); border-radius:12px; padding:18px;
-    font-family:var(--mono); font-size:13px; color:#c9c6ff; direction:ltr; text-align:left;
-    white-space:pre-wrap; min-height:280px; max-height:420px; overflow-y:auto;
-  }
-
-  /* ---------- FOOTER ---------- */
-  footer{
-    border-top:1px solid var(--panel-border); padding:40px 0; margin-top:40px;
-  }
-  .footer-row{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;}
-  .footer-row p{color:var(--text-faint); font-size:13px;}
-
-  button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible{
-    outline:2px solid var(--green); outline-offset:2px;
-  }
-
-  @media (max-width:900px){
-    .hero-grid{grid-template-columns:1fr;}
-    .pb-grid{grid-template-columns:1fr;}
-    .nav-links{
-      position:fixed; top:64px; right:0; left:0; background:rgba(10,9,23,0.98);
-      flex-direction:column; align-items:stretch; padding:14px; gap:4px;
-      border-bottom:1px solid var(--panel-border);
-      transform:translateY(-130%); transition:.25s; opacity:0;
-    }
-    .nav-links.show{transform:translateY(0); opacity:1;}
-    .nav-toggle{display:flex;}
-    .stat-row{gap:20px;}
-  }
+:root{
+  --cyan:#00e5ff; --pink:#ff4081; --yellow:#ffd54f; --green:#00e676;
+  --bg1:#0f0c29; --bg2:#302b63; --bg3:#24243e;
+  --panel:rgba(255,255,255,.06); --border:rgba(255,255,255,.14); --text:#f3f3ff;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Vazirmatn',system-ui,Tahoma,sans-serif;color:var(--text);
+  overflow:hidden;background:linear-gradient(135deg,var(--bg1) 0%,var(--bg2) 55%,var(--bg3) 100%);
+  background-attachment:fixed;user-select:none}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 20% 20%,rgba(0,229,255,.12),transparent 35%),
+             radial-gradient(circle at 80% 75%,rgba(255,64,129,.12),transparent 35%);
+  animation:pulseBg 8s ease-in-out infinite alternate}
+@keyframes pulseBg{from{opacity:.55}to{opacity:1}}
+#app{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+.screen{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+.screen.active{display:flex}
+.card{width:100%;max-width:460px;background:var(--panel);border:1px solid var(--border);border-radius:22px;
+  padding:26px 20px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  box-shadow:0 20px 60px rgba(0,0,0,.45);text-align:center}
+.game-title{font-size:clamp(32px,9vw,50px);font-weight:900;letter-spacing:1px;
+  background:linear-gradient(90deg,var(--cyan),var(--pink),var(--yellow));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 18px rgba(0,229,255,.45));margin-bottom:2px}
+.badge{display:inline-block;font-size:10px;font-weight:700;color:#06121a;background:var(--yellow);
+  border-radius:20px;padding:3px 12px;margin-bottom:14px;letter-spacing:2px}
+.subtitle{font-size:13px;color:#b9b6e0;margin-bottom:20px}
+.btn{display:block;width:100%;padding:13px 16px;margin-top:9px;font-family:inherit;font-size:16px;font-weight:700;
+  color:#06121a;border:none;border-radius:14px;cursor:pointer;
+  background:linear-gradient(90deg,var(--cyan),#18ffff);box-shadow:0 8px 22px rgba(0,229,255,.35);
+  transition:transform .12s ease,box-shadow .12s ease}
+.btn:hover{transform:translateY(-2px) scale(1.02)}
+.btn:active{transform:scale(.97)}
+.btn.secondary{background:linear-gradient(90deg,var(--pink),#ff6e9a);box-shadow:0 8px 22px rgba(255,64,129,.35);color:#fff}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border);box-shadow:none}
+.btn.small{width:auto;padding:9px 14px;font-size:13px;display:inline-block}
+.btn.warn{background:linear-gradient(90deg,#ff9100,#ffb74d)}
+.btn-row{display:flex;gap:8px;margin-top:9px}
+.btn-row .btn{margin-top:0}
+.input-row{display:flex;gap:8px;margin-top:12px}
+input[type=text]{flex:1;min-width:0;padding:12px 14px;font-family:inherit;font-size:16px;font-weight:700;
+  text-align:center;letter-spacing:3px;text-transform:uppercase;color:var(--text);
+  background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:12px;outline:none}
+input[type=text]:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.2)}
+.divider{margin:18px 0 4px;font-size:12px;color:#8e8bb8;position:relative}
+.divider::before,.divider::after{content:"";position:absolute;top:50%;width:32%;height:1px;background:var(--border)}
+.divider::before{right:0}.divider::after{left:0}
+.status{margin-top:14px;font-size:14px;min-height:22px;color:var(--yellow);line-height:1.7}
+.status.error{color:#ff5252}.status.ok{color:var(--green)}
+.room-code-box{display:none;margin:14px auto 0;width:fit-content;padding:12px 26px;border-radius:16px;
+  background:rgba(0,229,255,.08);border:2px dashed rgba(0,229,255,.55)}
+.room-code-box.show{display:block}
+.room-code-box .label{font-size:12px;color:#9defff;margin-bottom:4px}
+.room-code-box .code{font-size:30px;font-weight:900;letter-spacing:8px;color:var(--cyan);
+  text-shadow:0 0 16px rgba(0,229,255,.6);cursor:pointer}
+.spinner{display:inline-block;width:15px;height:15px;margin-left:8px;border:2px solid rgba(255,255,255,.25);
+  border-top-color:var(--yellow);border-radius:50%;animation:spin 1s linear infinite;vertical-align:-3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* صفحه بازی */
+#gameScreen{flex-direction:column;gap:8px;padding:6px}
+.hud{width:100%;max-width:560px;display:flex;align-items:center;gap:8px;background:var(--panel);
+  border:1px solid var(--border);border-radius:16px;padding:7px 12px;backdrop-filter:blur(10px)}
+.player-box{flex:1;min-width:0;text-align:center}
+.player-box .name{font-size:11px;color:#b9b6e0}
+.player-box .score{font-size:22px;font-weight:900}
+.player-box.me .score{color:var(--cyan)}
+.player-box.opp .score{color:var(--pink)}
+.hearts{font-size:12px;letter-spacing:2px;margin-top:2px}
+.vs{font-weight:900;color:var(--yellow);font-size:14px}
+.room-tag{font-size:11px;color:#9defff;background:rgba(0,229,255,.1);padding:4px 10px;border-radius:20px;white-space:nowrap}
+.play-area{display:flex;gap:10px;align-items:flex-start;width:100%;max-width:560px;justify-content:center}
+.canvas-wrap{position:relative;border-radius:18px;overflow:hidden;border:2px solid rgba(0,229,255,.35);
+  box-shadow:0 0 34px rgba(0,229,255,.22),0 18px 40px rgba(0,0,0,.45);background:#0a0820}
+#gameCanvas{display:block;touch-action:none;cursor:pointer}
+.hint{font-size:11px;color:#8e8bb8;text-align:center;line-height:1.7;max-width:560px}
+/* صفحه پایان */
+.result-title{font-size:clamp(28px,7vw,42px);font-weight:900;margin:8px 0 4px}
+.result-title.win{color:var(--green);text-shadow:0 0 22px rgba(0,230,118,.6)}
+.result-title.lose{color:var(--pink);text-shadow:0 0 22px rgba(255,64,129,.6)}
+.result-title.draw{color:var(--yellow);text-shadow:0 0 22px rgba(255,213,79,.6)}
+.result-sub{font-size:13px;color:#b9b6e0;margin-bottom:14px}
+.final-scores{display:flex;gap:12px;justify-content:center;margin:12px 0 4px}
+.final-score-box{flex:1;max-width:150px;padding:12px 8px;background:rgba(0,0,0,.28);
+  border:1px solid var(--border);border-radius:14px}
+.final-score-box .n{font-size:12px;color:#b9b6e0}
+.final-score-box .s{font-size:26px;font-weight:900}
+/* تنظیمات */
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:12px 4px;
+  border-bottom:1px solid var(--border);font-size:14px}
+.set-row:last-child{border-bottom:none}
+.switch{position:relative;width:48px;height:26px;background:rgba(0,0,0,.4);border-radius:20px;cursor:pointer;
+  border:1px solid var(--border);transition:background .2s}
+.switch.on{background:rgba(0,230,118,.35);border-color:var(--green)}
+.switch::after{content:"";position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;
+  background:#fff;transition:transform .2s}
+.switch.on::after{transform:translateX(-22px)}
+/* مرحله */
+.level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.level-btn{aspect-ratio:1;background:var(--panel);border:1px solid var(--border);border-radius:16px;
+  color:var(--text);font-family:inherit;font-size:26px;font-weight:900;cursor:pointer;position:relative;
+  transition:transform .12s ease}
+.level-btn:hover{transform:scale(1.05)}
+.level-btn .lock{position:absolute;bottom:6px;left:0;right:0;font-size:10px;color:#8e8bb8;font-weight:400}
+.level-btn.locked{opacity:.4;cursor:not-allowed}
+.level-btn .stars{position:absolute;top:4px;left:0;right:0;font-size:10px}
+/* overlay */
+.overlay-msg{position:absolute;inset:0;z-index:30;display:none;align-items:center;justify-content:center;
+  background:rgba(10,8,32,.82);backdrop-filter:blur(4px);text-align:center;padding:20px}
+.overlay-msg.show{display:flex}
+.overlay-msg .t{font-size:20px;font-weight:900;color:var(--yellow)}
+.overlay-msg .d{font-size:13px;color:#b9b6e0;margin-top:8px}
+/* آموزش */
+.tut{font-size:13px;color:#b9b6e0;line-height:2;text-align:right}
+.tut .k{display:inline-block;background:rgba(0,229,255,.15);border:1px solid rgba(0,229,255,.4);
+  border-radius:8px;padding:1px 8px;color:var(--cyan);font-weight:700;font-size:12px}
+.tut .pw{display:inline-block;border-radius:8px;padding:1px 8px;font-weight:700;font-size:12px;color:#06121a}
+@media (max-width:520px){.card{padding:20px 14px}}
 </style>
 </head>
 <body>
+<div id="app">
 
-<header class="nav">
-  <div class="nav-inner">
-    <div class="brand">
-      <div class="brand-mark">AX</div>
-      <div>
-        AMX Mod X Academy
-        <small>آکادمی پلاگین‌نویسی</small>
+  <!-- ============ منوی اصلی ============ -->
+  <div class="screen active" id="menuScreen">
+    <div class="card">
+      <div class="game-title">اَشکِن</div>
+      <div class="badge">PRO</div>
+      <div class="subtitle">بازی آجرشکن آنلاین دو نفره</div>
+      <button class="btn" id="btnOnline">🌐 بازی آنلاین (دو نفره)</button>
+      <div class="btn-row">
+        <button class="btn secondary" id="btnLevels">🎯 مراحل</button>
+        <button class="btn ghost" id="btnEndless">♾️ بی‌نهایت</button>
       </div>
-    </div>
-    <nav class="nav-links" id="navLinks">
-      <a href="#home">خانه</a>
-      <a href="#tutorials">آموزش‌ها</a>
-      <a href="#explorer">کد اکسپلورر</a>
-      <a href="#dictionary">دیکشنری</a>
-      <a href="#promptbuilder" class="nav-cta">پرامپت‌ساز</a>
-    </nav>
-    <button class="nav-toggle" id="navToggle" aria-label="باز کردن منو">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-</header>
-
-<!-- ================= HERO ================= -->
-<section class="hero" id="home">
-  <div class="wrap hero-grid">
-    <div>
-      <span class="eyebrow">Counter-Strike 1.6 &nbsp;•&nbsp; Pawn Language</span>
-      <h1>پلاگین‌نویسی <span class="grad">AMX Mod X</span> را قدم‌به‌قدم یاد بگیر</h1>
-      <p>از اولین <code style="direction:ltr; display:inline-block;">#include</code> تا ساخت یک پلاگین کامل برای سرور کانتر-استرایک ۱.۶؛ کدها را خط‌به‌خط با توضیح فارسی بفهم، در دیکشنری توابع جست‌وجو کن و برای هوش مصنوعی پرامپت حرفه‌ای بساز.</p>
-      <div class="hero-actions">
-        <button class="btn btn-primary" onclick="document.getElementById('tutorials').scrollIntoView()">🚀 شروع آموزش</button>
-        <button class="btn btn-ghost" onclick="document.getElementById('explorer').scrollIntoView()">کد را توضیح بده</button>
+      <div class="btn-row">
+        <button class="btn ghost" id="btnSettings">⚙️ تنظیمات</button>
+        <button class="btn ghost" id="btnHowTo">📖 آموزش</button>
       </div>
-      <div class="stat-row">
-        <div class="stat"><b>۷</b><span>سرفصل آموزشی</span></div>
-        <div class="stat"><b>۲۵+</b><span>تابع در دیکشنری</span></div>
-        <div class="stat"><b>۱۰۰٪</b><span>توضیح فارسی</span></div>
-      </div>
-    </div>
-
-    <div class="hud-shell">
-      <div class="hud-topbar">
-        <span>server_console.log</span>
-        <div class="hud-dots"><span></span><span></span><span></span></div>
-      </div>
-      <div class="hud-screen">
-        <div class="hud-msg m1">Welcome Player_07 to Dust2 24/7!</div>
-        <div class="hud-msg m2">✔ amx_auto_welcome fired</div>
-        <div class="hud-msg m3">HUD color → random_num(0,3)</div>
-      </div>
-      <div class="hud-console">
-        <div class="line"><span class="k">public</span> <span class="fn">event_ResetHUD</span>(id) {</div>
-        <div class="line">&nbsp;&nbsp;<span class="fn">ShowWelcomeMessage</span>(id)</div>
-        <div class="line">}</div>
-      </div>
+      <div class="status" id="menuStatus"></div>
     </div>
   </div>
-</section>
 
-<!-- ================= CODE EXPLORER (DEMO - LOCKED) ================= -->
-<section id="explorer">
-  <div class="wrap">
-    <span class="eyebrow">Code Explorer</span>
-    <h2 class="section-title">کد پلاگین‌ات را بریز اینجا، خط‌به‌خط توضیح می‌دیم</h2>
-    <p class="section-sub">کد Pawn پلاگین AMX Mod X را در باکس زیر وارد کن و روی «توضیح بده» بزن. هر خط با یک برچسب دسته‌بندی و توضیح فارسی نمایش داده می‌شود.</p>
-
-    <div class="demo-lock">
-      <span class="demo-lock-icon">🔒</span>
-      <h3>این بخش در نسخه دمو غیرفعال است</h3>
-      <p>برای استفاده از کد اکسپلورر خط‌به‌خط، به نسخه کامل مراجعه کنید.</p>
-      <a href="#" class="btn btn-primary">مشاهده نسخه کامل</a>
-    </div>
-  </div>
-</section>
-
-<!-- ================= TUTORIALS (DEMO - OPEN) ================= -->
-<section id="tutorials" style="background:linear-gradient(180deg, transparent, rgba(139,92,246,0.04), transparent);">
-  <div class="wrap">
-    <span class="eyebrow">Tutorials</span>
-    <h2 class="section-title">مسیر آموزشی، از صفر تا ساخت پلاگین کامل</h2>
-    <p class="section-sub">هفت سرفصل پشت‌سرهم؛ هر کدام روی مطلب قبلی سوار می‌شود. روی هر مورد بزن تا محتوایش باز شود.</p>
-
-    <div class="tut-list" id="tutList"></div>
-  </div>
-</section>
-
-<!-- ================= DICTIONARY (DEMO - 10 ITEMS) ================= -->
-<section id="dictionary">
-  <div class="wrap">
-    <span class="eyebrow">Dictionary</span>
-    <h2 class="section-title">دیکشنری توابع و کلمات کلیدی</h2>
-    <p class="section-sub">بیش از ۲۰۰ تابع، مستقیماً بر اساس ماژول‌های رسمی <code style="direction:ltr; display:inline-block;">amxmodx.org/api</code> — نام هر تابع دقیقاً همان چیزی است که در مستندات رسمی وجود دارد؛ روی هر کارت لینک «مشاهده در مستندات رسمی» هم هست.</p>
-
-    <div class="chip-group" id="dictFilter" style="margin-bottom:16px;"></div>
-
-    <div class="dict-search">
-      <span>🔍</span>
-      <input type="text" id="dictSearch" placeholder="مثلاً: register_event یا رنگ یا cs_get_user...">
-    </div>
-    <div class="dict-count" id="dictCount"></div>
-    <div class="dict-grid" id="dictGrid"></div>
-  </div>
-</section>
-
-<!-- ================= PROMPT BUILDER (DEMO - OPEN) ================= -->
-<section id="promptbuilder" style="background:linear-gradient(180deg, transparent, rgba(59,130,246,0.05), transparent);">
-  <div class="wrap">
-    <span class="eyebrow">Prompt Builder</span>
-    <h2 class="section-title">پرامپت حرفه‌ای برای ساخت پلاگین بساز</h2>
-    <p class="section-sub">مشخصات پلاگینی که می‌خواهی را وارد کن؛ یک پرامپت کامل و آماده برای هوش مصنوعی تولید می‌شود.</p>
-
-    <div class="pb-grid">
-      <div class="card">
-        <div class="field">
-          <label for="pbName">نام پلاگین</label>
-          <input type="text" id="pbName" placeholder="مثلاً: Auto Welcome Message">
-        </div>
-        <div class="field">
-          <label for="pbDesc">توضیح عملکرد پلاگین</label>
-          <textarea id="pbDesc" placeholder="مثلاً: وقتی بازیکن وارد سرور می‌شود، یک پیام خوش‌آمدگویی رنگی روی HUD نمایش داده شود."></textarea>
-        </div>
-        <div class="field">
-          <label>سطح پلاگین</label>
-          <div class="chip-group" id="pbLevel">
-            <div class="chip active" data-val="ساده">ساده</div>
-            <div class="chip" data-val="متوسط">متوسط</div>
-            <div class="chip" data-val="حرفه‌ای">حرفه‌ای</div>
-          </div>
-        </div>
-        <div class="field">
-          <label>ویژگی‌های خاص (می‌توانید چند مورد انتخاب کنید)</label>
-          <div class="chip-group" id="pbFeatures">
-            <div class="chip" data-val="پیام HUD رنگی">پیام HUD رنگی</div>
-            <div class="chip" data-val="دستور کنسول ادمین">دستور کنسول ادمین</div>
-            <div class="chip" data-val="ذخیره‌سازی در فایل">ذخیره‌سازی در فایل</div>
-            <div class="chip" data-val="کاربرد CVAR قابل تنظیم">CVAR قابل تنظیم</div>
-            <div class="chip" data-val="پشتیبانی چندزبانه">پشتیبانی چندزبانه</div>
-            <div class="chip" data-val="تایمر / زمان‌بندی">تایمر / زمان‌بندی</div>
-          </div>
-        </div>
-        <button class="btn btn-primary" id="pbGenerate" style="width:100%; justify-content:center;">✨ ساخت پرامپت</button>
+  <!-- ============ لابی آنلاین ============ -->
+  <div class="screen" id="lobbyScreen">
+    <div class="card">
+      <div class="game-title" style="font-size:clamp(26px,7vw,38px)">بازی آنلاین</div>
+      <div class="subtitle">با دوستتان وارد یک اتاق شوید</div>
+      <button class="btn" id="btnCreateRoom">⚡ ساخت اتاق جدید</button>
+      <div class="room-code-box" id="roomCodeBox">
+        <div class="label">کد اتاق شما (برای دوستتان بفرستید)</div>
+        <div class="code" id="roomCodeText">------</div>
+        <div class="status ok" id="waitStatus" style="margin-top:10px">در انتظار بازیکن دوم <span class="spinner"></span></div>
       </div>
+      <div class="divider">یا</div>
+      <div class="input-row">
+        <input type="text" id="joinCodeInput" maxlength="6" placeholder="کد اتاق" autocomplete="off">
+        <button class="btn secondary" id="btnJoinRoom" style="width:auto;flex-shrink:0">پیوستن</button>
+      </div>
+      <div class="status" id="lobbyStatus"></div>
+      <button class="btn ghost" id="btnBackMenu">↩ بازگشت به منو</button>
+    </div>
+  </div>
 
-      <div class="card">
-        <div class="field" style="margin-bottom:12px;">
-          <label>خروجی پرامپت</label>
-        </div>
-        <div class="pb-output" id="pbOutput">با پر کردن فرم و زدن دکمه «ساخت پرامپت»، متن آماده اینجا نمایش داده می‌شود.</div>
-        <div style="margin-top:14px; display:flex; gap:10px;">
-          <button class="btn btn-ghost btn-sm" id="pbCopy">📋 کپی پرامپت</button>
+  <!-- ============ انتخاب مرحله ============ -->
+  <div class="screen" id="levelsScreen">
+    <div class="card">
+      <div class="game-title" style="font-size:clamp(26px,7vw,38px)">مراحل</div>
+      <div class="subtitle">هر مرحله سخت‌تر از قبلی است</div>
+      <div class="level-grid" id="levelGrid"></div>
+      <button class="btn ghost" id="btnLevelsBack" style="margin-top:14px">↩ بازگشت</button>
+    </div>
+  </div>
+
+  <!-- ============ تنظیمات ============ -->
+  <div class="screen" id="settingsScreen">
+    <div class="card">
+      <div class="game-title" style="font-size:clamp(26px,7vw,38px)">تنظیمات</div>
+      <div class="set-row"><span>🔊 صدا</span><div class="switch on" id="swSound"></div></div>
+      <div class="set-row"><span>📳 لرزش (موبایل)</span><div class="switch on" id="swVibrate"></div></div>
+      <div class="set-row"><span>✨ افکت‌های بصری</span><div class="switch on" id="swFx"></div></div>
+      <div class="set-row"><span>🎵 موسیقی پس‌زمینه</span><div class="switch" id="swMusic"></div></div>
+      <button class="btn ghost" id="btnSettingsBack" style="margin-top:14px">↩ بازگشت</button>
+    </div>
+  </div>
+
+  <!-- ============ آموزش ============ -->
+  <div class="screen" id="howToScreen">
+    <div class="card">
+      <div class="game-title" style="font-size:clamp(26px,7vw,38px)">آموزش</div>
+      <div class="tut" style="text-align:right">
+        <p>🎮 حرکت پَدل: <span class="k">← →</span> یا <span class="k">A</span> <span class="k">D</span> یا لمس صفحه</p>
+        <p>🚀 شلیک توپ: <span class="k">Space</span> یا کلیک</p>
+        <p>🔫 تیر لیزر: با گرفتن پاورآپ لیزر، با <span class="k">Space</span> تیر بزنید</p>
+        <p>❤️ شما ۳ جان دارید. اگر توپ افتاد، یک جان کم می‌شود</p>
+        <p>💎 پاورآپ‌ها:</p>
+        <p style="padding-right:12px"><span class="pw" style="background:#00e676">سه توپ</span> <span class="pw" style="background:#00b0ff">پَدل بزرگ</span></p>
+        <p style="padding-right:12px"><span class="pw" style="background:#ff4081">لیزر</span> <span class="pw" style="background:#7c4dff">آهنربا</span></p>
+        <p style="padding-right:12px"><span class="pw" style="background:#ffd54f">جان اضافه</span> <span class="pw" style="background:#ff9100">کندی</span></p>
+        <p>🔥 هر برخورد پشت سر هم = <b>کمبو</b> و امتیاز بیشتر!</p>
+        <p>🌐 آنلاین: میزبان پَدل پایین، مهمان پَدل بالا را کنترل می‌کند</p>
+      </div>
+      <button class="btn ghost" id="btnHowToBack" style="margin-top:14px">↩ بازگشت</button>
+    </div>
+  </div>
+
+  <!-- ============ صفحه بازی ============ -->
+  <div class="screen" id="gameScreen">
+    <div class="hud">
+      <div class="player-box me"><div class="name">شما</div><div class="score" id="myScore">0</div><div class="hearts" id="myHearts">❤️❤️❤️</div></div>
+      <div class="vs">VS</div>
+      <div class="player-box opp"><div class="name" id="oppName">حریف</div><div class="score" id="oppScore">0</div><div class="hearts" id="oppHearts">❤️❤️❤️</div></div>
+      <div class="room-tag" id="roomTag">مرحله ۱</div>
+      <button class="btn ghost small" id="btnPause">⏸</button>
+      <button class="btn ghost small" id="btnExit">خروج</button>
+    </div>
+    <div class="play-area">
+      <div class="canvas-wrap">
+        <canvas id="gameCanvas"></canvas>
+        <div class="overlay-msg" id="overlayMsg">
+          <div><div class="t" id="overlayTitle">مکث</div><div class="d" id="overlayDesc"></div></div>
         </div>
       </div>
     </div>
+    <div class="hint" id="gameHint">🎮 ← → یا A/D برای حرکت • Space یا کلیک برای شلیک</div>
   </div>
-</section>
 
-<footer>
-  <div class="wrap footer-row">
-    <p>AMX Mod X Academy — ساخته‌شده برای علاقه‌مندان پلاگین‌نویسی کانتر-استرایک ۱.۶ 🎮</p>
-    <p>این یک نسخه دمو است • برای دسترسی کامل به سایت اصلی مراجعه کنید</p>
+  <!-- ============ صفحه پایان ============ -->
+  <div class="screen" id="resultScreen">
+    <div class="card">
+      <div class="result-title" id="resultTitle">نتیجه</div>
+      <div class="result-sub" id="resultSub"></div>
+      <div class="final-scores">
+        <div class="final-score-box"><div class="n">شما</div><div class="s" id="finalMy" style="color:var(--cyan)">0</div></div>
+        <div class="final-score-box"><div class="n">حریف</div><div class="s" id="finalOpp" style="color:var(--pink)">0</div></div>
+      </div>
+      <div class="status" id="resultBest"></div>
+      <button class="btn" id="btnReplay">🔁 بازی مجدد</button>
+      <button class="btn secondary" id="btnNextLevel">▶️ مرحله بعد</button>
+      <button class="btn ghost" id="btnBackMenu2">↩ منوی اصلی</button>
+    </div>
   </div>
-</footer>
 
+</div>
+
+<!-- ==================== کتابخانه PeerJS از CDN ==================== -->
+<!-- چند منبع برای اطمینان از لود شدن در شبکه‌های مختلف -->
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
+// اگر PeerJS از منبع اول لود نشد، از منابع دیگر استفاده می‌شود
 (function(){
-  "use strict";
-
-  /* ---------------- NAV ---------------- */
-  var navToggle = document.getElementById('navToggle');
-  var navLinks = document.getElementById('navLinks');
-  navToggle.addEventListener('click', function(){
-    navLinks.classList.toggle('show');
-  });
-  navLinks.querySelectorAll('a').forEach(function(a){
-    a.addEventListener('click', function(){ navLinks.classList.remove('show'); });
-  });
-
-  /* ---------------- DICTIONARY (DEMO - 10 ITEMS) ---------------- */
-  var MODULES = [
-    { id:"amxmodx", title:"ماژول اصلی (amxmodx.inc)", url:"https://www.amxmodx.org/api/amxmodx", items:[
-      {term:"register_plugin", desc:"پلاگین را در سیستم ثبت می‌کند؛ نام، نسخه و نویسنده را مشخص می‌کند."},
-      {term:"register_event", desc:"یک رویداد بازی (مثل ResetHUD) را به تابع شما وصل می‌کند."},
-      {term:"register_concmd", desc:"یک دستور کنسول سمت سرور (مثل amx_command) ثبت می‌کند."},
-      {term:"set_task", desc:"یک تایمر می‌سازد تا بعد از زمان مشخص (یا تکراری) یک تابع اجرا شود."},
-      {term:"set_hudmessage", desc:"رنگ، موقعیت، مدت‌زمان و افکت پیام بعدی HUD را تنظیم می‌کند."},
-      {term:"show_hudmessage", desc:"پیام تنظیم‌شده با set_hudmessage را برای یک بازیکن نمایش می‌دهد."},
-      {term:"client_print", desc:"یک پیام متنی در چت یا کنسول بازیکن نمایش می‌دهد."},
-      {term:"get_user_name", desc:"نام درون‌بازی یک بازیکن را بر اساس شناسه (id) برمی‌گرداند."},
-      {term:"is_user_alive", desc:"بررسی می‌کند بازیکن زنده است یا نه."},
-      {term:"random_num", desc:"یک عدد صحیح تصادفی بین دو مقدار مشخص تولید می‌کند."}
-    ]}
-  ];
-
-  var dictionary = [];
-  MODULES.forEach(function(mod){
-    mod.items.forEach(function(it){
-      var firstTerm = it.term.split(' / ')[0].split(' ')[0];
-      dictionary.push({
-        term: it.term,
-        desc: it.desc,
-        module: mod.id,
-        moduleTitle: mod.title,
-        link: mod.url + '/' + encodeURIComponent(firstTerm)
-      });
+  function loadScript(src){
+    return new Promise(function(res,rej){
+      var s=document.createElement('script');
+      s.src=src; s.onload=function(){res()}; s.onerror=function(){rej()};
+      document.head.appendChild(s);
     });
-  });
-
-  var dictGrid = document.getElementById('dictGrid');
-  var dictCount = document.getElementById('dictCount');
-  var dictSearch = document.getElementById('dictSearch');
-  var dictFilter = document.getElementById('dictFilter');
-  var activeModule = 'all';
-
-  var allChip = document.createElement('div');
-  allChip.className = 'chip active';
-  allChip.textContent = 'همه (' + dictionary.length + ')';
-  allChip.dataset.val = 'all';
-  dictFilter.appendChild(allChip);
-  MODULES.forEach(function(mod){
-    var chip = document.createElement('div');
-    chip.className = 'chip';
-    chip.textContent = mod.title.split(' (')[0] + ' ('+mod.items.length+')';
-    chip.dataset.val = mod.id;
-    dictFilter.appendChild(chip);
-  });
-  dictFilter.querySelectorAll('.chip').forEach(function(chip){
-    chip.addEventListener('click', function(){
-      dictFilter.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('active'); });
-      chip.classList.add('active');
-      activeModule = chip.dataset.val;
-      applyDictFilters();
-    });
-  });
-
-  function renderDict(list){
-    dictGrid.innerHTML = '';
-    if(list.length === 0){
-      dictGrid.innerHTML = '<div class="empty-hint">چیزی پیدا نشد 🤔</div>';
-    }
-    list.forEach(function(item){
-      var card = document.createElement('div');
-      card.className = 'dict-card';
-      card.innerHTML =
-        '<div class="dict-card-top"><code>'+item.term+'</code><span class="dict-module">'+item.module+'</span></div>' +
-        '<p>'+item.desc+'</p>' +
-        '<a class="dict-link" href="'+item.link+'" target="_blank" rel="noopener">مشاهده در مستندات رسمی ↗</a>';
-      dictGrid.appendChild(card);
-    });
-    dictCount.textContent = list.length + ' نتیجه از ' + dictionary.length + ' مورد';
   }
-
-  function applyDictFilters(){
-    var q = dictSearch.value.trim().toLowerCase();
-    var filtered = dictionary.filter(function(item){
-      var moduleOk = (activeModule === 'all' || item.module === activeModule);
-      var searchOk = !q || item.term.toLowerCase().indexOf(q) !== -1 || item.desc.toLowerCase().indexOf(q) !== -1;
-      return moduleOk && searchOk;
-    });
-    renderDict(filtered);
+  if(typeof Peer==='undefined'){
+    var fallbacks=[
+      'https://cdn.jsdelivr.net/npm/peerjs@1.5.4/dist/peerjs.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js'
+    ];
+    var i=0;
+    function tryNext(){
+      if(i>=fallbacks.length) return;
+      loadScript(fallbacks[i++]).then(function(){
+        console.log('PeerJS loaded from fallback');
+      }).catch(tryNext);
+    }
+    tryNext();
   }
-
-  renderDict(dictionary);
-  dictSearch.addEventListener('input', applyDictFilters);
-
-  /* ---------------- TUTORIALS DATA ---------------- */
-  var tutorials = [
-    {
-      level:"low", levelLabel:"مبتدی",
-      title:"آشنایی با AMX Mod X",
-      body: "<p>AMX Mod X (به‌اختصار AMXX) یک افزونه (SDK) برای موتور بازی نیم‌لایف است که به شما اجازه می‌دهد بدون تغییر کد اصلی بازی، رفتار سرور کانتر-استرایک ۱.۶ را با نوشتن پلاگین تغییر دهید.</p>" +
-        "<ul>" +
-        "<li>پلاگین‌ها با زبان <b>Pawn</b> نوشته می‌شوند؛ زبانی ساده و شبیه C.</li>" +
-        "<li>فایل نهایی با پسوند <code>.sma</code> نوشته و به <code>.amxx</code> کامپایل می‌شود.</li>" +
-        "<li>پلاگین‌ها روی سرور اجرا می‌شوند، نه روی کلاینت بازیکن‌ها.</li>" +
-        "</ul>" +
-        "<p>در ادامه با نصب، ساختار پایه و توابع مهم آشنا می‌شویم.</p>"
-    },
-    {
-      level:"low", levelLabel:"مبتدی",
-      title:"نصب و راه‌اندازی",
-      body: "<p>برای شروع پلاگین‌نویسی به این موارد نیاز دارید:</p>" +
-        "<ul>" +
-        "<li>یک سرور کانتر-استرایک ۱.۶ با متاماد (Metamod) و AMX Mod X نصب‌شده.</li>" +
-        "<li>ویرایشگر کد مناسب برای Pawn (پیشوند رنگ‌بندی .sma).</li>" +
-        "<li>کامپایلر <code>amxxpc</code> که در پوشه scripting همراه AMXX قرار دارد.</li>" +
-        "</ul>" +
-        "<p>فایل <code>.sma</code> خود را در پوشه <code>scripting</code> قرار می‌دهید، آن را کامپایل می‌کنید و فایل <code>.amxx</code> خروجی را در پوشه <code>plugins</code> کپی و در فایل <code>plugins.ini</code> فعال می‌کنید.</p>"
-    },
-    {
-      level:"low", levelLabel:"مبتدی",
-      title:"ساختار یک پلاگین",
-      body: "<p>هر پلاگین معمولاً از این بخش‌ها تشکیل شده:</p>" +
-        "<pre class='code-block'>#include &lt;amxmodx&gt;\n\n#define PLUGIN \"My First Plugin\"\n#define VERSION \"1.0\"\n#define AUTHOR \"Your Name\"\n\npublic plugin_init() {\n    register_plugin(PLUGIN, VERSION, AUTHOR)\n}</pre>" +
-        "<ul>" +
-        "<li><b>include ها</b>: کتابخانه‌های مورد نیاز را وارد می‌کنند.</li>" +
-        "<li><b>define ها</b>: ثابت‌هایی مثل نام و نسخه پلاگین را تعریف می‌کنند.</li>" +
-        "<li><b>plugin_init</b>: نقطه شروع اجرای پلاگین است.</li>" +
-        "</ul>"
-    },
-    {
-      level:"mid", levelLabel:"متوسط",
-      title:"توابع مهم: register_plugin, register_event, register_concmd",
-      body: "<p>این سه تابع پرکاربردترین نقاط شروع در بیشتر پلاگین‌ها هستند:</p>" +
-        "<pre class='code-block'>public plugin_init() {\n    register_plugin(\"My Plugin\", \"1.0\", \"Author\")\n    register_event(\"ResetHUD\", \"onSpawn\", \"b\")\n    register_concmd(\"amx_hello\", \"cmdHello\", ADMIN_CFG, \"- say hello\")\n}</pre>" +
-        "<ul>" +
-        "<li><code>register_plugin</code> پلاگین را معرفی می‌کند.</li>" +
-        "<li><code>register_event</code> یک رویداد بازی را به تابع خودتان وصل می‌کند.</li>" +
-        "<li><code>register_concmd</code> یک دستور کنسول جدید تعریف می‌کند.</li>" +
-        "</ul>"
-    },
-    {
-      level:"mid", levelLabel:"متوسط",
-      title:"متغیرها و آرایه‌ها",
-      body: "<p>در Pawn متغیرها با کلمه‌ی <code>new</code> تعریف می‌شوند:</p>" +
-        "<pre class='code-block'>new g_Score = 0                 // متغیر عددی ساده\nnew g_PlayerName[32]            // آرایه رشته‌ای (حداکثر ۳۱ کاراکتر)\nnew g_PlayerIP[33][16]          // آرایه دوبعدی: تا ۳۲ بازیکن، هرکدام ۱۵ کاراکتر</pre>" +
-        "<p>برای رشته‌ها همیشه یک خانه‌ی اضافه برای کاراکتر پایانی (null terminator) در نظر بگیرید.</p>"
-    },
-    {
-      level:"mid", levelLabel:"متوسط",
-      title:"کار با رنگ‌ها و HUD",
-      body: "<p>پیام‌های HUD رنگی یکی از محبوب‌ترین ویژگی‌های پلاگین‌های کانتر-استرایک ۱.۶ هستند:</p>" +
-        "<pre class='code-block'>set_hudmessage(255, 0, 0, -1.0, 0.35, 0, 6.0, 4.0, 0.1, 0.2, -1)\nshow_hudmessage(id, \"%s\", \"Welcome!\")</pre>" +
-        "<ul>" +
-        "<li>سه عدد اول رنگ RGB هستند (قرمز، سبز، آبی).</li>" +
-        "<li>دو عدد بعدی موقعیت افقی و عمودی روی صفحه‌اند (-1.0 یعنی وسط‌چین خودکار).</li>" +
-        "<li>پارامترهای بعدی مدت زمان محو شدن و ماندگاری پیام را تعیین می‌کنند.</li>" +
-        "</ul>"
-    },
-    {
-      level:"high", levelLabel:"حرفه‌ای",
-      title:"ساخت پلاگین کامل",
-      body: "<p>در این مرحله همه‌چیز را کنار هم می‌گذاریم: ثبت پلاگین، شنیدن یک رویداد، خواندن اطلاعات بازیکن و نمایش پیام رنگی روی HUD.</p>" +
-        "<pre class='code-block'>#include &lt;amxmodx&gt;\n#include &lt;amxmisc&gt;\n\n#define PLUGIN \"Auto Welcome\"\n#define VERSION \"1.0\"\n#define AUTHOR \"You\"\n\npublic plugin_init() {\n    register_plugin(PLUGIN, VERSION, AUTHOR)\n    register_event(\"ResetHUD\", \"onSpawn\", \"b\")\n}\n\npublic onSpawn(id) {\n    new name[32]\n    get_user_name(id, name, charsmax(name))\n\n    set_hudmessage(0, 255, 100, -1.0, 0.55, 0, 6.0, 4.0, 0.1, 0.2, -1)\n    show_hudmessage(id, \"Welcome, %s!\", name)\n}</pre>" +
-        "<p>از اینجا می‌توانید ویژگی‌هایی مثل CVAR قابل تنظیم، ذخیره در فایل یا دستور کنسول ادمین اضافه کنید — دقیقاً همان مواردی که در بخش «پرامپت‌ساز» می‌توانید برای هوش مصنوعی مشخص کنید.</p>"
-    }
-  ];
-
-  var tutList = document.getElementById('tutList');
-  tutorials.forEach(function(t, i){
-    var item = document.createElement('div');
-    item.className = 'tut-item';
-    var lvlClass = t.level === 'mid' ? 'mid' : (t.level === 'high' ? 'high' : '');
-    item.innerHTML =
-      '<div class="tut-head">' +
-        '<div class="tut-num">'+ String(i+1).padStart(2,'0') +'</div>' +
-        '<h3>'+ t.title +'</h3>' +
-        '<span class="tut-level '+lvlClass+'">'+ t.levelLabel +'</span>' +
-        '<span class="chev">▾</span>' +
-      '</div>' +
-      '<div class="tut-body"><div>'+ t.body +'</div></div>';
-
-    var head = item.querySelector('.tut-head');
-    var body = item.querySelector('.tut-body');
-    head.addEventListener('click', function(){
-      var isOpen = item.classList.contains('open');
-      tutList.querySelectorAll('.tut-item').forEach(function(other){
-        other.classList.remove('open');
-        other.querySelector('.tut-body').style.maxHeight = null;
-      });
-      if(!isOpen){
-        item.classList.add('open');
-        body.style.maxHeight = body.scrollHeight + 40 + 'px';
-      }
-    });
-    tutList.appendChild(item);
-  });
-
-  /* ---------------- PROMPT BUILDER ---------------- */
-  var levelChips = document.querySelectorAll('#pbLevel .chip');
-  var selectedLevel = 'ساده';
-  levelChips.forEach(function(chip){
-    chip.addEventListener('click', function(){
-      levelChips.forEach(function(c){ c.classList.remove('active'); });
-      chip.classList.add('active');
-      selectedLevel = chip.dataset.val;
-    });
-  });
-
-  var featureChips = document.querySelectorAll('#pbFeatures .chip');
-  var selectedFeatures = [];
-  featureChips.forEach(function(chip){
-    chip.addEventListener('click', function(){
-      chip.classList.toggle('active');
-      var v = chip.dataset.val;
-      var idx = selectedFeatures.indexOf(v);
-      if(chip.classList.contains('active') && idx === -1) selectedFeatures.push(v);
-      if(!chip.classList.contains('active') && idx !== -1) selectedFeatures.splice(idx,1);
-    });
-  });
-
-  var pbOutput = document.getElementById('pbOutput');
-
-  document.getElementById('pbGenerate').addEventListener('click', function(){
-    var name = document.getElementById('pbName').value.trim() || 'پلاگین بدون‌نام';
-    var desc = document.getElementById('pbDesc').value.trim() || 'توضیح عملکرد مشخص نشده است.';
-    var featuresText = selectedFeatures.length ? selectedFeatures.join('، ') : 'ویژگی خاصی انتخاب نشده';
-
-    var prompt =
-"یک پلاگین AMX Mod X برای Counter-Strike 1.6 به زبان Pawn بنویس با مشخصات زیر:\n\n" +
-"نام پلاگین: " + name + "\n" +
-"توضیح عملکرد: " + desc + "\n" +
-"سطح پیچیدگی کد: " + selectedLevel + "\n" +
-"ویژگی‌های خاص مورد نیاز: " + featuresText + "\n\n" +
-"الزامات فنی:\n" +
-"- از include های استاندارد مناسب (amxmodx, amxmisc و در صورت نیاز cstrike/fun) استفاده کن.\n" +
-"- ثابت‌های PLUGIN, VERSION, AUTHOR را در ابتدای فایل تعریف کن.\n" +
-"- کد را با کامنت‌های کوتاه توضیح بده.\n" +
-"- از نام‌گذاری استاندارد متغیرها و توابع در Pawn پیروی کن.\n" +
-"- در صورت استفاده از رشته‌ها، همیشه از charsmax برای جلوگیری از سرریز بافر استفاده کن.\n" +
-"- کد نهایی باید بدون خطای کامپایل در amxxpc قابل کامپایل باشد.";
-
-    pbOutput.textContent = prompt;
-  });
-
-  document.getElementById('pbCopy').addEventListener('click', function(){
-    var text = pbOutput.textContent;
-    if(!text || text.indexOf('با پر کردن فرم') !== -1){ return; }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(function(){
-        var btn = document.getElementById('pbCopy');
-        var old = btn.textContent;
-        btn.textContent = '✅ کپی شد';
-        setTimeout(function(){ btn.textContent = old; }, 1600);
-      });
-    }
-  });
-
 })();
+</script>
+<script>
+'use strict';
+/* =====================================================================
+   ثابت‌های بازی
+===================================================================== */
+const GW=480, GH=640, COLS=8, ROWS=6, BRICK_TOP=80, BRICK_H=22, BRICK_GAP=6;
+const PADDLE_W=92, PADDLE_H=13, BALL_R=7;
+const BASE_SPEED=300, SPEED_PER_BRICK=11, SPEED_PER_SEC=2.0, MAX_SPEED=780;
+const MAX_LIVES=3, CLEAR_BONUS=500;
+const BRICK_COLORS=["#ff4081","#ff9100","#ffd54f","#00e676","#00b0ff","#7c4dff"];
+const COMBO_TIMEOUT=2.2; // ثانیه
+
+// انواع پاورآپ
+const PU = {
+  MULTI:{c:'#00e676',t:'۳ توپ'}, BIG:{c:'#00b0ff',t:'پَدل بزرگ'},
+  LASER:{c:'#ff4081',t:'لیزر'}, MAGNET:{c:'#7c4dff',t:'آهنربا'},
+  LIFE:{c:'#ffd54f',t:'جان'}, SLOW:{c:'#ff9100',t:'کندی'}
+};
+
+// چیدمان ۶ مرحله (۰=خالی، ۱=آجر معمولی، ۲=سخت)
+const LEVELS = [
+  {name:'مرحله ۱', layout:[
+    [1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]},
+  {name:'مرحله ۲', layout:[
+    [1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]},
+  {name:'مرحله ۳', layout:[
+    [2,2,2,2,2,2,2,2],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]},
+  {name:'مرحله ۴', layout:[
+    [2,2,2,2,2,2,2,2],[2,2,2,2,2,2,2,2],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0]]},
+  {name:'مرحله ۵', layout:[
+    [2,2,2,2,2,2,2,2],[2,2,2,2,2,2,2,2],[2,2,2,2,2,2,2,2],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1]]},
+  {name:'مرحله ۶', layout:[
+    [2,2,2,2,2,2,2,2],[2,2,2,2,2,2,2,2],[2,2,2,2,2,2,2,2],[2,2,2,2,2,2,2,2],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1]]}
+];
+
+/* =====================================================================
+   متغیرهای بازی
+===================================================================== */
+let canvas, ctx, dpr=1;
+let gameState='menu'; // menu|lobby|levels|settings|howto|playing|paused|gameover
+let mode='menu';      // online|levels|endless|practice
+let myRole=null;      // host|guest|null
+let roomCode='';
+let currentLevel=0, unlockedLevel=0;
+
+let paddleBottom, paddleTop, balls=[], bricks=[], particles=[], powerups=[], lasers=[], floatTexts=[];
+let myScore=0, oppScore=0, lives=MAX_LIVES, bricksBroken=0, elapsed=0;
+let combo=0, comboTimer=0, bestScore=0;
+let keys={left:false,right:false,shoot:false};
+let lastTime=0, acc=0, shake=0;
+let paddleHitFlash=0, bgPulse=0;
+
+// پاورآپ‌های فعال
+let fx={big:0, laser:0, magnet:0, slow:0}; // زمان باقی‌مانده (ثانیه)
+
+// شبکه
+let peer=null, conn=null, connected=false, remotePaddleX=0.5, lastNetSend=0, guestView=null;
+
+// تنظیمات
+let settings={sound:true, vibrate:true, fx:true, music:false};
+
+/* =====================================================================
+   ابزارها
+===================================================================== */
+const $=id=>document.getElementById(id);
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');}
+function setStatus(el,msg,cls){const e=$(el);e.textContent=msg;e.className='status'+(cls?' '+cls:'');}
+function makeRoomCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let o='';for(let i=0;i<6;i++)o+=c[Math.floor(Math.random()*c.length)];return o;}
+function hearts(n){return '❤️'.repeat(Math.max(0,n))+'🖤'.repeat(Math.max(0,MAX_LIVES-n));}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+
+/* =====================================================================
+   موتور صوتی Web Audio (بدون فایل صوتی خارجی)
+===================================================================== */
+let audioCtx=null, musicNodes=null;
+function initAudio(){
+  if(audioCtx) return;
+  try{ audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
+}
+function playSound(freq, dur=0.08, type='square', vol=0.15, slide=0){
+  if(!settings.sound||!audioCtx) return;
+  try{
+    const t=audioCtx.currentTime;
+    const osc=audioCtx.createOscillator();
+    const gain=audioCtx.createGain();
+    osc.type=type;
+    osc.frequency.setValueAtTime(freq,t);
+    if(slide) osc.frequency.exponentialRampToValueAtTime(Math.max(20,freq+slide),t+dur);
+    gain.gain.setValueAtTime(vol,t);
+    gain.gain.exponentialRampToValueAtTime(0.001,t+dur);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(t); osc.stop(t+dur);
+  }catch(e){}
+}
+const SFX={
+  hit:()=>playSound(440,0.05,'square',0.12),
+  brick:()=>{playSound(660,0.06,'square',0.14);playSound(880,0.08,'sine',0.08);},
+  hard:()=>{playSound(220,0.1,'sawtooth',0.16);},
+  paddle:()=>playSound(330,0.07,'sine',0.15),
+  lose:()=>playSound(200,0.3,'sawtooth',0.2,-120),
+  win:()=>{playSound(523,0.1,'sine',0.15);setTimeout(()=>playSound(659,0.1,'sine',0.15),100);setTimeout(()=>playSound(784,0.2,'sine',0.15),200);},
+  powerup:()=>{playSound(600,0.08,'sine',0.15);setTimeout(()=>playSound(900,0.1,'sine',0.15),80);},
+  laser:()=>playSound(1200,0.05,'sawtooth',0.08,-400),
+  combo:()=>playSound(800+Math.min(combo*60,1200),0.06,'square',0.1)
+};
+// موسیقی پس‌زمینه ساده (لوپ آرام)
+function startMusic(){
+  if(!settings.music||!audioCtx||musicNodes) return;
+  try{
+    const t=audioCtx.currentTime;
+    musicNodes={osc:audioCtx.createOscillator(),gain:audioCtx.createGain(),lfo:audioCtx.createOscillator(),lfoGain:audioCtx.createGain()};
+    musicNodes.osc.type='sine'; musicNodes.osc.frequency.value=110;
+    musicNodes.lfo.frequency.value=0.5;
+    musicNodes.lfo.connect(musicNodes.lfoGain); musicNodes.lfoGain.gain.value=20;
+    musicNodes.lfoGain.connect(musicNodes.osc.frequency);
+    musicNodes.gain.gain.value=0.04;
+    musicNodes.osc.connect(musicNodes.gain); musicNodes.gain.connect(audioCtx.destination);
+    musicNodes.osc.start(t); musicNodes.lfo.start(t);
+  }catch(e){}
+}
+function stopMusic(){
+  if(musicNodes){try{musicNodes.osc.stop();musicNodes.lfo.stop();}catch(e){}musicNodes=null;}
+}
+function vibrate(ms){ if(settings.vibrate&&navigator.vibrate) navigator.vibrate(ms); }
+
+/* =====================================================================
+   ذخیره رکورد و پیشرفت
+===================================================================== */
+function saveProgress(){
+  try{
+    localStorage.setItem('ashkan_pro', JSON.stringify({best:bestScore, unlocked:unlockedLevel}));
+  }catch(e){}
+}
+function loadProgress(){
+  try{
+    const d=JSON.parse(localStorage.getItem('ashkan_pro')||'{}');
+    bestScore=d.best||0; unlockedLevel=d.unlocked||0;
+  }catch(e){}
+}
+
+/* =====================================================================
+   شبکه PeerJS
+   نکته: هر دو بازیکن باید به یک سرور سیگنالینگ وصل شوند.
+   سرور پیش‌فرض رسمی PeerJS استفاده می‌شود تا همیشه یکسان باشد.
+===================================================================== */
+const PEER_OPTIONS = {
+  debug: 1,
+  config: {
+    iceServers: [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+      { urls: 'stun:stun2.l.google.com:19302' },
+      { urls: 'stun:stun3.l.google.com:19302' },
+      { urls: 'stun:stun4.l.google.com:19302' }
+    ]
+  }
+};
+
+function createRoom(){
+  setStatus('lobbyStatus','در حال ساخت اتاق...');
+  roomCode=makeRoomCode(); myRole='host';
+  try{ peer=new Peer(roomCode, PEER_OPTIONS); }catch(e){setStatus('lobbyStatus','خطا: '+e.message,'error');return;}
+  peer.on('open',()=>{
+    $('roomCodeBox').classList.add('show');
+    $('roomCodeText').textContent=roomCode;
+    setStatus('lobbyStatus','اتاق ساخته شد. کد را برای دوستتان بفرستید.','ok');
+    gameState='waiting';
+  });
+  peer.on('connection',c=>{
+    if(conn&&conn.open){c.close();return;}
+    conn=c; setupConn();
+  });
+  peer.on('error',err=>{
+    console.error(err);
+    if(err.type==='unavailable-id'){ setStatus('lobbyStatus','کد تکراری بود. دوباره تلاش کنید.','error'); return; }
+    if(err.type==='peer-unavailable'){ setStatus('lobbyStatus','❌ اتاقی با این کد پیدا نشد.','error'); return; }
+    if(err.type==='network'||err.type==='server-error'){
+      setStatus('lobbyStatus','خطای شبکه. در حال تلاش مجدد...','error');
+      try{ peer.destroy(); }catch(e){}
+      setTimeout(()=>{ createRoom(); }, 1200);
+      return;
+    }
+    setStatus('lobbyStatus','خطا: '+err.type+' — اینترنت خود را بررسی کنید.','error');
+  });
+}
+function joinRoom(){
+  const code=$('joinCodeInput').value.trim().toUpperCase();
+  if(code.length<4){setStatus('lobbyStatus','کد اتاق معتبر نیست.','error');return;}
+  setStatus('lobbyStatus','در حال اتصال به اتاق '+code+' ...');
+  roomCode=code; myRole='guest';
+  try{ peer=new Peer(PEER_OPTIONS); }catch(e){setStatus('lobbyStatus','خطا: '+e.message,'error');return;}
+  peer.on('open',()=>{
+    conn=peer.connect(roomCode,{reliable:true, serialization:'json'});
+    setupConn();
+  });
+  peer.on('error',err=>{
+    console.error(err);
+    if(err.type==='peer-unavailable'){ setStatus('lobbyStatus','❌ اتاقی با این کد پیدا نشد. از کد مطمئن شوید.','error'); return; }
+    if(err.type==='network'||err.type==='server-error'){
+      setStatus('lobbyStatus','خطای شبکه. در حال تلاش مجدد...','error');
+      try{ peer.destroy(); }catch(e){}
+      setTimeout(()=>{ joinRoom(); }, 1200);
+      return;
+    }
+    setStatus('lobbyStatus','خطا: '+err.type+' — اینترنت خود را بررسی کنید.','error');
+  });
+}
+function setupConn(joinTimeout){
+  if(joinTimeout) clearTimeout(joinTimeout);
+  conn.on('open',()=>{
+    connected=true;
+    setStatus('lobbyStatus','✅ متصل شدید! در حال شروع بازی...','ok');
+    if(myRole==='guest'){
+      send({t:'hello'});
+      // مهمان وارد صفحه می‌شود و منتظر داده‌های میزبان می‌ماند
+      startGame('online');
+    }
+  });
+  conn.on('data',handleNetData);
+  conn.on('close',()=>{ connected=false; if(gameState==='playing') handleOpponentLeft(); });
+  conn.on('error',e=>console.error(e));
+}
+function send(obj){ if(conn&&conn.open){ try{conn.send(obj);}catch(e){} } }
+function handleNetData(data){
+  if(!data||typeof data!=='object') return;
+  switch(data.t){
+    case 'hello':
+      // مهمان وصل شد → میزبان بازی را شروع می‌کند
+      if(gameState==='waiting'||gameState==='lobby') startGame('online');
+      break;
+    case 'paddle': remotePaddleX=data.x; break;
+    case 'launch': if(myRole==='host'&&!balls[0].launched) launchBall(); break;
+    case 'shoot': if(myRole==='host'&&fx.laser>0) shootLaser(); break;
+    case 'state': if(myRole==='guest') guestView=data; break;
+    case 'gameover': if(myRole==='guest'&&gameState==='playing') showResult(data.kind); break;
+    case 'replay': if(myRole==='guest'){guestView=null;gameState='playing';hideOverlay();showScreen('gameScreen');} break;
+    case 'bye': handleOpponentLeft(); break;
+  }
+}
+function handleOpponentLeft(){
+  if(gameState!=='playing') return;
+  showOverlay('⚠️ حریف قطع شد','بازیکن دوم از بازی خارج شد.');
+  setTimeout(()=>{ if(gameState==='playing') showResult('left'); },2500);
+}
+function showOverlay(t,d){$('overlayTitle').textContent=t;$('overlayDesc').textContent=d||'';$('overlayMsg').classList.add('show');}
+function hideOverlay(){$('overlayMsg').classList.remove('show');}
+
+/* =====================================================================
+   شروع بازی
+===================================================================== */
+function startGame(m, level){
+  mode=m; currentLevel=level||0;
+  gameState='playing';
+  $('roomTag').textContent = mode==='online' ? ('اتاق: '+roomCode)
+    : mode==='levels' ? ('مرحله '+(currentLevel+1)) : mode==='endless' ? 'بی‌نهایت' : 'تمرین';
+  $('oppName').textContent = mode==='online' ? 'حریف' : 'رکورد';
+  $('btnNextLevel').style.display = mode==='levels' ? 'block':'none';
+  hideOverlay();
+  showScreen('gameScreen');
+  if(myRole!=='guest') resetRound();
+  resizeCanvas();
+  if(settings.music) startMusic();
+}
+function resetRound(){
+  myScore=0; oppScore=0; lives=MAX_LIVES; bricksBroken=0; elapsed=0;
+  combo=0; comboTimer=0; shake=0;
+  fx={big:0,laser:0,magnet:0,slow:0};
+  particles=[]; powerups=[]; lasers=[]; floatTexts=[];
+  paddleBottom={x:GW/2-PADDLE_W/2,y:GH-34,w:PADDLE_W,h:PADDLE_H};
+  paddleTop={x:GW/2-PADDLE_W/2,y:26,w:PADDLE_W,h:PADDLE_H};
+  resetBall();
+  buildBricks();
+  gameState='playing';
+  hideOverlay();
+  updateHUD();
+}
+function resetBall(){
+  balls=[{x:paddleBottom.x+paddleBottom.w/2,y:paddleBottom.y-BALL_R-3,dx:0,dy:0,launched:false,trail:[]}];
+}
+function launchBall(){
+  const b=balls[0];
+  if(b.launched) return;
+  b.launched=true;
+  const ang=(Math.random()*0.6-0.3)-Math.PI/2;
+  const sp=currentSpeed();
+  b.dx=Math.cos(ang)*sp; b.dy=Math.sin(ang)*sp;
+  SFX.hit();
+}
+function currentSpeed(){
+  let s=BASE_SPEED+bricksBroken*SPEED_PER_BRICK+elapsed*SPEED_PER_SEC;
+  if(mode==='levels') s+=currentLevel*25;
+  if(fx.slow>0) s*=0.6;
+  return Math.min(MAX_SPEED,s);
+}
+function buildBricks(){
+  bricks=[];
+  const gap=BRICK_GAP, totalW=GW-40;
+  const bw=(totalW-gap*(COLS-1))/COLS;
+  let layout;
+  if(mode==='levels'&&LEVELS[currentLevel]) layout=LEVELS[currentLevel].layout;
+  else if(mode==='online'||mode==='practice') layout=LEVELS[1].layout;
+  else layout=LEVELS[2].layout; // endless
+  for(let r=0;r<ROWS;r++) for(let c=0;c<COLS;c++){
+    const v=layout[r]?layout[r][c]:0;
+    if(!v) continue;
+    bricks.push({x:20+c*(bw+gap),y:BRICK_TOP+r*(BRICK_H+gap),w:bw,h:BRICK_H,
+      alive:true,hp:v,color:v===2?'#e0e0ff':BRICK_COLORS[r%BRICK_COLORS.length],
+      row:r,hard:v===2,anim:0});
+  }
+}
+
+/* =====================================================================
+   حلقه اصلی
+===================================================================== */
+function gameLoop(t){
+  requestAnimationFrame(gameLoop);
+  if(!lastTime) lastTime=t;
+  let dt=(t-lastTime)/1000; lastTime=t;
+  if(dt>0.1) dt=0.1;
+  bgPulse+=dt;
+  if(gameState==='playing'){
+    if(myRole!=='guest'){
+      acc+=dt; const STEP=1/120;
+      while(acc>=STEP){ update(STEP); acc-=STEP; }
+      elapsed+=dt;
+      // تایمرهای پاورآپ
+      for(const k in fx) if(fx[k]>0) fx[k]=Math.max(0,fx[k]-dt);
+      if(comboTimer>0){ comboTimer-=dt; if(comboTimer<=0) combo=0; }
+    } else {
+      updateGuestPaddle(dt);
+    }
+  }
+  render();
+  netSync();
+}
+function updateGuestPaddle(dt){
+  const sp=560;
+  if(keys.left) paddleTop.x-=sp*dt;
+  if(keys.right) paddleTop.x+=sp*dt;
+  paddleTop.x=clamp(paddleTop.x,0,GW-paddleTop.w);
+}
+function update(dt){
+  let lifeLostThisFrame=false; // جلوگیری از کم شدن دو جان در یک فریم
+  // پَدل میزبان
+  const sp=560;
+  if(keys.left) paddleBottom.x-=sp*dt;
+  if(keys.right) paddleBottom.x+=sp*dt;
+  paddleBottom.x=clamp(paddleBottom.x,0,GW-paddleBottom.w);
+  // اندازه پَدل (پاورآپ بزرگ)
+  const targetW=fx.big>0?PADDLE_W*1.6:PADDLE_W;
+  paddleBottom.w+= (targetW-paddleBottom.w)*Math.min(1,dt*8);
+  paddleBottom.x=clamp(paddleBottom.x,0,GW-paddleBottom.w);
+  // پَدل مهمان
+  const tx=remotePaddleX*GW-paddleTop.w/2;
+  paddleTop.x+=(tx-paddleTop.x)*Math.min(1,dt*18);
+  paddleTop.x=clamp(paddleTop.x,0,GW-paddleTop.w);
+
+  // توپ روی پَدل قبل از شلیک
+  const b0=balls[0];
+  if(!b0.launched){
+    b0.x=paddleBottom.x+paddleBottom.w/2; b0.y=paddleBottom.y-BALL_R-3;
+    return;
+  }
+  // تیر لیزر (نگه‌داشتن Space)
+  if(keys.shoot&&fx.laser>0) shootLaser();
+
+  // حرکت توپ‌ها
+  for(let i=balls.length-1;i>=0;i--){
+    const b=balls[i];
+    b.x+=b.dx*dt; b.y+=b.dy*dt;
+    // دنباله
+    if(settings.fx){ b.trail.push({x:b.x,y:b.y}); if(b.trail.length>8) b.trail.shift(); }
+    // دیواره‌ها
+    if(b.x-BALL_R<0){b.x=BALL_R;b.dx=Math.abs(b.dx);SFX.hit();}
+    if(b.x+BALL_R>GW){b.x=GW-BALL_R;b.dx=-Math.abs(b.dx);SFX.hit();}
+    // سقف: در حالت تک‌نفره توپ از بالا برمی‌گردد (پَدل بالایی کنترل نمی‌شود)
+    if(mode!=='online'&&b.y-BALL_R<0){b.y=BALL_R;b.dy=Math.abs(b.dy);SFX.hit();}
+    // پَدل پایین - محدوده تشخیص گسترده‌تر برای جلوگیری از رد شدن توپ
+    const pB=paddleBottom;
+    if(b.dy>0&&b.y+BALL_R>=pB.y&&b.y+BALL_R<=pB.y+pB.h+14&&b.x>=pB.x-BALL_R&&b.x<=pB.x+pB.w+BALL_R){
+      const hit=(b.x-(pB.x+pB.w/2))/(pB.w/2);
+      const ang=hit*(Math.PI/3);
+      const s=currentSpeed();
+      b.dx=Math.sin(ang)*s; b.dy=-Math.abs(Math.cos(ang))*s;
+      b.y=pB.y-BALL_R-1;
+      // آهنربا: توپ می‌چسبد به پَدل
+      if(fx.magnet>0&&!b.stuck){ b.stuck=true; b.launched=false; }
+      addCombo(); myScore+=5*(1+combo*0.1); updateHUD();
+      SFX.paddle(); paddleHitFlash=1;
+    }
+    // پَدل بالایی (مهمان) - محدوده تشخیص گسترده‌تر برای جلوگیری از رد شدن توپ
+    const pT=paddleTop;
+    if(b.dy<0&&b.y-BALL_R<=pT.y+pT.h&&b.y-BALL_R>=pT.y-18&&b.x>=pT.x-BALL_R&&b.x<=pT.x+pT.w+BALL_R){
+      const hit=(b.x-(pT.x+pT.w/2))/(pT.w/2);
+      const ang=hit*(Math.PI/3);
+      const s=currentSpeed();
+      b.dx=Math.sin(ang)*s; b.dy=Math.abs(Math.cos(ang))*s;
+      b.y=pT.y+pT.h+BALL_R+1;
+      addCombo(); oppScore+=5*(1+combo*0.1); updateHUD();
+      SFX.paddle();
+    }
+    // برخورد با آجرها
+    for(let j=0;j<bricks.length;j++){
+      const br=bricks[j];
+      if(!br.alive) continue;
+      if(b.x+BALL_R>br.x&&b.x-BALL_R<br.x+br.w&&b.y+BALL_R>br.y&&b.y-BALL_R<br.y+br.h){
+        const oL=(b.x+BALL_R)-br.x, oR=(br.x+br.w)-(b.x-BALL_R);
+        const oT=(b.y+BALL_R)-br.y, oB=(br.y+br.h)-(b.y-BALL_R);
+        const mH=Math.min(oL,oR), mV=Math.min(oT,oB);
+        if(mH<mV) b.dx=(oL<oR)?-Math.abs(b.dx):Math.abs(b.dx);
+        else      b.dy=(oT<oB)?-Math.abs(b.dy):Math.abs(b.dy);
+        hitBrick(br);
+        break;
+      }
+    }
+    // افتادن توپ (در حالت آنلاین از بالا و پایین، در غیر این صورت فقط پایین)
+    const outBottom=b.y-BALL_R>GH;
+    const outTop=(mode==='online')&&(b.y+BALL_R<0);
+    if(outBottom||outTop){
+      balls.splice(i,1);
+      if(balls.length===0&&!lifeLostThisFrame){
+        lifeLostThisFrame=true;
+        lives--; shake=16; vibrate(120); SFX.lose();
+        combo=0;
+        updateHUD();
+        if(lives<=0){ showResult('lose'); send({t:'gameover',kind:'win'}); }
+        else resetBall();
+      }
+    }
+  }
+  // تیرهای لیزر
+  for(let i=lasers.length-1;i>=0;i--){
+    const L=lasers[i];
+    L.y+=L.dy*dt;
+    for(let j=0;j<bricks.length;j++){
+      const br=bricks[j];
+      if(br.alive&&L.x>br.x&&L.x<br.x+br.w&&L.y<br.y+br.h&&L.y>br.y){
+        hitBrick(br); lasers.splice(i,1); break;
+      }
+    }
+    if(L.y<0||L.y>GH) lasers.splice(i,1);
+  }
+  // پاورآپ‌های در حال سقوط
+  for(let i=powerups.length-1;i>=0;i--){
+    const p=powerups[i];
+    p.y+=140*dt;
+    // گرفتن با پَدل پایین
+    const pB=paddleBottom;
+    if(p.y+p.r>pB.y&&p.y-p.r<pB.y+pB.h&&p.x>pB.x&&p.x<pB.x+pB.w){
+      applyPowerup(p.kind); powerups.splice(i,1); SFX.powerup(); vibrate(40);
+      continue;
+    }
+    if(p.y>GH+20) powerups.splice(i,1);
+  }
+  // ذرات
+  for(let i=particles.length-1;i>=0;i--){
+    const p=particles[i];
+    p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=420*dt; p.life-=dt;
+    if(p.life<=0) particles.splice(i,1);
+  }
+  // متن‌های شناور
+  for(let i=floatTexts.length-1;i>=0;i--){
+    const f=floatTexts[i];
+    f.y-=50*dt; f.life-=dt;
+    if(f.life<=0) floatTexts.splice(i,1);
+  }
+  if(shake>0) shake=Math.max(0,shake-dt*60);
+  if(paddleHitFlash>0) paddleHitFlash=Math.max(0,paddleHitFlash-dt*4);
+}
+function addCombo(){
+  combo++; comboTimer=COMBO_TIMEOUT;
+  if(combo>1){ SFX.combo(); floatTexts.push({x:GW/2,y:GH/2-40,text:'کمبو ×'+combo,life:1,color:'#ffd54f'}); }
+}
+function hitBrick(b){
+  if(b.hard&&b.hp>1){ b.hp--; SFX.hard(); b.anim=0.5; return; }
+  b.alive=false; b.anim=1; bricksBroken++;
+  const pts=Math.round(((ROWS-b.row)*10+10)*(1+combo*0.15));
+  myScore+=pts;
+  floatTexts.push({x:b.x+b.w/2,y:b.y,text:'+'+pts,life:0.8,color:b.color});
+  // ذرات
+  if(settings.fx) for(let i=0;i<12;i++){
+    particles.push({x:b.x+b.w/2,y:b.y+b.h/2,
+      vx:(Math.random()-0.5)*280,vy:(Math.random()-0.5)*280-80,
+      size:3+Math.random()*4,color:b.color,life:0.5+Math.random()*0.4});
+  }
+  // احتمال افتادن پاورآپ
+  if(Math.random()<0.14){
+    const kinds=Object.keys(PU);
+    const k=kinds[Math.floor(Math.random()*kinds.length)];
+    powerups.push({x:b.x+b.w/2,y:b.y+b.h/2,kind:k,r:11,vy:140});
+  }
+  SFX.brick();
+  updateHUD();
+  checkWin();
+}
+function applyPowerup(kind){
+  const t=8; // مدت اثر (ثانیه)
+  switch(kind){
+    case 'MULTI': {
+      const src=balls.find(b=>b.launched)||balls[0];
+      for(let i=0;i<2;i++){
+        const ang=Math.atan2(src.dy,src.dx)+(i?0.5:-0.5);
+        const s=Math.hypot(src.dx,src.dy)||currentSpeed();
+        balls.push({x:src.x,y:src.y,dx:Math.cos(ang)*s,dy:Math.sin(ang)*s,launched:true,trail:[]});
+      }
+      break;
+    }
+    case 'BIG': fx.big=t; break;
+    case 'LASER': fx.laser=t; break;
+    case 'MAGNET': fx.magnet=t; break;
+    case 'LIFE': lives=Math.min(MAX_LIVES+1,lives+1); break;
+    case 'SLOW': fx.slow=t; break;
+  }
+  floatTexts.push({x:GW/2,y:GH/2-40,text:PU[kind].t,life:1.2,color:PU[kind].c});
+  updateHUD();
+}
+function shootLaser(){
+  if(lasers.filter(l=>l.from==='bottom').length>3) return;
+  lasers.push({x:paddleBottom.x+paddleBottom.w*0.25,y:paddleBottom.y,dy:-700,from:'bottom'});
+  lasers.push({x:paddleBottom.x+paddleBottom.w*0.75,y:paddleBottom.y,dy:-700,from:'bottom'});
+  SFX.laser();
+}
+function checkWin(){
+  if(gameState!=='playing') return;
+  if(bricks.length&&bricks.every(x=>!x.alive)){
+    myScore+=CLEAR_BONUS; updateHUD();
+    if(mode==='levels'){
+      if(currentLevel+1>unlockedLevel){ unlockedLevel=currentLevel+1; saveProgress(); }
+    }
+    SFX.win();
+    showResult('win');
+    send({t:'gameover',kind:'lose'});
+  }
+}
+
+/* =====================================================================
+   همگام‌سازی شبکه
+===================================================================== */
+function netSync(){
+  const now=Date.now();
+  if(now-lastNetSend<50) return;
+  lastNetSend=now;
+  if(myRole==='guest'){
+    send({t:'paddle',x:(paddleTop.x+paddleTop.w/2)/GW});
+  } else if(myRole==='host'&&gameState==='playing'){
+    // محافظت: اگر توپی وجود ندارد (بین از دست رفتن و ریست)، state نفرست
+    const b=balls[0];
+    if(!b) return;
+    send({t:'state',
+      bx:clamp(b.x/GW,0,1), by:clamp(b.y/GH,0,1),
+      pB:clamp((paddleBottom.x+paddleBottom.w/2)/GW,0,1),
+      pT:clamp((paddleTop.x+paddleTop.w/2)/GW,0,1),
+      my:myScore,op:oppScore,lv:lives,launched:b.launched,
+      bricks:bricksToString(), nBalls:balls.length});
+  }
+}
+function bricksToString(){let s='';for(let i=0;i<bricks.length;i++)s+=bricks[i].alive?'0':'1';return s;}
+
+/* =====================================================================
+   پایان بازی
+===================================================================== */
+function showResult(kind){
+  if(gameState==='gameover') return;
+  gameState='gameover'; hideOverlay(); stopMusic();
+  if(myRole==='host'&&mode==='online') send({t:'gameover',kind:kind==='win'?'lose':'win'});
+  const t=$('resultTitle'), s=$('resultSub');
+  $('finalMy').textContent=myScore;
+  $('finalOpp').textContent=mode==='online'?oppScore:bestScore;
+  if(kind==='win'){
+    t.textContent='🎉 شما بردید!'; t.className='result-title win';
+    s.textContent=mode==='levels'?'مرحله '+(currentLevel+1)+' را کامل کردید!':'آفرین! همه آجرها شکسته شدند.';
+  } else if(kind==='left'){
+    t.textContent='👋 حریف ترک کرد'; t.className='result-title draw';
+    s.textContent='بازی ناتمام ماند. امتیاز شما: '+myScore;
+  } else {
+    t.textContent='😞 بازی تمام شد'; t.className='result-title lose';
+    s.textContent='جان‌های شما تمام شد. دوباره تلاش کنید!';
+  }
+  if(myScore>bestScore){ bestScore=myScore; saveProgress(); $('resultBest').textContent='🏆 رکورد جدید: '+bestScore; }
+  else $('resultBest').textContent='🏆 بهترین رکورد: '+bestScore;
+  $('btnNextLevel').style.display=(mode==='levels'&&kind==='win'&&currentLevel<LEVELS.length-1)?'block':'none';
+  showScreen('resultScreen');
+}
+
+/* =====================================================================
+   رندر
+===================================================================== */
+function render(){
+  ctx.save();
+  if(shake>0) ctx.translate((Math.random()-0.5)*shake,(Math.random()-0.5)*shake);
+  // پس‌زمینه
+  const grad=ctx.createLinearGradient(0,0,0,GH);
+  grad.addColorStop(0,'#141033'); grad.addColorStop(1,'#0a0820');
+  ctx.fillStyle=grad; ctx.fillRect(0,0,GW,GH);
+  // هاله‌ی متحرک
+  const p=(Math.sin(bgPulse*1.5)+1)/2;
+  ctx.fillStyle=`rgba(0,229,255,${0.03+p*0.04})`;
+  ctx.beginPath(); ctx.arc(GW/2,GH/2,GW*0.6,0,Math.PI*2); ctx.fill();
+  // شبکه
+  ctx.strokeStyle='rgba(255,255,255,0.035)'; ctx.lineWidth=1;
+  for(let x=0;x<GW;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,GH);ctx.stroke();}
+  for(let y=0;y<GH;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(GW,y);ctx.stroke();}
+
+  if(myRole==='guest'&&guestView){ renderGuestView(); ctx.restore(); return; }
+
+  // آجرها
+  for(const b of bricks){
+    if(!b.alive) continue;
+    ctx.save();
+    ctx.shadowColor=b.color; ctx.shadowBlur=10;
+    ctx.fillStyle=b.color;
+    rr(b.x,b.y,b.w,b.h,5); ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.fillStyle='rgba(255,255,255,0.28)';
+    rr(b.x+3,b.y+3,b.w-6,b.h*0.32,3); ctx.fill();
+    if(b.hard){ // علامت آجر سخت
+      ctx.fillStyle='rgba(0,0,0,0.35)';
+      ctx.font='700 11px Vazirmatn'; ctx.textAlign='center';
+      ctx.fillText('۲',b.x+b.w/2,b.y+b.h-6);
+    }
+    ctx.restore();
+  }
+  // پاورآپ‌ها
+  for(const pu of powerups){
+    const c=PU[pu.kind].c;
+    ctx.save();
+    ctx.shadowColor=c; ctx.shadowBlur=14;
+    ctx.fillStyle=c;
+    ctx.beginPath(); ctx.arc(pu.x,pu.y,pu.r,0,Math.PI*2); ctx.fill();
+    ctx.shadowBlur=0;
+    ctx.fillStyle='#06121a'; ctx.font='900 11px Vazirmatn'; ctx.textAlign='center';
+    ctx.fillText(PU[pu.kind].t,pu.x,pu.y+4);
+    ctx.restore();
+  }
+  // ذرات
+  for(const p of particles){
+    ctx.globalAlpha=Math.max(0,p.life*1.6);
+    ctx.fillStyle=p.color;
+    ctx.fillRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size);
+  }
+  ctx.globalAlpha=1;
+  // تیر لیزر
+  for(const L of lasers){
+    ctx.save();
+    ctx.shadowColor='#ff4081'; ctx.shadowBlur=10;
+    ctx.fillStyle='#ff4081';
+    ctx.fillRect(L.x-2,L.y-10,4,20);
+    ctx.restore();
+  }
+  // پَدل‌ها
+  drawPaddle(paddleBottom,'#00e5ff',paddleHitFlash);
+  drawPaddle(paddleTop,'#ff4081',0);
+  // توپ‌ها + دنباله
+  for(const b of balls){
+    if(settings.fx&&b.trail){
+      for(let i=0;i<b.trail.length;i++){
+        const t=b.trail[i];
+        ctx.globalAlpha=(i/b.trail.length)*0.4;
+        ctx.fillStyle='#ffd54f';
+        ctx.beginPath(); ctx.arc(t.x,t.y,BALL_R*(i/b.trail.length),0,Math.PI*2); ctx.fill();
+      }
+      ctx.globalAlpha=1;
+    }
+    ctx.save();
+    ctx.shadowColor='#ffd54f'; ctx.shadowBlur=16;
+    ctx.fillStyle='#fffde7';
+    ctx.beginPath(); ctx.arc(b.x,b.y,BALL_R,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+  }
+  // متن‌های شناور
+  for(const f of floatTexts){
+    ctx.globalAlpha=Math.max(0,f.life);
+    ctx.fillStyle=f.color; ctx.font='900 16px Vazirmatn'; ctx.textAlign='center';
+    ctx.fillText(f.text,f.x,f.y);
+    ctx.globalAlpha=1;
+  }
+  // نشانگر پاورآپ‌های فعال
+  let px=10;
+  for(const k in fx){
+    if(fx[k]>0){
+      const c=PU[k]?PU[k].c:'#fff';
+      ctx.fillStyle=c; ctx.globalAlpha=0.9;
+      rr(px,8,52,16,8); ctx.fill();
+      ctx.fillStyle='#06121a'; ctx.font='700 9px Vazirmatn'; ctx.textAlign='center';
+      ctx.fillText(Math.ceil(fx[k])+'s',px+26,19);
+      ctx.globalAlpha=1;
+      px+=58;
+    }
+  }
+  // کمبو
+  if(combo>1){
+    ctx.fillStyle='#ffd54f'; ctx.font='900 18px Vazirmatn'; ctx.textAlign='left';
+    ctx.shadowColor='#ffd54f'; ctx.shadowBlur=10;
+    ctx.fillText('🔥 کمبو ×'+combo,10,GH-12);
+    ctx.shadowBlur=0;
+  }
+  // راهنمای شلیک
+  const b0=balls[0];
+  if(b0&&!b0.launched&&gameState==='playing'){
+    ctx.fillStyle='rgba(255,255,255,0.75)';
+    ctx.font='600 15px Vazirmatn'; ctx.textAlign='center';
+    ctx.fillText('برای شلیک توپ Space بزن یا کلیک کن',GW/2,GH-70);
+    ctx.beginPath();
+    ctx.moveTo(GW/2,b0.y-BALL_R-26);
+    ctx.lineTo(GW/2-8,b0.y-BALL_R-12);
+    ctx.lineTo(GW/2+8,b0.y-BALL_R-12);
+    ctx.closePath();
+    ctx.fillStyle='rgba(255,213,79,0.9)'; ctx.fill();
+  }
+  ctx.restore();
+}
+function renderGuestView(){
+  const v=guestView;
+  // محافظت: اگر داده ناقص است چیزی رسم نکن
+  if(v===null||typeof v.bx!=='number') return;
+  const gap=BRICK_GAP, totalW=GW-40;
+  const bw=(totalW-gap*(COLS-1))/COLS;
+  if(v.bricks){
+    for(let i=0;i<v.bricks.length&&i<COLS*ROWS;i++){
+      if(v.bricks[i]!=='1') continue;
+      const r=Math.floor(i/COLS), c=i%COLS;
+      const bx=20+c*(bw+gap), by=BRICK_TOP+r*(BRICK_H+gap);
+      ctx.save();
+      ctx.shadowColor=BRICK_COLORS[r%BRICK_COLORS.length]; ctx.shadowBlur=10;
+      ctx.fillStyle=BRICK_COLORS[r%BRICK_COLORS.length];
+      rr(bx,by,bw,BRICK_H,5); ctx.fill();
+      ctx.shadowBlur=0;
+      ctx.fillStyle='rgba(255,255,255,0.28)';
+      rr(bx+3,by+3,bw-6,BRICK_H*0.32,3); ctx.fill();
+      ctx.restore();
+    }
+  }
+  drawPaddle({x:clamp(v.pB*GW-PADDLE_W/2,0,GW-PADDLE_W),y:GH-34,w:PADDLE_W,h:PADDLE_H},'#00e5ff',0);
+  drawPaddle({x:clamp(v.pT*GW-PADDLE_W/2,0,GW-PADDLE_W),y:26,w:PADDLE_W,h:PADDLE_H},'#ff4081',0);
+  ctx.save();
+  ctx.shadowColor='#ffd54f'; ctx.shadowBlur=16;
+  ctx.fillStyle='#fffde7';
+  // توپ در محدوده‌ی میدان بماند (جلوگیری از رسم شدن بیرون از کانواس)
+  ctx.beginPath(); ctx.arc(clamp(v.bx*GW,BALL_R,GW-BALL_R),clamp(v.by*GH,BALL_R,GH-BALL_R),BALL_R,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+  myScore=v.my??myScore; oppScore=v.op??oppScore; lives=v.lv??lives;
+  updateHUD();
+}
+function drawPaddle(p,c1,flash){
+  ctx.save();
+  ctx.shadowColor=c1; ctx.shadowBlur=18+flash*20;
+  const pg=ctx.createLinearGradient(p.x,0,p.x+p.w,0);
+  pg.addColorStop(0,c1); pg.addColorStop(0.5,'#ffffff'); pg.addColorStop(1,c1);
+  ctx.fillStyle=pg;
+  rr(p.x,p.y,p.w,p.h,7); ctx.fill();
+  ctx.restore();
+}
+
+/* =====================================================================
+   HUD
+===================================================================== */
+function updateHUD(){
+  $('myScore').textContent=myScore;
+  $('oppScore').textContent=mode==='online'?oppScore:bestScore;
+  $('myHearts').textContent=hearts(lives);
+  $('oppHearts').textContent=hearts(lives);
+}
+
+/* =====================================================================
+   کنترل‌ها
+===================================================================== */
+function setupInputs(){
+  window.addEventListener('keydown',e=>{
+    if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A'){keys.left=true;e.preventDefault();}
+    if(e.key==='ArrowRight'||e.key==='d'||e.key==='D'){keys.right=true;e.preventDefault();}
+    if(e.key===' '||e.key==='Spacebar'){
+      if(gameState==='playing'){
+        if(myRole==='guest') send({t:'launch'});
+        else { if(!balls[0].launched) launchBall(); else if(fx.laser>0) keys.shoot=true; }
+      }
+      e.preventDefault();
+    }
+    if(e.key==='Escape'||e.key==='p'||e.key==='P'){ togglePause(); }
+  });
+  window.addEventListener('keyup',e=>{
+    if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A') keys.left=false;
+    if(e.key==='ArrowRight'||e.key==='d'||e.key==='D') keys.right=false;
+    if(e.key===' '||e.key==='Spacebar') keys.shoot=false;
+  });
+  function toGameX(cx){const r=canvas.getBoundingClientRect();return (cx-r.left)/r.width*GW;}
+  function myPaddle(){return (myRole==='guest')?paddleTop:paddleBottom;}
+  function handlePoint(cx){
+    if(gameState!=='playing') return;
+    const p=myPaddle();
+    p.x=clamp(toGameX(cx)-p.w/2,0,GW-p.w);
+  }
+  canvas.addEventListener('mousemove',e=>handlePoint(e.clientX));
+  function tryLaunch(){
+    if(gameState!=='playing') return;
+    if(myRole==='guest') send({t:'launch'});
+    else if(!balls[0].launched) launchBall();
+    else if(fx.laser>0) shootLaser();
+  }
+  canvas.addEventListener('mousedown',tryLaunch);
+  canvas.addEventListener('click',tryLaunch);
+  canvas.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    handlePoint(e.touches[0].clientX);
+    if(gameState!=='playing') return;
+    if(myRole==='guest') send({t:'launch'});
+    else if(!balls[0].launched) launchBall();
+    else if(fx.laser>0) shootLaser();
+  },{passive:false});
+  canvas.addEventListener('touchmove',e=>{e.preventDefault();handlePoint(e.touches[0].clientX);},{passive:false});
+}
+
+/* =====================================================================
+   توقف بازی
+===================================================================== */
+function togglePause(){
+  if(gameState==='playing'){
+    gameState='paused';
+    showOverlay('⏸ مکث','برای ادامه دوباره ضربه بزنید.');
+  } else if(gameState==='paused'){
+    gameState='playing';
+    hideOverlay();
+  }
+}
+
+/* =====================================================================
+   واکنش‌گرا
+===================================================================== */
+function resizeCanvas(){
+  dpr=Math.min(window.devicePixelRatio||1,2);
+  const availW=Math.min(window.innerWidth-20,560);
+  const availH=window.innerHeight-150;
+  const cssW=Math.min(availW,availH*GW/GH);
+  const cssH=cssW*GH/GW;
+  canvas.style.width=cssW+'px'; canvas.style.height=cssH+'px';
+  canvas.width=GW*dpr; canvas.height=GH*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+/* =====================================================================
+   خروج
+===================================================================== */
+function exitRoom(){
+  send({t:'bye'});
+  try{ if(conn) conn.close(); if(peer) peer.destroy(); }catch(e){}
+  cleanup();
+}
+function cleanup(){
+  gameState='menu'; mode='menu'; myRole=null; roomCode='';
+  connected=false; remotePaddleX=0.5; conn=null; peer=null; guestView=null;
+  stopMusic();
+  $('roomCodeBox').classList.remove('show');
+  $('joinCodeInput').value='';
+  setStatus('lobbyStatus','');
+  showScreen('menuScreen');
+}
+
+/* =====================================================================
+   منوها
+===================================================================== */
+function buildLevelGrid(){
+  const g=$('levelGrid');
+  g.innerHTML='';
+  for(let i=0;i<LEVELS.length;i++){
+    const locked=i>unlockedLevel;
+    const btn=document.createElement('button');
+    btn.className='level-btn'+(locked?' locked':'');
+    btn.innerHTML=(i+1)+(locked?'<div class="lock">🔒</div>':'<div class="lock">باز شد</div>');
+    btn.addEventListener('click',()=>{
+      if(locked){ vibrate(30); return; }
+      initAudio(); startGame('levels',i);
+    });
+    g.appendChild(btn);
+  }
+}
+function toggleSwitch(id,key){
+  $(id).classList.toggle('on');
+  settings[key]=$(id).classList.contains('on');
+  if(key==='music'){ if(settings.music) startMusic(); else stopMusic(); }
+}
+
+// منتظر لود شدن PeerJS می‌ماند (در صورت لود نشدن از fallback استفاده می‌کند)
+function waitForPeer(maxWait){
+  return new Promise(function(res){
+    if(typeof Peer!=='undefined') return res(true);
+    const start=Date.now();
+    const iv=setInterval(function(){
+      if(typeof Peer!=='undefined'){ clearInterval(iv); res(true); }
+      else if(Date.now()-start>(maxWait||4000)){ clearInterval(iv); res(false); }
+    },100);
+  });
+}
+
+/* =====================================================================
+   راه‌اندازی
+===================================================================== */
+function init(){
+  canvas=$('gameCanvas'); ctx=canvas.getContext('2d');
+  loadProgress();
+  paddleBottom={x:GW/2-PADDLE_W/2,y:GH-34,w:PADDLE_W,h:PADDLE_H};
+  paddleTop={x:GW/2-PADDLE_W/2,y:26,w:PADDLE_W,h:PADDLE_H};
+  resetBall(); buildBricks();
+
+  // منوی اصلی
+  $('btnOnline').addEventListener('click',()=>{ initAudio(); showScreen('lobbyScreen'); gameState='lobby'; });
+  $('btnLevels').addEventListener('click',()=>{ buildLevelGrid(); showScreen('levelsScreen'); });
+  $('btnEndless').addEventListener('click',()=>{ initAudio(); startGame('endless'); });
+  $('btnSettings').addEventListener('click',()=>showScreen('settingsScreen'));
+  $('btnHowTo').addEventListener('click',()=>showScreen('howToScreen'));
+
+  // لابی
+  $('btnCreateRoom').addEventListener('click',async()=>{
+    const ok=await waitForPeer();
+    if(!ok){setStatus('lobbyStatus','کتابخانه PeerJS لود نشد. اینترنت را بررسی کنید.','error');return;}
+    createRoom();
+  });
+  $('btnJoinRoom').addEventListener('click',async()=>{
+    const ok=await waitForPeer();
+    if(!ok){setStatus('lobbyStatus','کتابخانه PeerJS لود نشد. اینترنت را بررسی کنید.','error');return;}
+    joinRoom();
+  });
+  $('joinCodeInput').addEventListener('keydown',e=>{if(e.key==='Enter')$('btnJoinRoom').click();});
+  $('btnBackMenu').addEventListener('click',cleanup);
+
+  // تنظیمات
+  $('swSound').addEventListener('click',()=>toggleSwitch('swSound','sound'));
+  $('swVibrate').addEventListener('click',()=>toggleSwitch('swVibrate','vibrate'));
+  $('swFx').addEventListener('click',()=>toggleSwitch('swFx','fx'));
+  $('swMusic').addEventListener('click',()=>{toggleSwitch('swMusic','music');initAudio();});
+  $('btnSettingsBack').addEventListener('click',()=>showScreen('menuScreen'));
+  $('btnHowToBack').addEventListener('click',()=>showScreen('menuScreen'));
+  $('btnLevelsBack').addEventListener('click',()=>showScreen('menuScreen'));
+
+  // بازی
+  $('btnPause').addEventListener('click',togglePause);
+  $('btnExit').addEventListener('click',exitRoom);
+  $('overlayMsg').addEventListener('click',()=>{ if(gameState==='paused') togglePause(); });
+
+  // پایان بازی
+  $('btnReplay').addEventListener('click',()=>{
+    if(mode==='online'){
+      if(myRole==='host'){ resetRound(); send({t:'replay'}); showScreen('gameScreen'); }
+      else { send({t:'replay'}); $('resultStatus').textContent='منتظر میزبان...'; }
+    } else { startGame(mode,currentLevel); }
+  });
+  $('btnNextLevel').addEventListener('click',()=>startGame('levels',currentLevel+1));
+  $('btnBackMenu2').addEventListener('click',cleanup);
+
+  // کپی کد اتاق
+  $('roomCodeText').addEventListener('click',()=>{
+    const txt=$('roomCodeText').textContent;
+    if(navigator.clipboard&&txt&&!txt.includes('-')){
+      navigator.clipboard.writeText(txt).then(()=>setStatus('lobbyStatus','📋 کد اتاق کپی شد!','ok'));
+    }
+  });
+
+  window.addEventListener('resize',resizeCanvas);
+  window.addEventListener('orientationchange',resizeCanvas);
+  window.addEventListener('beforeunload',()=>send({t:'bye'}));
+
+  setupInputs();
+  resizeCanvas();
+  requestAnimationFrame(gameLoop);
+}
+window.addEventListener('load',init);
 </script>
 </body>
 </html>
