@@ -1,0 +1,14 @@
+# GitHub Pages
+.github-pages
+
+# وابستگی‌ها
+node_modules/
+
+# فایل‌های سیستمی
+.DS_Store
+Thumbs.db
+*.log
+
+# ویرایشگرها
+.vscode/
+.idea/
