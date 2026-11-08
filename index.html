@@ -1,214 +1,1517 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>قاره‌ی تاریک</title>
-<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سایه‌های قاره تاریک</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#07060a;--blood:#8b1a1a;--gold:#c9a227;--smoke:#1c2733;--text:#e8dcc4;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#07060a}}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0}
-body{background:var(--bg);color:var(--text);font-family:'Vazirmatn',Tahoma,sans-serif;overflow:hidden}
-#stage{position:fixed;inset:0;transition:opacity .8s,background 1s;background:#000}
-#stage::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,#000 5%,rgba(0,0,0,.35) 45%,rgba(0,0,0,.6));}
-.ember{position:fixed;bottom:-10px;width:3px;height:3px;border-radius:50%;background:#e25822;box-shadow:0 0 6px #e25822;opacity:0;animation:rise linear infinite;z-index:1}
-@keyframes rise{0%{opacity:0;transform:translateY(0)}15%{opacity:.9}100%{opacity:0;transform:translateY(-95vh) translateX(40px)}}
-.bar{position:fixed;left:0;right:0;height:7vh;background:#000;z-index:5}
-.bar.t{top:0}.bar.b{bottom:0}
-#intro,#game{position:fixed;inset:0;z-index:4}
-#intro{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;text-align:center}
-h1{font-size:clamp(2.2rem,8vw,4.5rem);margin:0;color:var(--gold);text-shadow:0 0 25px var(--blood),0 3px 0 #000;font-weight:900}
-.sub{opacity:.7;margin:0 0 10px}
-label{display:block;text-align:right;color:var(--gold);font-size:.95rem;margin-bottom:4px}
-input{width:min(340px,86vw);padding:12px;background:rgba(0,0,0,.65);border:1px solid #5a4a1a;color:var(--text);font:inherit;border-radius:4px;outline:none}
-input:focus{border-color:var(--gold);box-shadow:0 0 12px rgba(201,162,39,.4)}
-.btn{font:inherit;cursor:pointer;color:var(--text);background:linear-gradient(#34302c,#1a1816);border:1px solid #6b5a2a;padding:11px 20px;border-radius:4px;box-shadow:inset 0 1px 0 #555,0 3px 8px #000;transition:.25s}
-.btn:hover{border-color:var(--gold);box-shadow:0 0 16px rgba(201,162,39,.55),inset 0 1px 0 #666;color:#fff;transform:translateY(-2px)}
-.btn.big{font-size:1.2rem;padding:13px 38px;background:linear-gradient(#6b1515,#2e0707);border-color:var(--gold);font-weight:700}
-#game{display:none}
-#hud{position:absolute;top:calc(7vh + 8px);left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:0 14px;gap:8px;flex-wrap:wrap;font-size:.85rem}
-#chapter{color:var(--gold);font-weight:700;letter-spacing:1px}
-.names{color:var(--text);background:rgba(0,0,0,.55);padding:4px 12px;border:1px solid #4a3d18;border-radius:3px}
-.stats{display:flex;gap:10px;background:rgba(0,0,0,.55);padding:4px 12px;border:1px solid #4a3d18;border-radius:3px}
-.stats b{color:var(--gold)}
-#tools{position:absolute;top:calc(7vh + 48px);left:14px;display:flex;gap:6px}
-#tools .btn{padding:5px 11px;font-size:.85rem}
-#panel{position:absolute;right:50%;transform:translateX(50%);bottom:calc(7vh + 10px);width:min(900px,94vw);background:rgba(8,6,6,.78);border:1px solid #4a3d18;border-radius:6px;padding:18px 20px;box-shadow:0 0 40px #000;backdrop-filter:blur(3px)}
-#text{font-size:clamp(1rem,2.6vw,1.3rem);line-height:2;min-height:4.5em;cursor:pointer}
-#choices{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
-#choices .btn{flex:1 1 220px;text-align:center;animation:fade .6s}
-@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
-.end{color:var(--gold);font-weight:900}
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --gold: #d4af37;
+    --gold-bright: #f4d76b;
+    --blood: #8b0000;
+    --blood-bright: #c93030;
+    --text: #e8e3d6;
+    --muted: #8a8270;
+    --panel: rgba(8, 8, 12, 0.88);
+  }
+  html, body {
+    height: 100%; overflow: hidden;
+    font-family: 'Vazirmatn', sans-serif;
+    background: #000; color: var(--text);
+    user-select: none; -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ===== صفحه شروع ===== */
+  #introScreen {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 20px;
+    background:
+      radial-gradient(ellipse at 50% 0%, #2a0a0a 0%, transparent 55%),
+      radial-gradient(ellipse at 50% 100%, #0a0a1a 0%, transparent 55%),
+      linear-gradient(180deg, #050507 0%, #0a0508 50%, #050507 100%);
+    z-index: 100; transition: opacity 0.8s;
+  }
+  #introScreen.hide { opacity: 0; pointer-events: none; }
+
+  .particles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .particle {
+    position: absolute; width: 3px; height: 3px;
+    background: var(--gold); border-radius: 50%;
+    box-shadow: 0 0 8px var(--gold); opacity: 0;
+    animation: floatUp linear infinite;
+  }
+  @keyframes floatUp {
+    0% { transform: translateY(100vh); opacity: 0; }
+    10% { opacity: 0.8; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-20vh) translateX(40px); opacity: 0; }
+  }
+
+  .title-wrap { text-align:center; margin-bottom:40px; position:relative; z-index:2; }
+  .title-main {
+    font-size: clamp(2rem, 7vw, 3.5rem); font-weight: 900; letter-spacing: 2px;
+    background: linear-gradient(180deg, #f4d76b 0%, #d4af37 40%, #8a6d1f 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 60px rgba(212,175,55,0.3);
+  }
+  .title-sub {
+    font-size: clamp(0.8rem, 2.5vw, 1rem);
+    color: var(--muted); margin-top: 12px;
+    letter-spacing: 6px; font-weight: 300;
+  }
+  .title-line {
+    width: 120px; height: 1px; margin: 20px auto 0;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .name-form {
+    display: flex; flex-direction: column; gap: 22px;
+    width: 100%; max-width: 420px; position: relative; z-index: 2;
+  }
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field label {
+    color: var(--gold); font-size: 0.85rem; font-weight: 600;
+    letter-spacing: 1px; padding-right: 4px;
+  }
+  .field input {
+    width: 100%; padding: 15px 18px;
+    background: rgba(10,10,15,0.7);
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 4px; color: var(--text);
+    font-family: inherit; font-size: 1rem;
+    outline: none; transition: all 0.3s;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.5);
+  }
+  .field input::placeholder { color: #4a4538; }
+  .field input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 20px rgba(212,175,55,0.25), inset 0 2px 8px rgba(0,0,0,0.5);
+    background: rgba(15,12,8,0.9);
+  }
+
+  .btn-main {
+    padding: 16px 40px;
+    background: linear-gradient(180deg, #3a0e0e 0%, #1a0505 100%);
+    border: 1px solid var(--gold); border-radius: 4px;
+    color: var(--gold-bright); font-family: inherit;
+    font-size: 1.1rem; font-weight: 700; letter-spacing: 3px;
+    cursor: pointer; transition: all 0.35s;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+    position: relative; overflow: hidden;
+  }
+  .btn-main::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(212,175,55,0.2), transparent);
+    transform: translateX(-100%); transition: transform 0.6s;
+  }
+  .btn-main:hover::before { transform: translateX(100%); }
+  .btn-main:hover {
+    color: #fff;
+    box-shadow: 0 0 40px rgba(212,175,55,0.4);
+    border-color: var(--gold-bright);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(212,175,55,0.25);
+    padding: 12px 24px; color: var(--muted);
+    font-family: inherit; font-size: 0.9rem;
+    border-radius: 4px; cursor: pointer;
+    transition: all 0.3s; letter-spacing: 1px;
+  }
+  .btn-secondary:hover { color: var(--gold); border-color: var(--gold); }
+
+  /* ===== صحنه بازی ===== */
+  #gameScreen { position: fixed; inset: 0; display: none; flex-direction: column; }
+  #gameScreen.active { display: flex; }
+
+  .scene-bg {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    background-color: #050507;
+    transition: opacity 1.2s ease, transform 8s ease;
+    opacity: 0; transform: scale(1.1);
+  }
+  .scene-bg.visible { opacity: 1; transform: scale(1); }
+  .scene-bg::after {
+    content: ''; position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.7) 100%),
+      linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 30%, transparent 55%, rgba(0,0,0,0.95) 100%);
+  }
+
+  .cinebar {
+    position: absolute; left: 0; right: 0; height: 6vh;
+    background: #000; z-index: 20;
+  }
+  .cinebar.top { top: 0; border-bottom: 1px solid rgba(212,175,55,0.15); }
+  .cinebar.bottom { bottom: 0; border-top: 1px solid rgba(212,175,55,0.15); }
+
+  .hud-top {
+    position: absolute; top: 6vh; left: 0; right: 0;
+    padding: 12px 20px 30px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 25; pointer-events: none;
+    background: linear-gradient(180deg, rgba(0,0,0,0.6), transparent);
+  }
+  .chapter-label {
+    font-size: 0.8rem; color: var(--gold);
+    letter-spacing: 4px; font-weight: 700;
+    text-shadow: 0 0 10px rgba(212,175,55,0.5);
+  }
+  .chapter-label .small {
+    font-size: 0.7rem; color: var(--muted);
+    letter-spacing: 2px; display: block;
+    font-weight: 300; margin-top: 2px;
+  }
+  .names-plate { display: flex; gap: 14px; align-items: center; }
+  .name-tag {
+    padding: 5px 14px; background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 3px; font-size: 0.8rem;
+    color: var(--text); letter-spacing: 1px;
+    backdrop-filter: blur(4px);
+  }
+  .name-tag .ico { color: var(--gold); margin-left: 6px; }
+
+  .stats {
+    position: absolute; top: calc(6vh + 60px); right: 20px;
+    display: flex; gap: 10px; z-index: 25;
+  }
+  .stat {
+    background: rgba(0,0,0,0.7);
+    border: 1px solid rgba(212,175,55,0.25);
+    border-radius: 3px; padding: 6px 12px;
+    font-size: 0.75rem; color: var(--text);
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; gap: 6px; min-width: 90px;
+  }
+  .stat .icon { color: var(--gold); }
+  .stat .val { color: var(--gold-bright); font-weight: 700; margin-right: auto; }
+
+  .story-panel {
+    position: absolute; bottom: calc(6vh + 20px); left: 50%;
+    transform: translateX(-50%); width: min(900px, calc(100% - 40px));
+    z-index: 30; animation: panelIn 0.6s ease;
+  }
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  .dialogue {
+    background: var(--panel); backdrop-filter: blur(12px);
+    border: 1px solid rgba(212,175,55,0.2);
+    border-radius: 6px; padding: 20px 24px;
+    min-height: 120px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    margin-bottom: 14px; position: relative;
+  }
+  .dialogue::before {
+    content: ''; position: absolute; top: -1px; left: 20px;
+    width: 60px; height: 2px;
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+  .dialogue-text {
+    font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+    line-height: 2; color: var(--text);
+    min-height: 60px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  }
+  .dialogue-text .emph { color: var(--gold-bright); font-weight: 700; }
+  .cursor {
+    display: inline-block; width: 2px; height: 1em;
+    background: var(--gold); margin-right: 3px;
+    vertical-align: middle; animation: blink 0.7s infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .choices { display: flex; flex-direction: column; gap: 10px; }
+  .choice {
+    text-align: right; padding: 15px 22px;
+    background: linear-gradient(180deg, rgba(20,15,10,0.9) 0%, rgba(10,7,5,0.95) 100%);
+    border: 1px solid rgba(212,175,55,0.25);
+    border-right: 3px solid var(--blood);
+    border-radius: 4px; color: var(--text);
+    font-family: inherit; font-size: 0.95rem;
+    cursor: pointer; transition: all 0.25s;
+    position: relative; overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    opacity: 0; animation: choiceIn 0.4s forwards;
+  }
+  @keyframes choiceIn { to { opacity: 1; } }
+  .choice:hover {
+    border-right-color: var(--gold);
+    border-color: rgba(212,175,55,0.6);
+    color: var(--gold-bright); transform: translateX(-4px);
+    box-shadow: 0 4px 25px rgba(139,0,0,0.4);
+  }
+  .choice .arrow { color: var(--blood-bright); margin-left: 8px; transition: color 0.25s; }
+  .choice:hover .arrow { color: var(--gold); }
+  .choice .effect { display: inline-block; font-size: 0.75rem; color: var(--muted); margin-right: 8px; }
+
+  .corner-controls {
+    position: absolute; bottom: calc(6vh + 8px); left: 16px;
+    display: flex; gap: 8px; z-index: 35;
+  }
+  .ctrl-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: rgba(0,0,0,0.7);
+    border: 1px solid rgba(212,175,55,0.3);
+    color: var(--gold); font-size: 1rem;
+    cursor: pointer; transition: all 0.25s;
+    backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ctrl-btn:hover {
+    border-color: var(--gold); color: var(--gold-bright);
+    box-shadow: 0 0 20px rgba(212,175,55,0.4);
+  }
+  .ctrl-btn.active { background: rgba(139,0,0,0.4); border-color: var(--blood-bright); color: #fff; }
+
+  /* ===== صفحه پایان ===== */
+  #endingScreen {
+    position: fixed; inset: 0; display: none;
+    flex-direction: column; align-items: center; justify-content: center;
+    padding: 30px;
+    background: radial-gradient(ellipse at center, #1a0505 0%, #000 70%);
+    z-index: 200; text-align: center; animation: fadeIn 1.5s ease;
+  }
+  #endingScreen.active { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .ending-title {
+    font-size: clamp(1.8rem, 5vw, 2.8rem); font-weight: 900;
+    background: linear-gradient(180deg, var(--gold-bright), var(--blood-bright));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 20px; letter-spacing: 2px;
+  }
+  .ending-text {
+    max-width: 600px; line-height: 2;
+    color: var(--text); font-size: 1.05rem;
+    margin-bottom: 30px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+  }
+  .ending-stats {
+    display: flex; gap: 20px; margin-bottom: 30px;
+    flex-wrap: wrap; justify-content: center;
+  }
+  .ending-stat {
+    padding: 12px 24px; background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 4px; font-size: 0.9rem;
+  }
+  .ending-stat .lbl { color: var(--muted); font-size: 0.75rem; display: block; margin-bottom: 4px; }
+  .ending-stat .v { color: var(--gold-bright); font-weight: 700; font-size: 1.2rem; }
+
+  @media (max-width: 600px) {
+    .story-panel { bottom: calc(6vh + 10px); width: calc(100% - 20px); }
+    .dialogue { padding: 15px 16px; min-height: 100px; }
+    .choice { padding: 12px 16px; font-size: 0.88rem; }
+    .stats { top: calc(6vh + 55px); right: 10px; }
+    .stat { min-width: 70px; padding: 5px 8px; font-size: 0.7rem; }
+    .names-plate { flex-direction: column; gap: 4px; }
+    .name-tag { font-size: 0.7rem; padding: 3px 8px; }
+  }
 </style>
 </head>
 <body>
-<div id="stage"></div>
-<div class="bar t"></div><div class="bar b"></div>
 
-<div id="intro">
-  <h1>قاره‌ی تاریک</h1>
-  <p class="sub">یک ماجرای تاریک و سینمایی</p>
-  <div><label for="pn">نام قهرمان شما:</label><input id="pn" maxlength="20" placeholder="مثلاً آرش"></div>
-  <div><label for="cn">نام همراه شما:</label><input id="cn" maxlength="20" placeholder="مثلاً سیمرغ"></div>
-  <button class="btn big" onclick="startGame()">شروع ماجرا</button>
-  <button class="btn" id="contBtn" onclick="loadGame()" style="display:none">ادامه‌ی بازی ذخیره‌شده</button>
+<!-- ===== صفحه شروع ===== -->
+<div id="introScreen">
+  <div class="particles" id="particles"></div>
+  <div class="title-wrap">
+    <div class="title-main">سایه‌های قاره تاریک</div>
+    <div class="title-sub">یک ماجراجویی حماسی</div>
+    <div class="title-line"></div>
+  </div>
+  <div class="name-form">
+    <div class="field">
+      <label>نام قهرمان شما</label>
+      <input type="text" id="inPlayerName" placeholder="مثلاً حسین" maxlength="16" autocomplete="off">
+    </div>
+    <div class="field">
+      <label>نام همراه شما</label>
+      <input type="text" id="inCompanionName" placeholder="مثلاً علی" maxlength="16" autocomplete="off">
+    </div>
+    <button class="btn-main" onclick="startGame()">شروع ماجرا</button>
+    <button class="btn-secondary" id="loadBtn" onclick="loadGame()" style="display:none">📜 بارگذاری بازی ذخیره شده</button>
+  </div>
 </div>
 
-<div id="game">
-  <div id="hud">
-    <div id="chapter"></div>
-    <div class="names" id="names"></div>
-    <div class="stats"><span>شجاعت: <b id="cour">0</b></span><span>خرد: <b id="wis">0</b></span></div>
+<!-- ===== صفحه بازی ===== -->
+<div id="gameScreen">
+  <div class="scene-bg" id="sceneBg"></div>
+  <div class="cinebar top"></div>
+  <div class="cinebar bottom"></div>
+  <div class="hud-top">
+    <div class="names-plate">
+      <div class="name-tag"><span class="ico">⚔</span><span id="hudPlayer">—</span></div>
+      <div class="name-tag"><span class="ico">🛡</span><span id="hudCompanion">—</span></div>
+    </div>
+    <div class="chapter-label">
+      <span id="hudChapter">آغاز</span>
+      <span class="small" id="hudSceneNum">صحنه ۱</span>
+    </div>
   </div>
-  <div id="tools">
-    <button class="btn" id="muteBtn" onclick="toggleMute()">🔊</button>
-    <button class="btn" onclick="saveGame()">ذخیره</button>
+  <div class="stats">
+    <div class="stat"><span class="icon">⚔</span>شجاعت<span class="val" id="hudCourage">0</span></div>
+    <div class="stat"><span class="icon">📖</span>خرد<span class="val" id="hudWisdom">0</span></div>
   </div>
-  <div id="panel"><div id="text"></div><div id="choices"></div></div>
+  <div class="story-panel">
+    <div class="dialogue">
+      <div class="dialogue-text" id="dialogueText"></div>
+    </div>
+    <div class="choices" id="choicesContainer"></div>
+  </div>
+  <div class="corner-controls">
+    <button class="ctrl-btn" id="muteBtn" onclick="toggleMute()" title="صدا">🔊</button>
+    <button class="ctrl-btn" id="saveBtn" onclick="saveGame()" title="ذخیره">💾</button>
+    <button class="ctrl-btn" id="replayNarrBtn" onclick="replayNarration()" title="پخش دوباره">🔁</button>
+  </div>
+</div>
+
+<!-- ===== صفحه پایان ===== -->
+<div id="endingScreen">
+  <div class="ending-title" id="endingTitle"></div>
+  <div class="ending-text" id="endingText"></div>
+  <div class="ending-stats" id="endingStats"></div>
+  <button class="btn-main" onclick="restartGame()">🔄 بازی از اول</button>
 </div>
 
 <script>
-const CH={a:"فصل ۱ · آغاز",d:"فصل ۲ · کشف",k:"فصل ۳ · خطر",m:"فصل ۴ · انتخاب",b:"فصل ۵ · نبرد",e:"فصل ۶ · پایان"};
-const BG={
-a:["radial-gradient(ellipse at 50% 100%,#2b3a4a,#0b1118 70%)","radial-gradient(ellipse at 30% 90%,#1e2c3a,#05080c 75%)","linear-gradient(180deg,#0a0f16,#27323f 90%)"],
-d:["radial-gradient(ellipse at 50% 20%,#5a1212 0,#140a0c 60%)","radial-gradient(ellipse at 70% 80%,#3a2a12,#0c0806 70%)","linear-gradient(160deg,#1c1410,#3b2a14)","radial-gradient(circle at 50% 50%,#7a1010,#0a0405 65%)","radial-gradient(circle at 50% 60%,#9b1c1c,#0a0304 60%)"],
-k:["linear-gradient(180deg,#1a0808,#4a1010)","radial-gradient(circle at 50% 100%,#6a1a0a,#0a0505 70%)","linear-gradient(200deg,#0c0f14,#1c1f28)","radial-gradient(circle at 20% 80%,#8a2a0a,#080404 65%)","radial-gradient(ellipse at 50% 100%,#7a2200,#0b0504 70%)","linear-gradient(180deg,#0e0d12,#2a2230)"],
-m:["radial-gradient(circle at 50% 50%,#2a2438,#07060a 70%)","radial-gradient(circle at 50% 50%,#5a1818,#0a0506 70%)","radial-gradient(circle at 50% 50%,#1a3248,#05080c 70%)","radial-gradient(circle at 50% 50%,#3a3012,#0a0805 70%)"],
-b:["radial-gradient(ellipse at 50% 0,#7a1111,#0a0405 65%)","linear-gradient(180deg,#1a0505,#600e0e)","linear-gradient(180deg,#0a0a18,#2a1a4a)","radial-gradient(circle at 50% 70%,#9a2a0a,#0a0303 60%)","radial-gradient(circle at 50% 50%,#c9a227 0,#4a0e0e 35%,#050202 75%)","linear-gradient(180deg,#14100c,#3a2a1a)"],
-e:["radial-gradient(circle at 50% 40%,#5a0e0e,#030202 70%)","radial-gradient(circle at 50% 90%,#c9a227,#2a1a08 45%,#050403 85%)","radial-gradient(circle at 50% 50%,#2a4a6a,#050810 75%)","radial-gradient(circle at 50% 100%,#2a2a2a,#050505 70%)"]};
-
-const gameData={scenes:{}};
-function s(id,text,ch){gameData.scenes[id]={id,background:BG[id[0]][(parseInt(id.slice(1))-1)%BG[id[0]].length],text,
- choices:ch.map(c=>({text:c[0],nextScene:c[1],courage:c[2]||0,wisdom:c[3]||0,flag:c[4]}))};}
-
-// آغاز
-s("a1","[PLAYER] و [COMPANION] پا بر ساحل خاکستری قاره‌ی تاریک گذاشتند. مه غلیظ بود و از دوردست زوزه‌ای می‌آمد.",[["مشعل روشن کنیم","a2",0,1],["بی‌صدا در سایه‌ها برویم","a3",1,0]]);
-s("a2","نور مشعل جنگلی از درختان سوخته را نشان داد. [COMPANION] زمزمه کرد: «این‌جا کسی پیش‌تر آمده است.»",[["رد پاها را دنبال کنیم","d1",1,0],["مسیر دیگری برگزینیم","a3",0,1]]);
-s("a3","مه کنار رفت و در برابرشان دره‌ای عمیق پدیدار شد؛ در انتهایش ستون‌های شکسته‌ی شهری باستانی می‌درخشید.",[["به سوی ویرانه‌ها برویم","d1",1,0],["ابتدا دره را بررسی کنیم","d1",0,1]]);
-// کشف
-s("d1","ویرانه‌ها زیر ماه سرخ خاموش بودند. دروازه‌ای نیمه‌باز، [PLAYER] را به درون فرا می‌خواند.",[["وارد تالار شویم","d2",1,0],["اطراف را بگردیم","d3",0,1]]);
-s("d2","در تالار، مجسمه‌ی جنگجویی بی‌سر ایستاده بود. [COMPANION] دست [PLAYER] را گرفت: «چیزی ما را می‌پاید.»",[["جلوتر برویم","d4",1,0],["مجسمه را بررسی کنیم","d4",0,1]]);
-s("d3","بر دیوار بیرونی کتیبه‌ای کهن بود: «آن‌که تعویذ را بردارد، سایه‌ها را بیدار می‌کند.»",[["کتیبه را به خاطر بسپاریم","d4",0,1],["نادیده‌اش بگیریم","d4",1,0]]);
-s("d4","در عمق ویرانه، تعویذی سرخ بر محرابی سنگی می‌تپید، گویی قلبی زنده بود.",[["تعویذ را برداریم","d5",1,0],["پیش از لمس، نمادها را بخوانیم","d5",0,1]]);
-s("d5","زمین لرزید و چشمان تاریکی در همه‌جا گشوده شد. مرده‌ها از خاک برخاستند.",[["آماده‌ی نبرد شویم","k1",1,0],["راه فرار بجوییم","k3",0,1]]);
-// خطر
-s("k1","اسکلت‌های زره‌پوش حلقه زدند. [PLAYER] شمشیر کشید و [COMPANION] ورد سپر خواند.",[["حمله کنیم","k2",1,0],["سپر را نگه داریم","k2",0,1]]);
-s("k2","نبرد سخت بود؛ تیغی بر بازوی [PLAYER] نشست، اما صف دشمن شکست.",[["پیش برویم","k4",1,0],["زخم را ببندیم","k4",0,1]]);
-s("k3","آن‌ها به سردابی تنگ خزیدند. نفس‌ها حبس بود و بالای سرشان پنجه‌ها خاک را می‌کندند.",[["منتظر بمانیم","k4",0,1],["راه پنهانی را بکاویم","k4",1,0]]);
-s("k4","سگ‌های آتشین از دل مه بیرون آمدند و [COMPANION] بر لبه‌ی پرتگاه لغزید.",[["[COMPANION] را نجات دهیم","k5",2,0,"saved"],["از مسیر بالا بگذریم","k6",0,1]]);
-s("k5","[PLAYER] دست [COMPANION] را گرفت و کشید. هر دو نفس‌زنان بر سنگ افتادند؛ پیوندشان محکم‌تر شد.",[["ادامه دهیم","m1",0,1]]);
-s("k6","[PLAYER] تنها از تخته‌سنگ‌ها گذشت. [COMPANION] با زحمت خود را رساند، اما نگاهش سرد بود.",[["ادامه دهیم","m1",0,1]]);
-// انتخاب
-s("m1","در غاری، پیرمردی با چشمان خاکستری گفت: «تعویذ سه راه دارد: قدرت، دانایی یا وفا. کدام را می‌خواهی؟»",[["قدرت","m2",1,0],["دانایی","m3",0,1],["وفا","m4",1,1]]);
-s("m2","تعویذ در دست [PLAYER] گرم شد و نجوا کرد: «تاج جهان از آن توست.»",[["نجوا را بپذیریم","m5",2,0,"dark"],["نجوا را پس بزنیم","m5",0,1]]);
-s("m3","پیرمرد کتابی کهن گشود: ملکه‌ی خاکستر با قلب تعویذ زنده است.",[["رمز نابودی را بیاموزیم","m6",0,2],["کتاب را رها کنیم","m6",1,0]]);
-s("m4","[COMPANION] گفت: «هرچه شود، تنها نمی‌روی.» پیرمرد لبخند زد.",[["سوگند همراهی بخوریم","m7",1,1],["بر او تکیه کنیم","m7",0,1]]);
-s("m5","دره‌ای پر از اسیر پیش رویشان بود؛ زنجیرها با بهای تعویذ می‌شکست.",[["آزادشان کنیم","m8",2,0],["بگذریم","m8",0,0,"dark"]]);
-s("m6","بر پلی باریک نگهبانی معما پرسید: «چه چیز با بخشیدن بیشتر می‌شود؟»",[["پاسخ دهیم: دانایی","m8",0,2],["با شمشیر گذر کنیم","m8",2,0]]);
-s("m7","[COMPANION] زخمی شد و باید میان درمان او و شتاب در راه تصمیم می‌گرفتند.",[["او را درمان کنیم","m8",0,2],["با هم پیش برویم","m8",2,0]]);
-s("m8","برج خاکستر پیدا شد. تعویذ می‌لرزید؛ نگه داشتنش قدرت می‌داد و نابودی‌اش خطر.",[["تعویذ را نگه داریم","b1",1,0,"amulet"],["برای نابودی‌اش آماده شویم","b1",0,1]]);
-// نبرد
-s("b1","در تالار تخت، ملکه‌ی خاکستر با تاجی از دود نشسته بود و خندید: «آمده‌اید که بمیرید؟»",[["حمله کنیم","b2",2,0],["رمز کتیبه را بخوانیم","b3",0,2]]);
-s("b2","شمشیر [PLAYER] جرقه زد و ملکه عقب نشست؛ اما سایه‌ها چون مار بر پاهایشان پیچیدند.",[["سایه‌ها را ببریم","b4",1,0],["عقب بکشیم","b4",0,1]]);
-s("b3","کلمات باستانی تالار را لرزاند و ملکه فریاد کشید؛ نور سرخ تعویذ لرزید.",[["ورد را کامل کنیم","b4",0,2],["ورد را رها و حمله کنیم","b4",1,0]]);
-s("b4","ملکه با پنجه‌ای [COMPANION] را بر زمین کوبید. [PLAYER] فقط یک لحظه فرصت داشت.",[["به [COMPANION] برسیم","b5",2,0],["ضربه‌ی نهایی را بزنیم","b5",0,1,"cold"]]);
-s("b5","تعویذ سرخ درخشید و ملکه به سوی آن دست دراز کرد؛ همه‌چیز به یک لحظه رسیده بود.",[["تعویذ را بر ملکه بکوبیم","b6",1,1],["تعویذ را در شعله بیندازیم","b6",0,2]]);
-s("b6","تالار فرو ریخت. گرد و غبار که نشست، سکوتی سنگین ماند.",[["بیرون برویم","?",0,0]]);
-// پایان
-s("e1","[PLAYER] تاج خاکستر را بر سر نهاد. جهان زانو زد، اما [COMPANION] با اندوه از او دور شد.\n\nپایان: تاجدار تنها",[]);
-s("e2","[PLAYER] شمشیر برافراشته از ویرانه بیرون آمد، [COMPANION] در کنارش. قاره‌ی تاریک نامی تازه یافت.\n\nپایان: قهرمان سپیده",[]);
-s("e3","[PLAYER] با دانایی تعویذ را خاموش کرد و [COMPANION] داستانشان را نوشت.\n\nپایان: فرزانه‌ی خاموش",[]);
-s("e4","ضربه فرود آمد و ملکه افتاد، اما [COMPANION] دیگر برنخاست. [PLAYER] تنها از ویرانه بازگشت.\n\nپایان: بهای پیروزی",[]);
-
-const gameState={playerName:"",companionName:"",currentScene:"",choices:[],courage:0,wisdom:0,flags:{}};
-let muted=false,timer=null,typing=false,fullText="";
-const $=id=>document.getElementById(id);
-const fmt=t=>t.replace(/\[PLAYER\]/g,gameState.playerName).replace(/\[COMPANION\]/g,gameState.companionName);
-
-// ذرات
-for(let i=0;i<28;i++){const e=document.createElement("span");e.className="ember";e.style.left=Math.random()*100+"%";e.style.animationDuration=(6+Math.random()*9)+"s";e.style.animationDelay=(Math.random()*8)+"s";document.body.appendChild(e);}
-try{if(localStorage.getItem("dc_save"))$("contBtn").style.display="";}catch(e){}
-
-function startGame(){
-  gameState.playerName=$("pn").value.trim()||"قهرمان";
-  gameState.companionName=$("cn").value.trim()||"همراه";
-  Object.assign(gameState,{choices:[],courage:0,wisdom:0,flags:{}});
-  $("intro").style.display="none";$("game").style.display="block";
-  loadScene("a1");
-}
-function updateHud(){
-  $("cour").textContent=gameState.courage;$("wis").textContent=gameState.wisdom;
-  $("names").textContent="⚔ "+gameState.playerName+"  ·  ✦ "+gameState.companionName;
-}
-function loadScene(id){
-  const sc=gameData.scenes[id];gameState.currentScene=id;
-  $("stage").style.opacity=0;
-  setTimeout(()=>{$("stage").style.background=sc.background;$("stage").style.opacity=1;},350);
-  $("chapter").textContent=CH[id[0]];updateHud();
-  $("choices").innerHTML="";
-  const txt=fmt(sc.text);fullText=txt;
-  narrateText(txt);
-  typewriterEffect(txt,$("text"),()=>showChoices(sc));
-}
-function typewriterEffect(text,el,cb){
-  clearInterval(timer);el.textContent="";let i=0;typing=true;
-  const done=()=>{clearInterval(timer);el.textContent=text;typing=false;cb&&cb();};
-  el.onclick=()=>{if(typing)done();};
-  timer=setInterval(()=>{el.textContent=text.slice(0,++i);if(i>=text.length)done();},32);
-}
-function showChoices(sc){
-  const box=$("choices");box.innerHTML="";
-  if(sc.id[0]==="e"){
-    const st=document.createElement("div");st.className="end";st.style.width="100%";
-    st.textContent="شجاعت: "+gameState.courage+"  |  خرد: "+gameState.wisdom;box.appendChild(st);
-    const b=document.createElement("button");b.className="btn big";b.textContent="شروع دوباره با نام‌های تازه";
-    b.onclick=()=>{stopSpeech();$("game").style.display="none";$("intro").style.display="flex";$("pn").value="";$("cn").value="";};
-    box.appendChild(b);return;
+/* ============================================================
+   داده‌های داستان — بیش از ۳۵ صحنه
+   ============================================================ */
+const gameData = {
+  scenes: {
+    "start": {
+      chapter: "فصل یکم: آغاز",
+      bg: "radial-gradient(ellipse at 30% 40%, #2a0a0a 0%, #050507 70%), url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600') center/cover",
+      text: "شب بی‌پایان بر سرزمین مردگان سایه افکنده بود. [PLAYER] و [COMPANION] پس از سفری طولانی، سرانجام به سواحل قاره‌ی تاریک رسیدند. باد سردی از میان صخره‌های سیاه می‌وزید و بوی خون و خاکستر در هوا بود.",
+      choices: [
+        { text: "🏕️ «بیا اول اردوگاه بسازیم، [COMPANION]»", next: "camp", courage: 0, wisdom: 2 },
+        { text: "🗡️ «وقت تلف نکنیم، باید جلوتر برویم»", next: "forward", courage: 2, wisdom: 0 }
+      ]
+    },
+    "camp": {
+      chapter: "فصل یکم: آغاز",
+      bg: "radial-gradient(ellipse at 50% 60%, #1a1008 0%, #050507 80%), url('https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1600') center/cover",
+      text: "آتشی کوچک در دل تاریکی روشن شد. [COMPANION] با دقت اطراف را می‌پایید. «[PLAYER]، اینجا چیزی درست نیست. سکوت این سرزمین طبیعی نیست.» ناگهان صدایی از میان صخره‌ها شنیده شد.",
+      choices: [
+        { text: "🔦 با مشعل به سمت صدا برویم", next: "ruins_find", courage: 2, wisdom: 1 },
+        { text: "🤫 در سکوت منتظر بمانیم", next: "wait", courage: -1, wisdom: 2 }
+      ]
+    },
+    "forward": {
+      chapter: "فصل یکم: آغاز",
+      bg: "radial-gradient(ellipse at 50% 30%, #150a05 0%, #050507 80%), url('https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=1600') center/cover",
+      text: "قدم‌هایشان بر سنگفرش‌های ترک‌خورده اکو می‌شد. [PLAYER] جلوتر از [COMPANION] حرکت می‌کرد. ناگهان صدای زنگ فلزی از زیر خاک شنیده شد. چیزی دفن شده بود.",
+      choices: [
+        { text: "⛏️ چیزی زیر خاک است، بکنیم", next: "ruins_find", courage: 2, wisdom: 1 },
+        { text: "🚶 بی‌توجه رد شویم", next: "wait", courage: 0, wisdom: 1 }
+      ]
+    },
+    "wait": {
+      chapter: "فصل یکم: آغاز",
+      bg: "radial-gradient(ellipse at 50% 50%, #0a0a1a 0%, #050507 80%), url('https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?w=1600') center/cover",
+      text: "ساعت‌ها گذشت. سکوت همه‌جا را فرا گرفت. اما [COMPANION] می‌دانست در سکوت همیشه چیزی پنهان است. نیمه‌شب، نور سبزی از دور نمایان شد که به آرامی به سمتشان حرکت می‌کرد.",
+      choices: [
+        { text: "🗡️ سلاح بکشیم و آماده باشیم", next: "ruins_find", courage: 2, wisdom: 1 },
+        { text: "👁️ بدون حرکت تماشا کنیم", next: "ruins_find", courage: 0, wisdom: 2 }
+      ]
+    },
+    "ruins_find": {
+      chapter: "فصل دوم: کشف",
+      bg: "radial-gradient(ellipse at 50% 40%, #1a0a05 0%, #050507 75%), url('https://images.unsplash.com/photo-1519074002996-a69e7ac46a42?w=1600') center/cover",
+      text: "در دل تاریکی، ویرانه‌های عظیمی خودنمایی می‌کردند. ستون‌های شکسته و کتیبه‌هایی با خطوط ناشناخته. [PLAYER] زمزمه کرد: «این‌جا آرامگاه یک پادشاه باستانی است.» [COMPANION] با احتیاط وارد شد.",
+      choices: [
+        { text: "📜 کتیبه‌ها را بخوانیم", next: "read_inscriptions", courage: 0, wisdom: 3 },
+        { text: "⚱️ تالار اصلی را کاوش کنیم", next: "main_hall", courage: 2, wisdom: 1 }
+      ]
+    },
+    "read_inscriptions": {
+      chapter: "فصل دوم: کشف",
+      bg: "radial-gradient(ellipse at 50% 40%, #150a10 0%, #050507 75%), url('https://images.unsplash.com/photo-1533158307587-828f0a76ef46?w=1600') center/cover",
+      text: "حروف باستانی زیر انگشتان [PLAYER] جان گرفتند. ترجمه‌ای ناقص اما هشداردهنده: «آن‌که سنگ قلب را بیدار کند، نفرین ابدی را برمی‌انگیزد...» [COMPANION] لرزید: «[PLAYER]، شاید باید برگردیم.»",
+      choices: [
+        { text: "📖 ادامه بدهیم تا راز کامل را بیابیم", next: "main_hall", courage: 1, wisdom: 3 },
+        { text: "🚪 این خطر بیش از حد است، بازگردیم", next: "retreat", courage: -2, wisdom: 2 }
+      ]
+    },
+    "main_hall": {
+      chapter: "فصل دوم: کشف",
+      bg: "radial-gradient(ellipse at 50% 50%, #0a0510 0%, #050507 75%), url('https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=1600') center/cover",
+      text: "تالار اصلی با شکوهی هولناک گسترده بود. در مرکز، سکویی سنگی و بر آن یک جواهر درخشان با نور قرمز خونین. [COMPANION] نفس‌نفس‌زنان گفت: «[PLAYER]... این همان چیزی است که در افسانه‌ها گفته‌اند. قلب تاریکی.»",
+      choices: [
+        { text: "💎 جواهر را برداریم", next: "take_gem", courage: 3, wisdom: -1 },
+        { text: "🔍 اول بررسی‌اش کنیم", next: "examine_gem", courage: 0, wisdom: 3 },
+        { text: "🚶 دست نزنیم و برویم", next: "retreat", courage: -1, wisdom: 2 }
+      ]
+    },
+    "examine_gem": {
+      chapter: "فصل دوم: کشف",
+      bg: "radial-gradient(ellipse at 50% 50%, #200a10 0%, #050507 75%), url('https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=1600') center/cover",
+      text: "[PLAYER] با دقت به جواهر نزدیک شد. روی سطح آن نمادهای عجیبی حک شده بود، نمادهایی که در خواب هم دیده بود. ناگهان جواهر شروع به تپیدن کرد، مثل یک قلب زنده. [COMPANION] فریاد زد: «برگرد!»",
+      choices: [
+        { text: "💥 عقب بپریم!", next: "gem_awakens", courage: 1, wisdom: 2 },
+        { text: "✋ دستمان را روی جواهر بگذاریم", next: "take_gem", courage: 3, wisdom: 0 }
+      ]
+    },
+    "take_gem": {
+      chapter: "فصل دوم: کشف",
+      bg: "radial-gradient(ellipse at 50% 50%, #3a0a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=1600') center/cover",
+      text: "به محض لمس جواهر، نوری کورکننده همه‌جا را فرا گرفت. [PLAYER] احساس کرد چیزی درونش بیدار می‌شود، قدرتی تاریک و وسوسه‌انگیز. [COMPANION] با ترس عقب کشید: «چه... چه کار کردی؟»",
+      choices: [
+        { text: "⚡ قدرت را بپذیریم", next: "gem_awakens", courage: 3, wisdom: -2 },
+        { text: "🛡️ مقاومت کنیم و جواهر را بیندازیم", next: "resist_gem", courage: 2, wisdom: 1 }
+      ]
+    },
+    "resist_gem": {
+      chapter: "فصل دوم: کشف",
+      bg: "radial-gradient(ellipse at 50% 50%, #0a1a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600') center/cover",
+      text: "[PLAYER] با تمام قدرت جواهر را دور انداخت. نفس‌نفس‌زنان روی زمین افتاد. [COMPANION] کنارش زانو زد: «زنده‌ای؟» [PLAYER] لبخند تلخی زد: «فکر کنم هنوز خودم هستم.» اما صدای غرش از عمق زمین شنیده شد.",
+      choices: [
+        { text: "🏃 از ویرانه فرار کنیم", next: "flight", courage: -1, wisdom: 2 },
+        { text: "⚔️ برای نبرد آماده شویم", next: "first_battle", courage: 3, wisdom: 1 }
+      ]
+    },
+    "gem_awakens": {
+      chapter: "فصل سوم: خطر",
+      bg: "radial-gradient(ellipse at 50% 50%, #4a0a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=1600') center/cover",
+      text: "زمین لرزید. از دیوارهای سنگی، سایه‌هایی بیرون آمدند، نه انسان، نه حیوان. موجوداتی از جنس تاریکی. [COMPANION] شمشیرش را کشید: «[PLAYER]! پشت من بمان!»",
+      choices: [
+        { text: "⚔️ با هم بجنگیم", next: "first_battle", courage: 3, wisdom: 1 },
+        { text: "🧙 از قدرت جواهر استفاده کنیم", next: "use_power", courage: 2, wisdom: -1 },
+        { text: "🏃 به سمت خروج فرار کنیم", next: "flight", courage: -2, wisdom: 2 }
+      ]
+    },
+    "first_battle": {
+      chapter: "فصل سوم: خطر",
+      bg: "radial-gradient(ellipse at 50% 50%, #3a0505 0%, #050507 75%), url('https://images.unsplash.com/photo-1547489432-cf93fa6c71ee?w=1600') center/cover",
+      text: "نبرد آغاز شد. شمشیرها بر تاریکی فرود می‌آمدند. [PLAYER] و [COMPANION] پشت به پشت می‌جنگیدند. ناگهان سایه‌ها عقب کشیدند و موجودی بزرگ‌تر، سرداری از تاریکی، از میانشان بیرون آمد.",
+      choices: [
+        { text: "🎯 ضربه‌ی نهایی را بزنیم", next: "commander_fight", courage: 3, wisdom: 0 },
+        { text: "🛡️ دفاع کنیم و ضعفش را بیابیم", next: "find_weakness", courage: 1, wisdom: 3 }
+      ]
+    },
+    "use_power": {
+      chapter: "فصل سوم: خطر",
+      bg: "radial-gradient(ellipse at 50% 50%, #4a0a3a 0%, #050507 75%), url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1600') center/cover",
+      text: "نوری از دستان [PLAYER] بیرون زد و سایه‌ها را خاکستر کرد. اما خنده‌ی سردی از درون [PLAYER] شنیده شد، صدایی که خودش نبود. [COMPANION] با وحشت گفت: «[PLAYER]... چشمانت...»",
+      choices: [
+        { text: "😨 از [COMPANION] کمک بخواهیم", next: "help_from_friend", courage: 1, wisdom: 2 },
+        { text: "😈 قدرت را رها کنیم", next: "fight_corruption", courage: 3, wisdom: 0 }
+      ]
+    },
+    "flight": {
+      chapter: "فصل سوم: خطر",
+      bg: "radial-gradient(ellipse at 50% 50%, #0a0a20 0%, #050507 75%), url('https://images.unsplash.com/photo-1502790671504-542ad42d5189?w=1600') center/cover",
+      text: "آن‌ها دویدند. سنگ‌ها از سقف فرو می‌ریختند. [PLAYER] زمین خورد. [COMPANION] دستش را گرفت و کشید: «بلند شو! نمی‌ذارم بمیری!» سرانجام به بیرون رسیدند، اما چیزی تعقیبشان می‌کرد.",
+      choices: [
+        { text: "🌉 به سمت پل قدیمی بدویم", next: "bridge_crossing", courage: 1, wisdom: 2 },
+        { text: "🌲 وارد جنگل تاریک شویم", next: "dark_forest", courage: 2, wisdom: 1 }
+      ]
+    },
+    "help_from_friend": {
+      chapter: "فصل سوم: خطر",
+      bg: "radial-gradient(ellipse at 50% 50%, #1a0a20 0%, #050507 75%), url('https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1600') center/cover",
+      text: "[COMPANION] دست [PLAYER] را گرفت و فریاد زد: «به من نگاه کن! تو [PLAYER] هستی! این قدرت مال تو نیست!» نور خاموش شد. [PLAYER] به زانو افتاد، آزاد اما ضعیف.",
+      choices: [
+        { text: "💪 بلند شویم و ادامه دهیم", next: "dark_forest", courage: 2, wisdom: 1 },
+        { text: "🛌 استراحت کنیم تا قوا بازگردد", next: "rest_scene", courage: -1, wisdom: 2 }
+      ]
+    },
+    "fight_corruption": {
+      chapter: "فصل سوم: خطر",
+      bg: "radial-gradient(ellipse at 50% 50%, #3a0a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=1600') center/cover",
+      text: "[PLAYER] درون خود با تاریکی جنگید. عرق سرد بر پیشانی‌اش نشست. [COMPANION] کنارش زانو زد و چیزی زمزمه کرد، نامی که فقط آن دو می‌دانستند. تاریکی عقب کشید. [PLAYER] نفس عمیقی کشید: «ممنونم رفیق.»",
+      choices: [
+        { text: "🔍 بفهمیم این قدرت از کجا آمده", next: "dark_forest", courage: 1, wisdom: 3 },
+        { text: "⚔️ انتقام بگیریم از آن که این نفرین را ساخت", next: "dark_forest", courage: 3, wisdom: 0 }
+      ]
+    },
+    "bridge_crossing": {
+      chapter: "فصل سوم: خطر",
+      bg: "radial-gradient(ellipse at 50% 50%, #0a0a1a 0%, #050507 75%), url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600') center/cover",
+      text: "پل بر فراز دره‌ای بی‌پایان امتداد داشت. طناب‌هایش پوسیده بودند. نیمه‌های راه، پل تکان خورد. [COMPANION] فریاد زد: «[PLAYER]! نگاه نکن پایین!»",
+      choices: [
+        { text: "🏃 بدو تا آن طرف", next: "dark_forest", courage: 3, wisdom: 0 },
+        { text: "🐢 آهسته و با احتیاط برو", next: "dark_forest", courage: 0, wisdom: 2 }
+      ]
+    },
+    "rest_scene": {
+      chapter: "فصل سوم: خطر",
+      bg: "radial-gradient(ellipse at 50% 50%, #1a1008 0%, #050507 75%), url('https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?w=1600') center/cover",
+      text: "در غاری پناه گرفتند. [COMPANION] آتش روشن کرد و به [PLAYER] نگاه کرد: «از وقتی وارد این سرزمین شدیم، هر قدمی که برمی‌داریم، سنگین‌تر می‌شود. اما من به تو ایمان دارم.»",
+      choices: [
+        { text: "🤝 «من هم به تو ایمان دارم»", next: "dark_forest", courage: 1, wisdom: 3 },
+        { text: "🌙 «بخواب، من نگهبانی می‌دهم»", next: "dark_forest", courage: 2, wisdom: 1 }
+      ]
+    },
+    "dark_forest": {
+      chapter: "فصل چهارم: انتخاب",
+      bg: "radial-gradient(ellipse at 50% 50%, #050a10 0%, #050507 75%), url('https://images.unsplash.com/photo-1511497584788-876760111969?w=1600') center/cover",
+      text: "جنگل تاریک همه‌جا را فرا گرفته بود. درختانی که مثل استخوان‌های غول‌ها به آسمان می‌رسیدند. در میان درختان، پیرزنی خمیده با چشمانی سفید ایستاده بود. «مسافران... به دنبال حقیقت هستید؟»",
+      choices: [
+        { text: "🗣️ با پیرزن صحبت کنیم", next: "witch_talk", courage: 0, wisdom: 3 },
+        { text: "🚶 بی‌توجه رد شویم", next: "forest_path", courage: 1, wisdom: 0 },
+        { text: "⚔️ به او حمله کنیم", next: "attack_witch", courage: 3, wisdom: -2 }
+      ]
+    },
+    "witch_talk": {
+      chapter: "فصل چهارم: انتخاب",
+      bg: "radial-gradient(ellipse at 50% 50%, #0a1a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600') center/cover",
+      text: "پیرزن لبخند زد: «من نگهبان این جنگلم. قلب تاریکی شما را انتخاب کرده. اما می‌توانید مسیرتان را عوض کنید.» [COMPANION] زمزمه کرد: «[PLAYER]، به او اعتماد نکن.»",
+      choices: [
+        { text: "🙏 کمکش را بپذیریم", next: "witch_help", courage: 0, wisdom: 3 },
+        { text: "🤨 سوال بپرسیم", next: "witch_questions", courage: 1, wisdom: 2 },
+        { text: "🚫 ردش کنیم", next: "forest_path", courage: 1, wisdom: 0 }
+      ]
+    },
+    "witch_help": {
+      chapter: "فصل چهارم: انتخاب",
+      bg: "radial-gradient(ellipse at 50% 50%, #1a0a1a 0%, #050507 75%), url('https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=1600') center/cover",
+      text: "پیرزن عصایش را بلند کرد و نوری سبز از آن بیرون زد. «سه راه پیش روی شماست: راه شمشیر، راه خرد، و راه سایه. هر کدام بهایی دارد...» [PLAYER] به [COMPANION] نگاه کرد.",
+      choices: [
+        { text: "⚔️ راه شمشیر را انتخاب می‌کنیم", next: "path_sword", courage: 3, wisdom: 0 },
+        { text: "📖 راه خرد را انتخاب می‌کنیم", next: "path_wisdom", courage: 0, wisdom: 3 },
+        { text: "🌑 راه سایه را انتخاب می‌کنیم", next: "path_shadow", courage: 2, wisdom: -1 }
+      ]
+    },
+    "witch_questions": {
+      chapter: "فصل چهارم: انتخاب",
+      bg: "radial-gradient(ellipse at 50% 50%, #0a0a1a 0%, #050507 75%), url('https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?w=1600') center/cover",
+      text: "[PLAYER] پرسید: «چرا به ما کمک می‌کنی؟» پیرزن خندید: «چون سال‌ها پیش من هم مثل شما بودم. عاشق، جسور، و احمق. حالا فقط تماشاگرم.» چشمانش برقی زد: «انتخاب کنید. زمان کم است.»",
+      choices: [
+        { text: "⚔️ راه شمشیر", next: "path_sword", courage: 3, wisdom: 0 },
+        { text: "📖 راه خرد", next: "path_wisdom", courage: 0, wisdom: 3 },
+        { text: "🌑 راه سایه", next: "path_shadow", courage: 2, wisdom: -1 }
+      ]
+    },
+    "attack_witch": {
+      chapter: "فصل چهارم: انتخاب",
+      bg: "radial-gradient(ellipse at 50% 50%, #3a0a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=1600') center/cover",
+      text: "شمشیر [PLAYER] هوا را شکافت... اما پیرزن ناپدید شد و صدایش از همه‌جا شنیده شد: «احمق! خون بر خون می‌افزایی!» جنگل به لرزه افتاد. [COMPANION] فریاد زد: «[PLAYER]! چه کردی؟!»",
+      choices: [
+        { text: "😰 پشیمان شویم و عذرخواهی کنیم", next: "path_wisdom", courage: -2, wisdom: 2 },
+        { text: "😤 ادامه دهیم و مقابله کنیم", next: "path_shadow", courage: 3, wisdom: -2 }
+      ]
+    },
+    "forest_path": {
+      chapter: "فصل چهارم: انتخاب",
+      bg: "radial-gradient(ellipse at 50% 50%, #0a0a10 0%, #050507 75%), url('https://images.unsplash.com/photo-1511497584788-876760111969?w=1600') center/cover",
+      text: "مسیر باریکی در دل جنگل پیش رفت. [PLAYER] و [COMPANION] سکوت کردند. ناگهان به سه‌راهی رسیدند، یکی به سمت کوهستان آتشین، یکی به سمت معبد باستانی، و یکی به سمت باتلاق‌های سایه.",
+      choices: [
+        { text: "🔥 کوهستان آتشین", next: "path_sword", courage: 3, wisdom: 0 },
+        { text: "🏛️ معبد باستانی", next: "path_wisdom", courage: 0, wisdom: 3 },
+        { text: "🌫️ باتلاق سایه", next: "path_shadow", courage: 2, wisdom: -1 }
+      ]
+    },
+    "path_sword": {
+      chapter: "فصل چهارم: انتخاب",
+      bg: "radial-gradient(ellipse at 50% 50%, #5a0a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=1600') center/cover",
+      text: "کوه آتشین در برابرشان قد کشید. رودی از گدازه در دامنه جاری بود. [COMPANION] گفت: «این راه فقط برای جنگجویان است. مطمئنی؟» [PLAYER] با قاطعیت سر تکان داد.",
+      choices: [
+        { text: "🔥 از میان گدازه بگذریم", next: "lava_pass", courage: 3, wisdom: 0 },
+        { text: "⛰️ از قله صعود کنیم", next: "mountain_climb", courage: 2, wisdom: 1 }
+      ]
+    },
+    "lava_pass": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #6a0a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=1600') center/cover",
+      text: "گرما پوستشان را می‌سوزاند. ناگهان از دل گدازه، موجودی آتشین بیرون آمد، نگهبان کوه. [PLAYER] شمشیرش را بلند کرد. نبرد مرگ و زندگی آغاز شد.",
+      choices: [
+        { text: "⚔️ حمله‌ی مستقیم", next: "fire_battle", courage: 3, wisdom: 0 },
+        { text: "🎯 به نقطه ضعفش حمله کن", next: "fire_battle_smart", courage: 1, wisdom: 3 }
+      ]
+    },
+    "mountain_climb": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #3a1a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1600') center/cover",
+      text: "صعود سخت بود. باد یخ‌زده و صخره‌های لغزنده. در قله، محرابی سنگی با شمشیری درخشان در آن فرو رفته بود. [COMPANION] گفت: «افسانه‌ی شمشیر آتش حقیقت داشت.»",
+      choices: [
+        { text: "🗡️ شمشیر را بکشیم", next: "sword_of_fire", courage: 3, wisdom: 1 },
+        { text: "🙏 دعا کنیم و سپس اقدام", next: "sword_of_fire", courage: 1, wisdom: 3 }
+      ]
+    },
+    "sword_of_fire": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #5a2a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1547489432-cf93fa6c71ee?w=1600') center/cover",
+      text: "شمشیر از سنگ بیرون آمد و نوری سرخ همه‌جا را فرا گرفت. [PLAYER] حس کرد قدرتی باستانی درونش جاری شد. اما ناگهان زمین لرزید، اژدهایی از دل کوه بیدار شده بود.",
+      choices: [
+        { text: "🐉 با اژدها بجنگیم", next: "dragon_fight", courage: 3, wisdom: 0 },
+        { text: "🤝 با اژدها مذاکره کنیم", next: "dragon_talk", courage: 0, wisdom: 3 }
+      ]
+    },
+    "fire_battle": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #7a0a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=1600') center/cover",
+      text: "[PLAYER] با تمام قدرت ضربه زد. آتش به اطراف پاشید. اما موجود قوی‌تر از آن بود که فکرش را می‌کردند. [COMPANION] فریاد زد: «[PLAYER]! عقب!»",
+      choices: [
+        { text: "💥 با تمام توان ادامه بده", next: "dragon_fight", courage: 3, wisdom: -1 },
+        { text: "🛡️ عقب بکش و نقشه بکش", next: "fire_battle_smart", courage: 1, wisdom: 3 }
+      ]
+    },
+    "fire_battle_smart": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #4a1a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=1600') center/cover",
+      text: "[PLAYER] متوجه شد که موجود از سایه‌اش قدرت می‌گیرد. با یک حرکت حساب‌شده، نور مشعل را به سمت سایه‌اش انداخت. موجود فریاد کشید و ناپدید شد.",
+      choices: [
+        { text: "🏆 پیروزی را جشن بگیریم", next: "victory_sword", courage: 2, wisdom: 1 },
+        { text: "🔍 ببینیم چه چیزی از او باقی ماند", next: "fire_loot", courage: 0, wisdom: 3 }
+      ]
+    },
+    "fire_loot": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #2a1a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=1600') center/cover",
+      text: "از خاکستر موجود، سنگی سیاه باقی ماند که نبض می‌زد. [COMPANION] گفت: «این همان قلب تاریکی است، نسخه‌ی کوچکش.» [PLAYER] آن را در کیسه‌اش گذاشت.",
+      choices: [
+        { text: "🔙 بازگردیم و به راه ادامه دهیم", next: "victory_sword", courage: 1, wisdom: 2 }
+      ]
+    },
+    "path_wisdom": {
+      chapter: "فصل چهارم: انتخاب",
+      bg: "radial-gradient(ellipse at 50% 50%, #0a1a2a 0%, #050507 75%), url('https://images.unsplash.com/photo-1519074002996-a69e7ac46a42?w=1600') center/cover",
+      text: "معبد باستانی در دل جنگل سر برآورده بود. دیوارهایی پوشیده از کتیبه‌های نورانی. [COMPANION] گفت: «اینجا محل نگهداری دانش باستانی است. اما نگهبانانی دارد...»",
+      choices: [
+        { text: "📖 وارد کتابخانه شویم", next: "library", courage: 0, wisdom: 3 },
+        { text: "🧘 در محراب مراقبه کنیم", next: "meditation", courage: 1, wisdom: 3 }
+      ]
+    },
+    "library": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #1a1a2a 0%, #050507 75%), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1600') center/cover",
+      text: "کتابخانه‌ای بی‌پایان. هزاران طومار باستانی. [PLAYER] یکی را باز کرد و صدایی از آن بیرون آمد: «آن‌که دانش را جستجو کند، باید بهایش را بپردازد...»",
+      choices: [
+        { text: "📜 طومار ممنوعه را بخوانیم", next: "forbidden_scroll", courage: 2, wisdom: 3 },
+        { text: "📚 فقط طومارهای امن را بخوانیم", next: "safe_scrolls", courage: 0, wisdom: 2 }
+      ]
+    },
+    "forbidden_scroll": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #2a0a2a 0%, #050507 75%), url('https://images.unsplash.com/photo-1533158307587-828f0a76ef46?w=1600') center/cover",
+      text: "طومار حاوی نقشه‌ای از قاره بود و رازی هولناک: نفرین قاره توسط یکی از قهرمانان باستانی ساخته شده بود که برای قدرت، همه‌چیز را فدا کرد. [COMPANION] لرزید: «[PLAYER]... شاید این سرنوشت تو هم باشد.»",
+      choices: [
+        { text: "💪 قسم بخوریم که هرگز مثل او نشویم", next: "oath", courage: 2, wisdom: 3 },
+        { text: "🤔 بیشتر تحقیق کنیم", next: "safe_scrolls", courage: 0, wisdom: 3 }
+      ]
+    },
+    "oath": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #2a2a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=1600') center/cover",
+      text: "[PLAYER] دستش را روی قلبش گذاشت و سوگند یاد کرد. نوری طلایی از سینه‌اش بیرون زد و طومار خاکستر شد. [COMPANION] لبخند زد: «این همان [PLAYER] است که می‌شناسم.» اما معبد لرزید...",
+      choices: [
+        { text: "⚔️ آماده‌ی نبرد شویم", next: "temple_battle", courage: 3, wisdom: 1 }
+      ]
+    },
+    "safe_scrolls": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #1a2a1a 0%, #050507 75%), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1600') center/cover",
+      text: "طومارها درباره‌ی تاریخ قاره بودند. [PLAYER] فهمید که هر صد سال، یک قهرمان انتخاب می‌شود تا تعادل را حفظ کند و این بار نوبت او بود. [COMPANION] گفت: «پس این تقدیر توست...»",
+      choices: [
+        { text: "🎯 تقدیر را بپذیریم", next: "temple_battle", courage: 2, wisdom: 2 },
+        { text: "🚫 علیه تقدیر بجنگیم", next: "temple_battle", courage: 3, wisdom: 0 }
+      ]
+    },
+    "meditation": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #1a1a3a 0%, #050507 75%), url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600') center/cover",
+      text: "[PLAYER] در محراب نشست. چشمانش را بست. در خوابی عمیق، روح قهرمانان باستانی را دید. آن‌ها به او قدرتی دادند، نه قدرت شمشیر، بلکه قدرت درک. وقتی بیدار شد، [COMPANION] گفت: «چشمانت عوض شده.»",
+      choices: [
+        { text: "🔮 از این قدرت استفاده کنیم", next: "temple_battle", courage: 1, wisdom: 3 }
+      ]
+    },
+    "path_shadow": {
+      chapter: "فصل چهارم: انتخاب",
+      bg: "radial-gradient(ellipse at 50% 50%, #0a0a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=1600') center/cover",
+      text: "باتلاق سایه‌ها. هوا سنگین و خفه بود. صداهایی زمزمه می‌کردند: «[PLAYER]... [PLAYER]... به ما بپیوند...» [COMPANION] دستش را محکم گرفت: «به صداها گوش نده!»",
+      choices: [
+        { text: "🌑 تسلیم صداها شویم", next: "shadow_surrender", courage: 1, wisdom: -3 },
+        { text: "⚔️ با صداها بجنگیم", next: "shadow_fight", courage: 3, wisdom: 1 },
+        { text: "🧠 با ذهنمان مقاومت کنیم", next: "shadow_resist", courage: 1, wisdom: 3 }
+      ]
+    },
+    "shadow_surrender": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #1a0a1a 0%, #050507 75%), url('https://images.unsplash.com/photo-1509248961158-e54f6934749c?w=1600') center/cover",
+      text: "[PLAYER] قدمی به جلو برداشت. سایه‌ها دورش حلقه زدند. اما [COMPANION] خود را میانشان انداخت: «اگر می‌خواهی [PLAYER] را ببری، اول باید مرا بکشی!» نوری از فداکاری [COMPANION] سایه‌ها را عقب راند.",
+      choices: [
+        { text: "💔 [COMPANION] را نجات بده", next: "save_friend_shadow", courage: 3, wisdom: 1 },
+        { text: "⚡ از فرصت استفاده کن و قدرتش را بگیر", next: "take_shadow_power", courage: 2, wisdom: -3 }
+      ]
+    },
+    "shadow_fight": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #2a0a2a 0%, #050507 75%), url('https://images.unsplash.com/photo-1547489432-cf93fa6c71ee?w=1600') center/cover",
+      text: "[PLAYER] شمشیر کشید و به سایه‌ها حمله کرد. هر ضربه، سایه‌ای را پراکنده می‌کرد، اما جای دیگری ظاهر می‌شد. [COMPANION] فریاد زد: «نمی‌شود با شمشیر شکستشان داد! باید راه دیگری بیابیم!»",
+      choices: [
+        { text: "🧠 به حرف [COMPANION] گوش بده", next: "shadow_resist", courage: 0, wisdom: 3 },
+        { text: "💥 با تمام توان ادامه بده", next: "shadow_surrender", courage: 3, wisdom: -2 }
+      ]
+    },
+    "shadow_resist": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #1a2a2a 0%, #050507 75%), url('https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=1600') center/cover",
+      text: "[PLAYER] چشمانش را بست و روی خاطراتش تمرکز کرد، خانه، دوستان، [COMPANION]. سایه‌ها از نور درونش عقب کشیدند. وقتی چشمانش را باز کرد، باتلاق خشک شده بود. [COMPANION] نفس‌نفس‌زنان: «چطور؟» [PLAYER] گفت: «با یادآوری چیزی که برایش می‌جنگم.»",
+      choices: [
+        { text: "⚔️ حالا به سمت برج تاریکی برویم", next: "dark_tower", courage: 2, wisdom: 2 }
+      ]
+    },
+    "commander_fight": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #4a0505 0%, #050507 75%), url('https://images.unsplash.com/photo-1547489432-cf93fa6c71ee?w=1600') center/cover",
+      text: "سردار تاریکی در برابرشان ایستاد. شمشیری از جنس شب در دست داشت. «شما بازماندگان قاره، امشب آخرین شب شماست.» [PLAYER] و [COMPANION] نگاهی به هم انداختند و همزمان حمله کردند.",
+      choices: [
+        { text: "⚔️ با هم حمله کنیم", next: "dual_attack", courage: 3, wisdom: 1 },
+        { text: "🛡️ یکی حمله کند، یکی دفاع", next: "tactical_fight", courage: 1, wisdom: 3 }
+      ]
+    },
+    "dual_attack": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #5a0a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=1600') center/cover",
+      text: "ضربه‌هایشان هماهنگ بود. سردار برای اولین بار عقب کشید. نوری عجیب از زخم‌هایش بیرون زد، نوری که شبیه نور قلب تاریکی بود. «شما نمی‌فهمید... من خودم قربانی بودم...»",
+      choices: [
+        { text: "🤔 به حرفش گوش بدهیم", next: "commander_truth", courage: 0, wisdom: 3 },
+        { text: "💀 تمامش کن", next: "kill_commander", courage: 3, wisdom: -1 }
+      ]
+    },
+    "tactical_fight": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #2a1a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600') center/cover",
+      text: "[COMPANION] دفاع کرد و [PLAYER] فرصت را یافت. ضربه‌ای دقیق به قلب سردار. اما در لحظه‌ی آخر، سردار چیزی زمزمه کرد: «نفرین... با مرگ من... آزاد می‌شود...»",
+      choices: [
+        { text: "⏸️ صبر کن و بشنو", next: "commander_truth", courage: 0, wisdom: 3 },
+        { text: "💀 حرفش را نادیده بگیر", next: "kill_commander", courage: 3, wisdom: -1 }
+      ]
+    },
+    "commander_truth": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #1a1a2a 0%, #050507 75%), url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600') center/cover",
+      text: "سردار سرش را پایین انداخت: «من اولین قهرمان این سرزمین بودم. قلب تاریکی مرا فریب داد. حالا می‌توانی مرا بکشی و نفرین را بشکنی، یا با من متحد شوی و قاره را آزاد کنی.» [COMPANION] زمزمه کرد: «تله است [PLAYER]...»",
+      choices: [
+        { text: "🤝 با او متحد شویم", next: "ally_commander", courage: 1, wisdom: 3 },
+        { text: "⚔️ به او اعتماد نکن و بجنگ", next: "kill_commander", courage: 3, wisdom: 0 }
+      ]
+    },
+    "ally_commander": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #2a2a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=1600') center/cover",
+      text: "سردار دستش را دراز کرد. [PLAYER] و [COMPANION] با هم قبول کردند. نور سفیدی از اتحادشان درخشید. سردار گفت: «حالا برویم و قلب تاریکی را برای همیشه نابود کنیم.»",
+      choices: [
+        { text: "🔥 به سمت قلب تاریکی برویم", next: "final_battle", courage: 3, wisdom: 1 }
+      ]
+    },
+    "kill_commander": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #4a0a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1547489432-cf93fa6c71ee?w=1600') center/cover",
+      text: "سردار با آخرین نفس گفت: «احمق... حالا نفرین... آزاد شد...» زمین لرزید و آسمان قرمز شد. [COMPANION] فریاد زد: «[PLAYER]! باید سریع برویم!»",
+      choices: [
+        { text: "🏃 به سمت قلب تاریکی بدویم", next: "final_battle", courage: 2, wisdom: 0 }
+      ]
+    },
+    "find_weakness": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #1a1a1a 0%, #050507 75%), url('https://images.unsplash.com/photo-1614732414444-096e5f1122d5?w=1600') center/cover",
+      text: "[PLAYER] با دقت به حرکات سردار نگاه کرد. متوجه شد که او از نور می‌ترسد. [COMPANION] فریاد زد: «مشعل! مشعل را به سمتش بگیر!» سردار عقب کشید...",
+      choices: [
+        { text: "💡 با نور حمله کنیم", next: "commander_truth", courage: 1, wisdom: 3 }
+      ]
+    },
+    "save_friend_shadow": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #2a1a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=1600') center/cover",
+      text: "[PLAYER] دست [COMPANION] را گرفت و از میان سایه‌ها بیرون کشید. «هیچ‌وقت تنهات نمی‌ذارم.» سایه‌ها از نور دوستی عقب کشیدند. [COMPANION] لبخند زد: «می‌دونستم...»",
+      choices: [
+        { text: "⚔️ به سمت برج تاریکی برویم", next: "dark_tower", courage: 3, wisdom: 1 }
+      ]
+    },
+    "take_shadow_power": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #3a0a3a 0%, #050507 75%), url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1600') center/cover",
+      text: "قدرت سایه‌ها درون [PLAYER] جاری شد. [COMPANION] با چشمانی اشک‌بار گفت: «این تو نیستی [PLAYER]...» اما [PLAYER] دیگر نمی‌شنید. صدای تاریکی درونش بلندتر بود.",
+      choices: [
+        { text: "😈 مسیر تاریکی را ادامه بده", next: "dark_ending_setup", courage: 3, wisdom: -3, ending: true },
+        { text: "💔 به خاطر [COMPANION] مقاومت کن", next: "fight_corruption", courage: 2, wisdom: 2 }
+      ]
+    },
+    "dragon_fight": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #6a0a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=1600') center/cover",
+      text: "اژدها آتش از دهانش بیرون داد. [PLAYER] و [COMPANION] جدا شدند. شمشیر آتش می‌درخشید. اما اژدها از آن هم قوی‌تر به نظر می‌رسید...",
+      choices: [
+        { text: "⚔️ با شمشیر آتش حمله کن", next: "dragon_defeated", courage: 3, wisdom: 0 },
+        { text: "🎯 به چشمش حمله کن", next: "dragon_defeated", courage: 1, wisdom: 3 }
+      ]
+    },
+    "dragon_talk": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #3a2a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1600') center/cover",
+      text: "[PLAYER] شمشیرش را پایین آورد: «ما برای جنگ نیامده‌ایم. به دنبال حقیقتیم.» اژدها سرش را پایین آورد: «سالیان درازی منتظر کسی بودم که با کلمات بیاید نه شمشیر. بشنوید...»",
+      choices: [
+        { text: "👂 به حرف اژدها گوش کن", next: "dragon_truth", courage: 0, wisdom: 3 }
+      ]
+    },
+    "dragon_truth": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #2a2a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=1600') center/cover",
+      text: "اژدها گفت: «قلب تاریکی نفرین نیست، آزمون است. هر قهرمانی که به آن نزدیک شود، با خودش روبرو می‌شود. اگر شکست بخورد، تبدیل به هیولا می‌شود. اگر پیروز شود، قاره آزاد می‌شود.»",
+      choices: [
+        { text: "🎯 به سمت قلب تاریکی برویم", next: "final_battle", courage: 2, wisdom: 3 }
+      ]
+    },
+    "dragon_defeated": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #5a1a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1547489432-cf93fa6c71ee?w=1600') center/cover",
+      text: "اژدها با غرشی هولناک فرود آمد. [PLAYER] شمشیرش را بر قلبش فرو کرد. نوری سرخ همه‌جا را فرا گرفت. وقتی همه‌چیز آرام شد، اژدها تبدیل به مردی پیر شده بود: «ممنون که آزادم کردی...»",
+      choices: [
+        { text: "🗺️ راه را ادامه بدهیم", next: "final_battle", courage: 2, wisdom: 1 }
+      ]
+    },
+    "temple_battle": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #2a1a3a 0%, #050507 75%), url('https://images.unsplash.com/photo-1547489432-cf93fa6c71ee?w=1600') center/cover",
+      text: "نگهبانان معبد بیدار شدند، مجسمه‌های سنگی که جان گرفتند. [COMPANION] گفت: «[PLAYER]! این‌ها محافظان دانش باستانی هستند! شاید بتوانیم بدون جنگ رد شویم...»",
+      choices: [
+        { text: "🕊️ با آرامش رد شویم", next: "final_battle", courage: 0, wisdom: 3 },
+        { text: "⚔️ بجنگیم", next: "temple_battle_win", courage: 3, wisdom: 0 }
+      ]
+    },
+    "temple_battle_win": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #3a1a3a 0%, #050507 75%), url('https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=1600') center/cover",
+      text: "با ضربه‌ی نهایی [PLAYER]، آخرین مجسمه فرو ریخت. اما از میان خاک، نوری طلایی بیرون زد، دروازه‌ای به سمت قلب تاریکی باز شده بود.",
+      choices: [
+        { text: "🚪 از دروازه بگذریم", next: "final_battle", courage: 2, wisdom: 0 }
+      ]
+    },
+    "dark_tower": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #0a0a1a 0%, #050507 75%), url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1600') center/cover",
+      text: "برج تاریکی تا آسمان قد کشیده بود. در بالای آن، قلب تاریکی می‌تپید. [COMPANION] گفت: «[PLAYER]، این آخرین قدم است. هر چه اتفاق بیفتد، ممنونم که تا اینجا همراهم بودی.»",
+      choices: [
+        { text: "🤝 «ما با هم پیروز می‌شویم»", next: "final_battle", courage: 3, wisdom: 1 },
+        { text: "🙏 «اگر برنگشتم، ازت ممنونم»", next: "final_battle", courage: 1, wisdom: 3 }
+      ]
+    },
+    "victory_sword": {
+      chapter: "فصل پنجم: نبرد",
+      bg: "radial-gradient(ellipse at 50% 50%, #2a2a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=1600') center/cover",
+      text: "[PLAYER] و [COMPANION] پیروز از کوه پایین آمدند. اما هنوز قلب تاریکی در انتظارشان بود. مسیر پیش رو هنوز تمام نشده...",
+      choices: [
+        { text: "🏰 به سمت برج تاریکی برویم", next: "final_battle", courage: 2, wisdom: 1 }
+      ]
+    },
+    "final_battle": {
+      chapter: "فصل ششم: نبرد نهایی",
+      bg: "radial-gradient(ellipse at 50% 50%, #5a0a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=1600') center/cover",
+      text: "قلب تاریکی در برابرشان بود، جواهری که همه‌چیز را آغاز کرد. ناگهان جواهر شروع به تپیدن کرد و صدایی از آن برخاست: «[PLAYER]... سرانجام رسیدی. حالا انتخاب کن: قدرت من را بگیر، یا نابودم کن.» [COMPANION] دستش را روی شانه‌اش گذاشت.",
+      choices: [
+        { text: "💎 قدرت را بگیرم", next: "ending_power", courage: 3, wisdom: -2, ending: true },
+        { text: "💥 جواهر را نابود کنم", next: "ending_destroy", courage: 2, wisdom: 2, ending: true },
+        { text: "🤝 [COMPANION] را در تصمیم شریک کنم", next: "ending_share", courage: 1, wisdom: 3, ending: true },
+        { text: "🚫 از قدرت و نابودی هر دو چشم‌پوشی کنم و بروم", next: "ending_walk", courage: 0, wisdom: 3, ending: true }
+      ]
+    },
+    "ending_power": {
+      chapter: "پایان",
+      bg: "radial-gradient(ellipse at 50% 50%, #4a0a2a 0%, #050507 75%), url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1600') center/cover",
+      text: "دست [PLAYER] جواهر را گرفت. قدرتی عظیم درونش جاری شد. اما چشمانش سیاه شد و خنده‌ای سرد کرد. [COMPANION] فریاد زد: «[PLAYER]! نه!» اما دیگر دیر شده بود...",
+      ending: {
+        title: "پایان: قهرمانِ تاریکی",
+        text: "[PLAYER] به هیولایی تبدیل شد که سال‌ها از آن می‌ترسید. [COMPANION] با چشمانی اشک‌بار نظاره‌گر بود که دوستش به تاریکی ابدی می‌پیوندد. قاره تاریک‌تر از همیشه شد. اما در گوشه‌ای از ذهن هیولا، هنوز نام [COMPANION] می‌درخشید..."
+      }
+    },
+    "ending_destroy": {
+      chapter: "پایان",
+      bg: "radial-gradient(ellipse at 50% 50%, #2a3a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=1600') center/cover",
+      text: "[PLAYER] شمشیر را در قلب جواهر فرو کرد. نوری سفید همه‌جا را فرا گرفت. جواهر خرد شد. سکوت... و سپس نوری طلایی بر قاره تابید. تاریکی از بین رفت.",
+      ending: {
+        title: "پایان: سپیده‌دم",
+        text: "قلب تاریکی نابود شد. قاره بار دیگر نور را دید. [PLAYER] و [COMPANION] در کنار هم ایستادند و به طلوع نگاه کردند. قهرمانان بازگشتند، نه به خاطر قدرت، بلکه به خاطر دوستی و شجاعت. نامشان تا ابد در افسانه‌های قاره تاریک خواهد درخشید."
+      }
+    },
+    "ending_share": {
+      chapter: "پایان",
+      bg: "radial-gradient(ellipse at 50% 50%, #2a2a1a 0%, #050507 75%), url('https://images.unsplash.com/photo-1502134249126-9f3755a50d78?w=1600') center/cover",
+      text: "[PLAYER] دست [COMPANION] را گرفت. «با هم. مثل همیشه.» با هم به سمت جواهر رفتند. نورشان با هم یکی شد. جواهر ترک خورد و به هزاران ستاره تبدیل شد که آسمان را روشن کرد.",
+      ending: {
+        title: "پایان: دو قهرمان",
+        text: "قدرت جواهر بین [PLAYER] و [COMPANION] تقسیم شد. آن‌ها قهرمانان قاره شدند، نه یک نفر، بلکه دو نفر که همیشه با هم بودند. افسانه‌ی آن‌ها نسل به نسل نقل شد: دو دوست که تاریکی را با دوستی شکستند."
+      }
+    },
+    "ending_walk": {
+      chapter: "پایان",
+      bg: "radial-gradient(ellipse at 50% 50%, #1a1a2a 0%, #050507 75%), url('https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600') center/cover",
+      text: "[PLAYER] به [COMPANION] نگاه کرد و لبخند زد: «این قدرت نه مال من است، نه مال تو. بگذار قاره خودش سرنوشتش را انتخاب کند.» پشت کردند و راه بازگشت را در پیش گرفتند.",
+      ending: {
+        title: "پایان: راه آزاد",
+        text: "[PLAYER] و [COMPANION] بدون اینکه جواهر را لمس کنند، قاره را ترک کردند. آن‌ها فهمیدند که بعضی قدرت‌ها نباید به دست کسی بیفتد. در راه بازگشت، به هم نگاه کردند و خندیدند. قهرمان واقعی کسی است که می‌داند چه چیزی را نباید بگیرد. افسانه‌ی آن‌ها داستان خرد و آزادی شد."
+      }
+    },
+    "dark_ending_setup": {
+      chapter: "پایان",
+      bg: "radial-gradient(ellipse at 50% 50%, #2a0a2a 0%, #050507 75%), url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1600') center/cover",
+      text: "[PLAYER] به سمت برج تاریکی رفت، با چشمانی سیاه و قلبی سرد. [COMPANION] دنبالش دوید: «[PLAYER]! صبر کن! من می‌تونم کمکت کنم!» اما [PLAYER] دیگر نمی‌شنید...",
+      ending: {
+        title: "پایان: سقوط در تاریکی",
+        text: "[PLAYER] به قلب تاریکی رسید و بدون تردید آن را در آغوش گرفت. قدرتی بی‌پایان اما بی‌روح. [COMPANION] در سکوت نظاره‌گر بود که دوستش تبدیل به سایه‌ای می‌شود که خودش زمانی با او می‌جنگید. قاره تاریک‌تر از همیشه شد. و در گوشه‌ای، هنوز هم صدای [COMPANION] به گوش می‌رسد: «[PLAYER]... برگرد...»"
+      }
+    },
+    "retreat": {
+      chapter: "فصل دوم: کشف",
+      bg: "radial-gradient(ellipse at 50% 50%, #0a1a0a 0%, #050507 75%), url('https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1600') center/cover",
+      text: "[PLAYER] و [COMPANION] از ویرانه عقب کشیدند. «شاید باید راه دیگری پیدا کنیم.» اما در بیرون، چیزی در انتظارشان بود...",
+      choices: [
+        { text: "🌲 به سمت جنگل تاریک برویم", next: "dark_forest", courage: 0, wisdom: 2 }
+      ]
+    }
   }
-  sc.choices.forEach(c=>{
-    const b=document.createElement("button");b.className="btn";b.textContent=fmt(c.text);
-    b.onclick=()=>makeChoice(c.nextScene,c);box.appendChild(b);
+};
+
+/* ============================================================
+   وضعیت بازی
+   ============================================================ */
+const gameState = {
+  playerName: "",
+  companionName: "",
+  currentScene: "",
+  choices: [],
+  courage: 0,
+  wisdom: 0,
+  sceneCount: 0,
+  muted: false
+};
+
+/* ============================================================
+   سیستم روایت صوتی پیشرفته برای Chrome
+   ============================================================ */
+let currentUtterance = null;
+let narrateQueue = [];
+let isNarrating = false;
+let voicesReady = false;
+
+// بارگذاری صداها
+function initVoices() {
+  if (!('speechSynthesis' in window)) {
+    console.warn('⚠️ مرورگر از speechSynthesis پشتیبانی نمی‌کند');
+    return;
+  }
+  const voices = speechSynthesis.getVoices();
+  if (voices.length > 0) {
+    voicesReady = true;
+    console.log('✅ صداها لود شدند. تعداد:', voices.length);
+    const faVoices = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('fa'));
+    if (faVoices.length > 0) {
+      console.log('🇮🇷 صدای فارسی پیدا شد:', faVoices.map(v => v.name));
+    } else {
+      console.warn('⚠️ صدای فارسی پیدا نشد! لطفاً از تنظیمات ویندوز نصب کنید.');
+    }
+  }
+}
+
+if ('speechSynthesis' in window) {
+  initVoices();
+  speechSynthesis.onvoiceschanged = initVoices;
+  setTimeout(initVoices, 300);
+  setTimeout(initVoices, 1000);
+  setTimeout(initVoices, 2000);
+}
+
+function getPersianVoice() {
+  const voices = speechSynthesis.getVoices();
+  if (voices.length === 0) return null;
+
+  // اولویت‌بندی صداها
+  const priorities = [
+    v => v.lang === 'fa-IR' && v.localService,
+    v => v.lang === 'fa-IR',
+    v => v.lang && v.lang.toLowerCase() === 'fa',
+    v => v.name && (v.name.includes('Persian') || v.name.includes('Farsi')),
+    v => v.lang && v.lang.toLowerCase().startsWith('fa'),
+  ];
+
+  for (const check of priorities) {
+    const found = voices.find(check);
+    if (found) return found;
+  }
+  return null;
+}
+
+// پاکسازی متن از ایموجی‌ها و علائم خاص
+function cleanTextForSpeech(text) {
+  return text
+    .replace(/\[PLAYER\]/g, gameState.playerName)
+    .replace(/\[COMPANION\]/g, gameState.companionName)
+    // حذف ایموجی‌ها و کاراکترهای خاص
+    .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+    .replace(/[\u{2600}-\u{27BF}]/gu, '')
+    .replace(/[⚔🛡📖🗡💎🔥🌑⚡🧙🏃💥👁🔦🤫⛏🚶📜⚱🔍✋💪🛌🌉🌲🤝🌙🗣🙏🤨🚫🎯🐉💡💀⏸😨😈💔🤔🚪🏰🏆🔙🌫🏛⛰🌊🏔🗺✨🔄🔊🔇💾🔁✅◆]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// شکستن متن طولانی به تکه‌های کوچک
+function splitTextForSpeech(text, maxLen = 170) {
+  if (text.length <= maxLen) return [text];
+
+  // شکستن بر اساس علائم نگارشی
+  const parts = text.split(/(?<=[.!?؟،؛:])\s+/);
+  const chunks = [];
+  let current = '';
+
+  for (const part of parts) {
+    if ((current + ' ' + part).trim().length <= maxLen) {
+      current = current ? current + ' ' + part : part;
+    } else {
+      if (current) chunks.push(current.trim());
+      if (part.length > maxLen) {
+        // شکستن به کلمات
+        const words = part.split(/\s+/);
+        let buf = '';
+        for (const w of words) {
+          if ((buf + ' ' + w).trim().length <= maxLen) {
+            buf = buf ? buf + ' ' + w : w;
+          } else {
+            if (buf) chunks.push(buf.trim());
+            buf = w;
+          }
+        }
+        current = buf;
+      } else {
+        current = part;
+      }
+    }
+  }
+  if (current) chunks.push(current.trim());
+  return chunks.filter(c => c.length > 0);
+}
+
+function narrateText(text) {
+  if (gameState.muted) {
+    console.log('🔇 صدا قطع است');
+    return;
+  }
+  if (!('speechSynthesis' in window)) {
+    console.warn('⚠️ speechSynthesis موجود نیست');
+    return;
+  }
+
+  stopNarration();
+
+  const cleanText = cleanTextForSpeech(text);
+  if (!cleanText) return;
+
+  console.log('🎤 شروع روایت:', cleanText.substring(0, 50) + '...');
+
+  const chunks = splitTextForSpeech(cleanText, 170);
+  narrateQueue = chunks;
+  isNarrating = true;
+
+  // تاخیر کوچک برای اطمینان از لغو قبلی
+  setTimeout(() => {
+    speakNextChunk();
+  }, 150);
+}
+
+function speakNextChunk() {
+  if (!isNarrating || narrateQueue.length === 0 || gameState.muted) {
+    isNarrating = false;
+    return;
+  }
+
+  const chunk = narrateQueue.shift();
+  const u = new SpeechSynthesisUtterance(chunk);
+
+  const voice = getPersianVoice();
+  if (voice) {
+    u.voice = voice;
+    u.lang = voice.lang;
+  } else {
+    u.lang = 'fa-IR';
+    // اگر فارسی نبود، سعی کن عربی
+    const voices = speechSynthesis.getVoices();
+    const arVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('ar'));
+    if (arVoice) {
+      u.voice = arVoice;
+      u.lang = arVoice.lang;
+    }
+  }
+
+  u.rate = 0.9;
+  u.pitch = 1;
+  u.volume = 1;
+
+  u.onstart = () => console.log('▶️ در حال خواندن:', chunk.substring(0, 30) + '...');
+
+  u.onend = () => {
+    if (isNarrating && narrateQueue.length > 0 && !gameState.muted) {
+      // فاصله کوتاه بین جمله‌ها
+      setTimeout(speakNextChunk, 120);
+    } else {
+      isNarrating = false;
+      console.log('✅ روایت تمام شد');
+    }
+  };
+
+  u.onerror = (e) => {
+    console.warn('❌ خطا در صدا:', e.error);
+    if (e.error === 'interrupted' || e.error === 'canceled') {
+      isNarrating = false;
+      return;
+    }
+    // ادامه با تکه بعدی
+    if (isNarrating && narrateQueue.length > 0) {
+      setTimeout(speakNextChunk, 200);
+    }
+  };
+
+  currentUtterance = u;
+  try {
+    speechSynthesis.speak(u);
+  } catch(e) {
+    console.error('خطا در speak:', e);
+    isNarrating = false;
+  }
+}
+
+function stopNarration() {
+  if ('speechSynthesis' in window) {
+    isNarrating = false;
+    narrateQueue = [];
+    try {
+      speechSynthesis.cancel();
+    } catch(e) {}
+    currentUtterance = null;
+  }
+}
+
+function replayNarration() {
+  const scene = gameData.scenes[gameState.currentScene];
+  if (!scene) return;
+  narrateText(scene.text);
+}
+
+function toggleMute() {
+  gameState.muted = !gameState.muted;
+  const btn = document.getElementById('muteBtn');
+  if (gameState.muted) {
+    btn.textContent = '🔇';
+    btn.classList.add('active');
+    stopNarration();
+  } else {
+    btn.textContent = '🔊';
+    btn.classList.remove('active');
+    replayNarration();
+  }
+}
+
+/* ============================================================
+   شروع بازی
+   ============================================================ */
+function startGame() {
+  const p = document.getElementById('inPlayerName').value.trim() || 'حسین';
+  const c = document.getElementById('inCompanionName').value.trim() || 'علی';
+
+  gameState.playerName = p;
+  gameState.companionName = c;
+  gameState.courage = 0;
+  gameState.wisdom = 0;
+  gameState.choices = [];
+  gameState.sceneCount = 0;
+  gameState.currentScene = "start";
+
+  document.getElementById('hudPlayer').textContent = p;
+  document.getElementById('hudCompanion').textContent = c;
+
+  document.getElementById('introScreen').classList.add('hide');
+  setTimeout(() => {
+    document.getElementById('introScreen').style.display = 'none';
+    document.getElementById('gameScreen').classList.add('active');
+    loadScene("start");
+  }, 800);
+
+  initParticles();
+}
+
+/* ============================================================
+   بارگذاری صحنه
+   ============================================================ */
+function loadScene(sceneId) {
+  const scene = gameData.scenes[sceneId];
+  if (!scene) { console.error('صحنه پیدا نشد:', sceneId); return; }
+
+  gameState.currentScene = sceneId;
+  gameState.sceneCount++;
+
+  // پس‌زمینه
+  const bgEl = document.getElementById('sceneBg');
+  bgEl.classList.remove('visible');
+  setTimeout(() => {
+    bgEl.style.background = scene.bg;
+    bgEl.style.backgroundSize = 'cover';
+    bgEl.style.backgroundPosition = 'center';
+    bgEl.classList.add('visible');
+  }, 100);
+
+  // HUD
+  document.getElementById('hudChapter').textContent = scene.chapter || '—';
+  document.getElementById('hudSceneNum').textContent = `صحنه ${gameState.sceneCount}`;
+  document.getElementById('hudCourage').textContent = gameState.courage;
+  document.getElementById('hudWisdom').textContent = gameState.wisdom;
+
+  // متن
+  const processedText = scene.text
+    .replace(/\[PLAYER\]/g, `<span class="emph">${gameState.playerName}</span>`)
+    .replace(/\[COMPANION\]/g, `<span class="emph">${gameState.companionName}</span>`);
+
+  const choicesEl = document.getElementById('choicesContainer');
+  choicesEl.innerHTML = '';
+
+  const textEl = document.getElementById('dialogueText');
+  typewriterEffect(processedText, textEl, () => {
+    renderChoices(scene);
+    narrateText(scene.text);
+  });
+
+  setTimeout(saveGame, 500);
+}
+
+/* ============================================================
+   افکت تایپ
+   ============================================================ */
+let typingTimer = null;
+function typewriterEffect(htmlText, element, callback) {
+  clearInterval(typingTimer);
+
+  const temp = document.createElement('div');
+  temp.innerHTML = htmlText;
+  const plainLength = temp.textContent.length;
+
+  let result = '';
+  let charIndex = 0;
+  let visible = 0;
+  let i = 0;
+
+  const tokens = [];
+  while (i < htmlText.length) {
+    if (htmlText[i] === '<') {
+      const end = htmlText.indexOf('>', i);
+      tokens.push({ type: 'tag', value: htmlText.slice(i, end + 1) });
+      i = end + 1;
+    } else {
+      tokens.push({ type: 'char', value: htmlText[i] });
+      i++;
+    }
+  }
+
+  element.innerHTML = '';
+
+  typingTimer = setInterval(() => {
+    let added = false;
+    while (charIndex < tokens.length) {
+      const t = tokens[charIndex];
+      result += t.value;
+      charIndex++;
+      if (t.type === 'char') {
+        visible++;
+        added = true;
+        break;
+      }
+    }
+    element.innerHTML = result + '<span class="cursor"></span>';
+
+    if (!added || visible >= plainLength) {
+      clearInterval(typingTimer);
+      element.innerHTML = result;
+      if (callback) callback();
+    }
+  }, 22);
+}
+
+/* ============================================================
+   نمایش انتخاب‌ها
+   ============================================================ */
+function renderChoices(scene) {
+  const container = document.getElementById('choicesContainer');
+  container.innerHTML = '';
+
+  if (!scene.choices || scene.choices.length === 0) return;
+
+  scene.choices.forEach((choice, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice';
+    btn.style.animationDelay = (idx * 0.08) + 's';
+
+    let label = choice.text
+      .replace(/\[PLAYER\]/g, gameState.playerName)
+      .replace(/\[COMPANION\]/g, gameState.companionName);
+
+    let effectLabel = '';
+    if (choice.courage) {
+      effectLabel += `<span class="effect">⚔${choice.courage > 0 ? '+' : ''}${choice.courage}</span>`;
+    }
+    if (choice.wisdom) {
+      effectLabel += `<span class="effect">📖${choice.wisdom > 0 ? '+' : ''}${choice.wisdom}</span>`;
+    }
+
+    btn.innerHTML = `<span class="arrow">◆</span> ${label} ${effectLabel}`;
+    btn.onclick = () => makeChoice(choice);
+    container.appendChild(btn);
   });
 }
-function showEnding(){
-  const g=gameState,f=g.flags;
-  const id=f.amulet?"e1":f.cold?"e4":(g.courage>=g.wisdom?"e2":"e3");
-  loadScene(id);
+
+/* ============================================================
+   انجام انتخاب
+   ============================================================ */
+function makeChoice(choice) {
+  stopNarration();
+
+  if (choice.courage) gameState.courage += choice.courage;
+  if (choice.wisdom) gameState.wisdom += choice.wisdom;
+
+  gameState.choices.push({
+    scene: gameState.currentScene,
+    choice: choice.text
+  });
+
+  if (choice.ending) {
+    setTimeout(() => {
+      const endScene = gameData.scenes[choice.next];
+      if (endScene && endScene.ending) {
+        showEnding(endScene.ending);
+      } else {
+        loadScene(choice.next);
+      }
+    }, 300);
+  } else {
+    loadScene(choice.next);
+  }
 }
-function makeChoice(next,c){
-  stopSpeech();pendingPrefix=fmt(c.text);
-  gameState.courage+=c.courage;gameState.wisdom+=c.wisdom;
-  if(c.flag)gameState.flags[c.flag]=1;
-  gameState.choices.push({from:gameState.currentScene,text:c.text});
-  next==="?"?showEnding():loadScene(next);
+
+/* ============================================================
+   نمایش پایان
+   ============================================================ */
+function showEnding(endingData) {
+  const endScreen = document.getElementById('endingScreen');
+  const titleEl = document.getElementById('endingTitle');
+  const textEl = document.getElementById('endingText');
+  const statsEl = document.getElementById('endingStats');
+
+  titleEl.textContent = endingData.title;
+  textEl.innerHTML = endingData.text
+    .replace(/\[PLAYER\]/g, `<span style="color:var(--gold-bright);font-weight:700">${gameState.playerName}</span>`)
+    .replace(/\[COMPANION\]/g, `<span style="color:var(--gold-bright);font-weight:700">${gameState.companionName}</span>`);
+
+  statsEl.innerHTML = `
+    <div class="ending-stat"><span class="lbl">شجاعت</span><span class="v">${gameState.courage}</span></div>
+    <div class="ending-stat"><span class="lbl">خرد</span><span class="v">${gameState.wisdom}</span></div>
+    <div class="ending-stat"><span class="lbl">تعداد صحنه</span><span class="v">${gameState.sceneCount}</span></div>
+    <div class="ending-stat"><span class="lbl">انتخاب‌ها</span><span class="v">${gameState.choices.length}</span></div>
+  `;
+
+  narrateText(endingData.text);
+
+  endScreen.classList.add('active');
+  localStorage.removeItem('darkContinentSave');
 }
-function stopSpeech(){try{speechSynthesis.cancel();}catch(e){}}
-let pendingPrefix="";
-function pickVoice(){const vs=speechSynthesis.getVoices();return vs.find(v=>/^fa/i.test(v.lang))||vs.find(v=>/^ar/i.test(v.lang))||null;}
-function narrateText(text){
-  const pre=pendingPrefix;pendingPrefix="";
-  if(muted||!("speechSynthesis" in window))return;
-  stopSpeech();
-  const parts=((pre?pre+". ":"")+text).replace(/\n+/g,". ").split(/(?<=[.؛:!؟?])\s+/).filter(Boolean);
-  setTimeout(()=>{
-    const v=pickVoice();
-    parts.forEach(p=>{const u=new SpeechSynthesisUtterance(p);u.lang=v?v.lang:"fa-IR";if(v)u.voice=v;u.rate=.9;speechSynthesis.speak(u);});
-  },150);
+
+/* ============================================================
+   ذخیره و بارگذاری
+   ============================================================ */
+function saveGame() {
+  try {
+    localStorage.setItem('darkContinentSave', JSON.stringify({
+      ...gameState,
+      timestamp: Date.now()
+    }));
+    const btn = document.getElementById('saveBtn');
+    btn.textContent = '✅';
+    setTimeout(() => btn.textContent = '💾', 1200);
+  } catch(e) { console.warn('ذخیره ناموفق:', e); }
 }
-function toggleMute(){muted=!muted;$("muteBtn").textContent=muted?"🔇":"🔊";if(muted)stopSpeech();else narrateText(fullText);}
-function saveGame(){
-  try{localStorage.setItem("dc_save",JSON.stringify(gameState));$("muteBtn").blur();alert("بازی ذخیره شد.");}
-  catch(e){alert("ذخیره‌سازی در این مرورگر ممکن نیست.");}
+
+function loadGame() {
+  try {
+    const raw = localStorage.getItem('darkContinentSave');
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    Object.assign(gameState, saved);
+
+    document.getElementById('hudPlayer').textContent = gameState.playerName;
+    document.getElementById('hudCompanion').textContent = gameState.companionName;
+
+    document.getElementById('introScreen').style.display = 'none';
+    document.getElementById('gameScreen').classList.add('active');
+
+    loadScene(gameState.currentScene);
+  } catch(e) { console.warn('بارگذاری ناموفق:', e); }
 }
-function loadGame(){
-  try{
-    const d=JSON.parse(localStorage.getItem("dc_save"));if(!d)return;
-    Object.assign(gameState,d);
-    $("intro").style.display="none";$("game").style.display="block";loadScene(d.currentScene);
-  }catch(e){alert("ذخیره‌ای پیدا نشد.");}
+
+function restartGame() {
+  stopNarration();
+  localStorage.removeItem('darkContinentSave');
+  document.getElementById('endingScreen').classList.remove('active');
+  document.getElementById('gameScreen').classList.remove('active');
+  document.getElementById('introScreen').style.display = 'flex';
+  document.getElementById('introScreen').classList.remove('hide');
+  document.getElementById('inPlayerName').value = '';
+  document.getElementById('inCompanionName').value = '';
+  gameState.courage = 0;
+  gameState.wisdom = 0;
+  gameState.choices = [];
+  gameState.sceneCount = 0;
 }
+
+/* ============================================================
+   ذرات
+   ============================================================ */
+function initParticles() {
+  const container = document.getElementById('particles');
+  if (!container || container.dataset.done) return;
+  container.dataset.done = '1';
+
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (6 + Math.random() * 8) + 's';
+    p.style.animationDelay = (Math.random() * 5) + 's';
+    p.style.width = p.style.height = (1 + Math.random() * 3) + 'px';
+    if (Math.random() > 0.7) {
+      p.style.background = 'var(--blood-bright)';
+      p.style.boxShadow = '0 0 8px var(--blood-bright)';
+    }
+    container.appendChild(p);
+  }
+}
+
+/* ============================================================
+   راه‌اندازی
+   ============================================================ */
+window.addEventListener('DOMContentLoaded', () => {
+  initParticles();
+
+  if (localStorage.getItem('darkContinentSave')) {
+    document.getElementById('loadBtn').style.display = 'block';
+  }
+
+  document.getElementById('inPlayerName').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('inCompanionName').focus();
+  });
+  document.getElementById('inCompanionName').addEventListener('keydown', e => {
+    if (e.key === 'Enter') startGame();
+  });
+
+  window.addEventListener('beforeunload', () => {
+    if (gameState.currentScene && gameState.playerName) saveGame();
+  });
+});
 </script>
 </body>
 </html>
