@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>قاره‌ی تاریک</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07060a;--blood:#8b1a1a;--gold:#c9a227;--smoke:#1c2733;--text:#e8dcc4;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#07060a}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font-family:'Vazirmatn',Tahoma,sans-serif;overflow:hidden}
+#stage{position:fixed;inset:0;transition:opacity .8s,background 1s;background:#000}
+#stage::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,#000 5%,rgba(0,0,0,.35) 45%,rgba(0,0,0,.6));}
+.ember{position:fixed;bottom:-10px;width:3px;height:3px;border-radius:50%;background:#e25822;box-shadow:0 0 6px #e25822;opacity:0;animation:rise linear infinite;z-index:1}
+@keyframes rise{0%{opacity:0;transform:translateY(0)}15%{opacity:.9}100%{opacity:0;transform:translateY(-95vh) translateX(40px)}}
+.bar{position:fixed;left:0;right:0;height:7vh;background:#000;z-index:5}
+.bar.t{top:0}.bar.b{bottom:0}
+#intro,#game{position:fixed;inset:0;z-index:4}
+#intro{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;text-align:center}
+h1{font-size:clamp(2.2rem,8vw,4.5rem);margin:0;color:var(--gold);text-shadow:0 0 25px var(--blood),0 3px 0 #000;font-weight:900}
+.sub{opacity:.7;margin:0 0 10px}
+label{display:block;text-align:right;color:var(--gold);font-size:.95rem;margin-bottom:4px}
+input{width:min(340px,86vw);padding:12px;background:rgba(0,0,0,.65);border:1px solid #5a4a1a;color:var(--text);font:inherit;border-radius:4px;outline:none}
+input:focus{border-color:var(--gold);box-shadow:0 0 12px rgba(201,162,39,.4)}
+.btn{font:inherit;cursor:pointer;color:var(--text);background:linear-gradient(#34302c,#1a1816);border:1px solid #6b5a2a;padding:11px 20px;border-radius:4px;box-shadow:inset 0 1px 0 #555,0 3px 8px #000;transition:.25s}
+.btn:hover{border-color:var(--gold);box-shadow:0 0 16px rgba(201,162,39,.55),inset 0 1px 0 #666;color:#fff;transform:translateY(-2px)}
+.btn.big{font-size:1.2rem;padding:13px 38px;background:linear-gradient(#6b1515,#2e0707);border-color:var(--gold);font-weight:700}
+#game{display:none}
+#hud{position:absolute;top:calc(7vh + 8px);left:0;right:0;display:flex;justify-content:space-between;align-items:flex-start;padding:0 14px;gap:8px;flex-wrap:wrap;font-size:.85rem}
+#chapter{color:var(--gold);font-weight:700;letter-spacing:1px}
+.names{color:var(--text);background:rgba(0,0,0,.55);padding:4px 12px;border:1px solid #4a3d18;border-radius:3px}
+.stats{display:flex;gap:10px;background:rgba(0,0,0,.55);padding:4px 12px;border:1px solid #4a3d18;border-radius:3px}
+.stats b{color:var(--gold)}
+#tools{position:absolute;top:calc(7vh + 48px);left:14px;display:flex;gap:6px}
+#tools .btn{padding:5px 11px;font-size:.85rem}
+#panel{position:absolute;right:50%;transform:translateX(50%);bottom:calc(7vh + 10px);width:min(900px,94vw);background:rgba(8,6,6,.78);border:1px solid #4a3d18;border-radius:6px;padding:18px 20px;box-shadow:0 0 40px #000;backdrop-filter:blur(3px)}
+#text{font-size:clamp(1rem,2.6vw,1.3rem);line-height:2;min-height:4.5em;cursor:pointer}
+#choices{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+#choices .btn{flex:1 1 220px;text-align:center;animation:fade .6s}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1}}
+.end{color:var(--gold);font-weight:900}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div class="bar t"></div><div class="bar b"></div>
+
+<div id="intro">
+  <h1>قاره‌ی تاریک</h1>
+  <p class="sub">یک ماجرای تاریک و سینمایی</p>
+  <div><label for="pn">نام قهرمان شما:</label><input id="pn" maxlength="20" placeholder="مثلاً آرش"></div>
+  <div><label for="cn">نام همراه شما:</label><input id="cn" maxlength="20" placeholder="مثلاً سیمرغ"></div>
+  <button class="btn big" onclick="startGame()">شروع ماجرا</button>
+  <button class="btn" id="contBtn" onclick="loadGame()" style="display:none">ادامه‌ی بازی ذخیره‌شده</button>
+</div>
+
+<div id="game">
+  <div id="hud">
+    <div id="chapter"></div>
+    <div class="names" id="names"></div>
+    <div class="stats"><span>شجاعت: <b id="cour">0</b></span><span>خرد: <b id="wis">0</b></span></div>
+  </div>
+  <div id="tools">
+    <button class="btn" id="muteBtn" onclick="toggleMute()">🔊</button>
+    <button class="btn" onclick="saveGame()">ذخیره</button>
+  </div>
+  <div id="panel"><div id="text"></div><div id="choices"></div></div>
+</div>
+
+<script>
+const CH={a:"فصل ۱ · آغاز",d:"فصل ۲ · کشف",k:"فصل ۳ · خطر",m:"فصل ۴ · انتخاب",b:"فصل ۵ · نبرد",e:"فصل ۶ · پایان"};
+const BG={
+a:["radial-gradient(ellipse at 50% 100%,#2b3a4a,#0b1118 70%)","radial-gradient(ellipse at 30% 90%,#1e2c3a,#05080c 75%)","linear-gradient(180deg,#0a0f16,#27323f 90%)"],
+d:["radial-gradient(ellipse at 50% 20%,#5a1212 0,#140a0c 60%)","radial-gradient(ellipse at 70% 80%,#3a2a12,#0c0806 70%)","linear-gradient(160deg,#1c1410,#3b2a14)","radial-gradient(circle at 50% 50%,#7a1010,#0a0405 65%)","radial-gradient(circle at 50% 60%,#9b1c1c,#0a0304 60%)"],
+k:["linear-gradient(180deg,#1a0808,#4a1010)","radial-gradient(circle at 50% 100%,#6a1a0a,#0a0505 70%)","linear-gradient(200deg,#0c0f14,#1c1f28)","radial-gradient(circle at 20% 80%,#8a2a0a,#080404 65%)","radial-gradient(ellipse at 50% 100%,#7a2200,#0b0504 70%)","linear-gradient(180deg,#0e0d12,#2a2230)"],
+m:["radial-gradient(circle at 50% 50%,#2a2438,#07060a 70%)","radial-gradient(circle at 50% 50%,#5a1818,#0a0506 70%)","radial-gradient(circle at 50% 50%,#1a3248,#05080c 70%)","radial-gradient(circle at 50% 50%,#3a3012,#0a0805 70%)"],
+b:["radial-gradient(ellipse at 50% 0,#7a1111,#0a0405 65%)","linear-gradient(180deg,#1a0505,#600e0e)","linear-gradient(180deg,#0a0a18,#2a1a4a)","radial-gradient(circle at 50% 70%,#9a2a0a,#0a0303 60%)","radial-gradient(circle at 50% 50%,#c9a227 0,#4a0e0e 35%,#050202 75%)","linear-gradient(180deg,#14100c,#3a2a1a)"],
+e:["radial-gradient(circle at 50% 40%,#5a0e0e,#030202 70%)","radial-gradient(circle at 50% 90%,#c9a227,#2a1a08 45%,#050403 85%)","radial-gradient(circle at 50% 50%,#2a4a6a,#050810 75%)","radial-gradient(circle at 50% 100%,#2a2a2a,#050505 70%)"]};
+
+const gameData={scenes:{}};
+function s(id,text,ch){gameData.scenes[id]={id,background:BG[id[0]][(parseInt(id.slice(1))-1)%BG[id[0]].length],text,
+ choices:ch.map(c=>({text:c[0],nextScene:c[1],courage:c[2]||0,wisdom:c[3]||0,flag:c[4]}))};}
+
+// آغاز
+s("a1","[PLAYER] و [COMPANION] پا بر ساحل خاکستری قاره‌ی تاریک گذاشتند. مه غلیظ بود و از دوردست زوزه‌ای می‌آمد.",[["مشعل روشن کنیم","a2",0,1],["بی‌صدا در سایه‌ها برویم","a3",1,0]]);
+s("a2","نور مشعل جنگلی از درختان سوخته را نشان داد. [COMPANION] زمزمه کرد: «این‌جا کسی پیش‌تر آمده است.»",[["رد پاها را دنبال کنیم","d1",1,0],["مسیر دیگری برگزینیم","a3",0,1]]);
+s("a3","مه کنار رفت و در برابرشان دره‌ای عمیق پدیدار شد؛ در انتهایش ستون‌های شکسته‌ی شهری باستانی می‌درخشید.",[["به سوی ویرانه‌ها برویم","d1",1,0],["ابتدا دره را بررسی کنیم","d1",0,1]]);
+// کشف
+s("d1","ویرانه‌ها زیر ماه سرخ خاموش بودند. دروازه‌ای نیمه‌باز، [PLAYER] را به درون فرا می‌خواند.",[["وارد تالار شویم","d2",1,0],["اطراف را بگردیم","d3",0,1]]);
+s("d2","در تالار، مجسمه‌ی جنگجویی بی‌سر ایستاده بود. [COMPANION] دست [PLAYER] را گرفت: «چیزی ما را می‌پاید.»",[["جلوتر برویم","d4",1,0],["مجسمه را بررسی کنیم","d4",0,1]]);
+s("d3","بر دیوار بیرونی کتیبه‌ای کهن بود: «آن‌که تعویذ را بردارد، سایه‌ها را بیدار می‌کند.»",[["کتیبه را به خاطر بسپاریم","d4",0,1],["نادیده‌اش بگیریم","d4",1,0]]);
+s("d4","در عمق ویرانه، تعویذی سرخ بر محرابی سنگی می‌تپید، گویی قلبی زنده بود.",[["تعویذ را برداریم","d5",1,0],["پیش از لمس، نمادها را بخوانیم","d5",0,1]]);
+s("d5","زمین لرزید و چشمان تاریکی در همه‌جا گشوده شد. مرده‌ها از خاک برخاستند.",[["آماده‌ی نبرد شویم","k1",1,0],["راه فرار بجوییم","k3",0,1]]);
+// خطر
+s("k1","اسکلت‌های زره‌پوش حلقه زدند. [PLAYER] شمشیر کشید و [COMPANION] ورد سپر خواند.",[["حمله کنیم","k2",1,0],["سپر را نگه داریم","k2",0,1]]);
+s("k2","نبرد سخت بود؛ تیغی بر بازوی [PLAYER] نشست، اما صف دشمن شکست.",[["پیش برویم","k4",1,0],["زخم را ببندیم","k4",0,1]]);
+s("k3","آن‌ها به سردابی تنگ خزیدند. نفس‌ها حبس بود و بالای سرشان پنجه‌ها خاک را می‌کندند.",[["منتظر بمانیم","k4",0,1],["راه پنهانی را بکاویم","k4",1,0]]);
+s("k4","سگ‌های آتشین از دل مه بیرون آمدند و [COMPANION] بر لبه‌ی پرتگاه لغزید.",[["[COMPANION] را نجات دهیم","k5",2,0,"saved"],["از مسیر بالا بگذریم","k6",0,1]]);
+s("k5","[PLAYER] دست [COMPANION] را گرفت و کشید. هر دو نفس‌زنان بر سنگ افتادند؛ پیوندشان محکم‌تر شد.",[["ادامه دهیم","m1",0,1]]);
+s("k6","[PLAYER] تنها از تخته‌سنگ‌ها گذشت. [COMPANION] با زحمت خود را رساند، اما نگاهش سرد بود.",[["ادامه دهیم","m1",0,1]]);
+// انتخاب
+s("m1","در غاری، پیرمردی با چشمان خاکستری گفت: «تعویذ سه راه دارد: قدرت، دانایی یا وفا. کدام را می‌خواهی؟»",[["قدرت","m2",1,0],["دانایی","m3",0,1],["وفا","m4",1,1]]);
+s("m2","تعویذ در دست [PLAYER] گرم شد و نجوا کرد: «تاج جهان از آن توست.»",[["نجوا را بپذیریم","m5",2,0,"dark"],["نجوا را پس بزنیم","m5",0,1]]);
+s("m3","پیرمرد کتابی کهن گشود: ملکه‌ی خاکستر با قلب تعویذ زنده است.",[["رمز نابودی را بیاموزیم","m6",0,2],["کتاب را رها کنیم","m6",1,0]]);
+s("m4","[COMPANION] گفت: «هرچه شود، تنها نمی‌روی.» پیرمرد لبخند زد.",[["سوگند همراهی بخوریم","m7",1,1],["بر او تکیه کنیم","m7",0,1]]);
+s("m5","دره‌ای پر از اسیر پیش رویشان بود؛ زنجیرها با بهای تعویذ می‌شکست.",[["آزادشان کنیم","m8",2,0],["بگذریم","m8",0,0,"dark"]]);
+s("m6","بر پلی باریک نگهبانی معما پرسید: «چه چیز با بخشیدن بیشتر می‌شود؟»",[["پاسخ دهیم: دانایی","m8",0,2],["با شمشیر گذر کنیم","m8",2,0]]);
+s("m7","[COMPANION] زخمی شد و باید میان درمان او و شتاب در راه تصمیم می‌گرفتند.",[["او را درمان کنیم","m8",0,2],["با هم پیش برویم","m8",2,0]]);
+s("m8","برج خاکستر پیدا شد. تعویذ می‌لرزید؛ نگه داشتنش قدرت می‌داد و نابودی‌اش خطر.",[["تعویذ را نگه داریم","b1",1,0,"amulet"],["برای نابودی‌اش آماده شویم","b1",0,1]]);
+// نبرد
+s("b1","در تالار تخت، ملکه‌ی خاکستر با تاجی از دود نشسته بود و خندید: «آمده‌اید که بمیرید؟»",[["حمله کنیم","b2",2,0],["رمز کتیبه را بخوانیم","b3",0,2]]);
+s("b2","شمشیر [PLAYER] جرقه زد و ملکه عقب نشست؛ اما سایه‌ها چون مار بر پاهایشان پیچیدند.",[["سایه‌ها را ببریم","b4",1,0],["عقب بکشیم","b4",0,1]]);
+s("b3","کلمات باستانی تالار را لرزاند و ملکه فریاد کشید؛ نور سرخ تعویذ لرزید.",[["ورد را کامل کنیم","b4",0,2],["ورد را رها و حمله کنیم","b4",1,0]]);
+s("b4","ملکه با پنجه‌ای [COMPANION] را بر زمین کوبید. [PLAYER] فقط یک لحظه فرصت داشت.",[["به [COMPANION] برسیم","b5",2,0],["ضربه‌ی نهایی را بزنیم","b5",0,1,"cold"]]);
+s("b5","تعویذ سرخ درخشید و ملکه به سوی آن دست دراز کرد؛ همه‌چیز به یک لحظه رسیده بود.",[["تعویذ را بر ملکه بکوبیم","b6",1,1],["تعویذ را در شعله بیندازیم","b6",0,2]]);
+s("b6","تالار فرو ریخت. گرد و غبار که نشست، سکوتی سنگین ماند.",[["بیرون برویم","?",0,0]]);
+// پایان
+s("e1","[PLAYER] تاج خاکستر را بر سر نهاد. جهان زانو زد، اما [COMPANION] با اندوه از او دور شد.\n\nپایان: تاجدار تنها",[]);
+s("e2","[PLAYER] شمشیر برافراشته از ویرانه بیرون آمد، [COMPANION] در کنارش. قاره‌ی تاریک نامی تازه یافت.\n\nپایان: قهرمان سپیده",[]);
+s("e3","[PLAYER] با دانایی تعویذ را خاموش کرد و [COMPANION] داستانشان را نوشت.\n\nپایان: فرزانه‌ی خاموش",[]);
+s("e4","ضربه فرود آمد و ملکه افتاد، اما [COMPANION] دیگر برنخاست. [PLAYER] تنها از ویرانه بازگشت.\n\nپایان: بهای پیروزی",[]);
+
+const gameState={playerName:"",companionName:"",currentScene:"",choices:[],courage:0,wisdom:0,flags:{}};
+let muted=false,timer=null,typing=false,fullText="";
+const $=id=>document.getElementById(id);
+const fmt=t=>t.replace(/\[PLAYER\]/g,gameState.playerName).replace(/\[COMPANION\]/g,gameState.companionName);
+
+// ذرات
+for(let i=0;i<28;i++){const e=document.createElement("span");e.className="ember";e.style.left=Math.random()*100+"%";e.style.animationDuration=(6+Math.random()*9)+"s";e.style.animationDelay=(Math.random()*8)+"s";document.body.appendChild(e);}
+try{if(localStorage.getItem("dc_save"))$("contBtn").style.display="";}catch(e){}
+
+function startGame(){
+  gameState.playerName=$("pn").value.trim()||"قهرمان";
+  gameState.companionName=$("cn").value.trim()||"همراه";
+  Object.assign(gameState,{choices:[],courage:0,wisdom:0,flags:{}});
+  $("intro").style.display="none";$("game").style.display="block";
+  loadScene("a1");
+}
+function updateHud(){
+  $("cour").textContent=gameState.courage;$("wis").textContent=gameState.wisdom;
+  $("names").textContent="⚔ "+gameState.playerName+"  ·  ✦ "+gameState.companionName;
+}
+function loadScene(id){
+  const sc=gameData.scenes[id];gameState.currentScene=id;
+  $("stage").style.opacity=0;
+  setTimeout(()=>{$("stage").style.background=sc.background;$("stage").style.opacity=1;},350);
+  $("chapter").textContent=CH[id[0]];updateHud();
+  $("choices").innerHTML="";
+  const txt=fmt(sc.text);fullText=txt;
+  narrateText(txt);
+  typewriterEffect(txt,$("text"),()=>showChoices(sc));
+}
+function typewriterEffect(text,el,cb){
+  clearInterval(timer);el.textContent="";let i=0;typing=true;
+  const done=()=>{clearInterval(timer);el.textContent=text;typing=false;cb&&cb();};
+  el.onclick=()=>{if(typing)done();};
+  timer=setInterval(()=>{el.textContent=text.slice(0,++i);if(i>=text.length)done();},32);
+}
+function showChoices(sc){
+  const box=$("choices");box.innerHTML="";
+  if(sc.id[0]==="e"){
+    const st=document.createElement("div");st.className="end";st.style.width="100%";
+    st.textContent="شجاعت: "+gameState.courage+"  |  خرد: "+gameState.wisdom;box.appendChild(st);
+    const b=document.createElement("button");b.className="btn big";b.textContent="شروع دوباره با نام‌های تازه";
+    b.onclick=()=>{stopSpeech();$("game").style.display="none";$("intro").style.display="flex";$("pn").value="";$("cn").value="";};
+    box.appendChild(b);return;
+  }
+  sc.choices.forEach(c=>{
+    const b=document.createElement("button");b.className="btn";b.textContent=fmt(c.text);
+    b.onclick=()=>makeChoice(c.nextScene,c);box.appendChild(b);
+  });
+}
+function showEnding(){
+  const g=gameState,f=g.flags;
+  const id=f.amulet?"e1":f.cold?"e4":(g.courage>=g.wisdom?"e2":"e3");
+  loadScene(id);
+}
+function makeChoice(next,c){
+  stopSpeech();pendingPrefix=fmt(c.text);
+  gameState.courage+=c.courage;gameState.wisdom+=c.wisdom;
+  if(c.flag)gameState.flags[c.flag]=1;
+  gameState.choices.push({from:gameState.currentScene,text:c.text});
+  next==="?"?showEnding():loadScene(next);
+}
+function stopSpeech(){try{speechSynthesis.cancel();}catch(e){}}
+let pendingPrefix="";
+function pickVoice(){const vs=speechSynthesis.getVoices();return vs.find(v=>/^fa/i.test(v.lang))||vs.find(v=>/^ar/i.test(v.lang))||null;}
+function narrateText(text){
+  const pre=pendingPrefix;pendingPrefix="";
+  if(muted||!("speechSynthesis" in window))return;
+  stopSpeech();
+  const parts=((pre?pre+". ":"")+text).replace(/\n+/g,". ").split(/(?<=[.؛:!؟?])\s+/).filter(Boolean);
+  setTimeout(()=>{
+    const v=pickVoice();
+    parts.forEach(p=>{const u=new SpeechSynthesisUtterance(p);u.lang=v?v.lang:"fa-IR";if(v)u.voice=v;u.rate=.9;speechSynthesis.speak(u);});
+  },150);
+}
+function toggleMute(){muted=!muted;$("muteBtn").textContent=muted?"🔇":"🔊";if(muted)stopSpeech();else narrateText(fullText);}
+function saveGame(){
+  try{localStorage.setItem("dc_save",JSON.stringify(gameState));$("muteBtn").blur();alert("بازی ذخیره شد.");}
+  catch(e){alert("ذخیره‌سازی در این مرورگر ممکن نیست.");}
+}
+function loadGame(){
+  try{
+    const d=JSON.parse(localStorage.getItem("dc_save"));if(!d)return;
+    Object.assign(gameState,d);
+    $("intro").style.display="none";$("game").style.display="block";loadScene(d.currentScene);
+  }catch(e){alert("ذخیره‌ای پیدا نشد.");}
+}
+</script>
+</body>
+</html>
